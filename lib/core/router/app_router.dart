@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:remalux_ar/core/services/storage_service.dart';
 import 'package:remalux_ar/features/home/presentation/pages/home_page.dart';
+import 'package:remalux_ar/features/store/presentation/pages/store_page.dart';
 import 'package:remalux_ar/features/storybook/presentation/pages/storybook.dart';
 import 'package:remalux_ar/core/widgets/main_tabbar_screen.dart';
 import 'package:remalux_ar/features/onboarding/presentation/pages/onboarding_page.dart';
@@ -29,6 +30,11 @@ class AppRouter {
             path: '/',
             name: 'home',
             builder: (context, state) => const HomePage(),
+          ),
+          GoRoute(
+            path: '/store',
+            name: 'store',
+            builder: (context, state) => const StorePage(),
           ),
         ],
       ),

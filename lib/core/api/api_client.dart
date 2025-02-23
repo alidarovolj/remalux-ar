@@ -28,12 +28,20 @@ class ApiClient {
     _addInterceptors();
   }
 
-  Future<Map<String, dynamic>> get(String endpoint) async {
+  Future<Map<String, dynamic>?> get(
+    String endpoint, {
+    Map<String, dynamic>? queryParameters,
+  }) async {
     try {
-      final response = await dio.get(endpoint);
-      return response.data;
+      final response = await dio.get(
+        endpoint,
+        queryParameters: queryParameters,
+      );
+      return response.data as Map<String, dynamic>;
     } on DioException catch (e) {
-      throw Exception(e.message);
+      print('API Error: ${e.message}');
+      print('Response: ${e.response?.data}');
+      return null;
     }
   }
 

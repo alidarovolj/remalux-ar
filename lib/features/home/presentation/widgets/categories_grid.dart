@@ -5,6 +5,7 @@ import 'package:remalux_ar/core/widgets/section_widget.dart';
 import 'package:remalux_ar/features/home/domain/models/category.dart';
 import 'package:remalux_ar/features/home/presentation/providers/categories_provider.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:go_router/go_router.dart';
 
 class CategoriesGrid extends ConsumerWidget {
   const CategoriesGrid({super.key});
@@ -16,7 +17,9 @@ class CategoriesGrid extends ConsumerWidget {
     return SectionWidget(
       title: 'Категории',
       buttonTitle: 'В магазин',
-      onButtonPressed: () {},
+      onButtonPressed: () {
+        context.push('/store');
+      },
       child: categoriesAsync.when(
         data: (categories) => GridView.builder(
           shrinkWrap: true,

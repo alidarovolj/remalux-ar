@@ -2,17 +2,29 @@ import 'package:remalux_ar/core/api/api_client.dart';
 import 'package:remalux_ar/features/home/domain/models/category.dart';
 
 class CategoriesRepository {
-  final ApiClient _apiClient;
+  final ApiClient _apiClient = ApiClient();
 
-  CategoriesRepository({ApiClient? apiClient})
-      : _apiClient = apiClient ?? ApiClient();
+  Future<List<Category>> getCategories() async {
+    try {
+      final response =
+          await _apiClient.get('/categories/all', queryParameters: {
+        'page': '1',
+        'perPage': '10',
+      });
 
-  Future<List<Category>> getCategories({int page = 1, int perPage = 10}) async {
-    final response = await _apiClient.get(
-      '/categories/all?page=$page&perPage=$perPage',
-    );
+      if (response == null) {
+        throw Exception('API response is null');
+      }
 
-    final List<dynamic> data = response['data'];
-    return data.map((json) => Category.fromJson(json)).toList();
+      final List<dynamic> data = response['data'];
+
+      final categories = data.map((json) {
+        return Category.fromJson(json as Map<String, dynamic>);
+      }).toList();
+
+      return categories;
+    } catch (e, stackTrace) {
+      throw Exception('Failed to load categories: $e');
+    }
   }
 }
