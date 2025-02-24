@@ -12,19 +12,86 @@ final filtersProvider = FutureProvider<List<Filter>>((ref) async {
   return repository.getFilters();
 });
 
-final selectedFiltersProvider = StateProvider<List<int>>((ref) => []);
+final selectedFiltersProvider =
+    StateNotifierProvider<SelectedFiltersNotifier, Set<int>>((ref) {
+  return SelectedFiltersNotifier();
+});
+
+class SelectedFiltersNotifier extends StateNotifier<Set<int>> {
+  SelectedFiltersNotifier() : super({});
+
+  void toggleFilter(int id) {
+    final newState = Set<int>.from(state);
+    if (state.contains(id)) {
+      newState.remove(id);
+    } else {
+      newState.add(id);
+    }
+    state = newState;
+  }
+
+  void reset() {
+    state = {};
+  }
+}
+
 final searchQueryProvider = StateProvider<String>((ref) => '');
 final currentPageProvider = StateProvider<int>((ref) => 1);
 
-final productsProvider = FutureProvider<List<ProductVariant>>((ref) async {
-  final repository = ref.read(productsRepositoryProvider);
-  final selectedFilters = ref.watch(selectedFiltersProvider);
-  final searchQuery = ref.watch(searchQueryProvider);
-  final currentPage = ref.watch(currentPageProvider);
+final sortingProvider = StateProvider<String?>((ref) => null);
 
-  return repository.getProducts(
-    page: currentPage,
-    filterIds: selectedFilters,
-    searchQuery: searchQuery,
-  );
+class ProductsNotifier extends StateNotifier<AsyncValue<ProductsResponse>> {
+  final ProductsRepository _repository;
+
+  ProductsNotifier(this._repository) : super(const AsyncValue.loading()) {
+    fetchProducts();
+  }
+
+  Future<void> fetchProducts({Map<String, dynamic>? queryParams}) async {
+    state = const AsyncValue.loading();
+
+    try {
+      final filterIds = queryParams?.entries
+          .where((e) => e.key.startsWith('filter_ids['))
+          .map((e) => int.parse(e.value))
+          .toList();
+
+      final orderBy = queryParams?['order_by'];
+
+      final response = await _repository.getProducts(
+        filterIds: filterIds,
+        orderBy: orderBy,
+        page: 1,
+        perPage: 50,
+      );
+
+      if (mounted) {
+        state = AsyncValue.data(response);
+      }
+    } catch (error, stackTrace) {
+      if (mounted) {
+        state = AsyncValue.error(error, stackTrace);
+      }
+    }
+  }
+}
+
+class ProductsResponse {
+  final List<ProductVariant> data;
+  final Meta meta;
+
+  ProductsResponse({required this.data, required this.meta});
+}
+
+class Meta {
+  final int total;
+
+  Meta({required this.total});
+}
+
+final productsProvider =
+    StateNotifierProvider<ProductsNotifier, AsyncValue<ProductsResponse>>(
+        (ref) {
+  final repository = ref.read(productsRepositoryProvider);
+  return ProductsNotifier(repository);
 });

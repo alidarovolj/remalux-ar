@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -28,13 +29,13 @@ class SectionWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Row(
             children: [
               Text(
                 title,
-                style: const TextStyle(
-                  fontSize: 20,
+                style: GoogleFonts.ysabeau(
+                  fontSize: 19,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
                 ),

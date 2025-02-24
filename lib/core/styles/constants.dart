@@ -27,6 +27,7 @@ class AppColors {
 
   // Border colors
   static const Color borderColor = Color.fromRGBO(245, 245, 245, 1);
+  static const Color borderDark = Color.fromRGBO(38, 52, 79, 1);
 
   // Background colors
   static const Color backgroundLight = Color.fromRGBO(247, 247, 248, 1);
@@ -35,6 +36,7 @@ class AppColors {
   static const Color dividerColor = Color.fromRGBO(211, 217, 223, 1);
   // Button colors
   static const Color buttonColor = Color.fromRGBO(240, 242, 244, 1);
+  static const Color buttonSecondary = Color.fromRGBO(244, 246, 250, 1);
   static const Color buttonClose = Color.fromRGBO(234, 237, 240, 1);
   static const Color buttonText = Color(0xFFFFFFFF);
 

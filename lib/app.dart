@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
         title: 'Smart Medica',
         theme: appTheme.copyWith(
           scaffoldBackgroundColor: AppColors.white,
-          textTheme: GoogleFonts.ysabeauInfantTextTheme(),
+          textTheme: GoogleFonts.openSansTextTheme(),
         ),
         routerConfig: AppRouter.router,
       ),

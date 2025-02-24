@@ -26,7 +26,7 @@ class ProductsGrid extends StatelessWidget {
       itemBuilder: (context, index) {
         final product = products[index];
         return ProductItem(
-          product: product,
+          product: product.attributes['product'] as Product,
           onAddToCart: onAddToCart != null ? () => onAddToCart!(product) : null,
         );
       },

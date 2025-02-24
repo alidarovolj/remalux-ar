@@ -3,45 +3,106 @@ import 'package:flutter/foundation.dart';
 @immutable
 class ProductVariant {
   final int id;
-  final String value;
   final String sku;
+  final String value;
   final int quantity;
-  final String imageUrl;
-  final Product product;
+  final String image_url;
   final double price;
-  final double? discountPrice;
-  final bool isFavourite;
+  final double? discount_price;
+  final bool is_favourite;
   final double? rating;
+  final bool isActive;
+  final bool isAvailable;
+  final Map<String, dynamic> attributes;
 
-  const ProductVariant({
+  ProductVariant({
     required this.id,
-    required this.value,
     required this.sku,
+    required this.value,
     required this.quantity,
-    required this.imageUrl,
-    required this.product,
+    required this.image_url,
     required this.price,
-    this.discountPrice,
-    required this.isFavourite,
+    this.discount_price,
+    required this.is_favourite,
     this.rating,
+    required this.isActive,
+    required this.isAvailable,
+    required this.attributes,
   });
 
   factory ProductVariant.fromJson(Map<String, dynamic> json) {
+    // Create attributes map with product data
+    final Map<String, dynamic> attributes = {};
+
+    // If product exists in json, add it to attributes
+    if (json['product'] != null) {
+      attributes['product'] = json['product'];
+    }
+
+    // Add any existing attributes
+    if (json['attributes'] != null &&
+        json['attributes'] is Map<String, dynamic>) {
+      attributes.addAll(json['attributes'] as Map<String, dynamic>);
+    }
+
     return ProductVariant(
       id: json['id'] as int,
-      value: json['value'] as String,
-      sku: json['sku'] as String,
-      quantity: json['quantity'] as int,
-      imageUrl: json['image_url'] as String,
-      product: Product.fromJson(json['product'] as Map<String, dynamic>),
-      price: (json['price'] as num).toDouble(),
-      discountPrice: json['discount_price'] == null
+      sku: json['sku'] as String? ?? '',
+      value: json['value'] as String? ?? '',
+      quantity: json['quantity'] as int? ?? 0,
+      image_url: json['image_url'] as String? ?? '',
+      price: (json['price'] as num?)?.toDouble() ?? 0.0,
+      discount_price: json['discount_price'] == null
           ? null
           : (json['discount_price'] as num).toDouble(),
-      isFavourite: json['is_favourite'] as bool,
+      is_favourite: json['is_favourite'] as bool? ?? false,
       rating:
           json['rating'] == null ? null : (json['rating'] as num).toDouble(),
+      isActive: json['is_active'] as bool? ?? false,
+      isAvailable: json['is_available'] as bool? ?? false,
+      attributes: attributes,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'sku': sku,
+      'value': value,
+      'quantity': quantity,
+      'image_url': image_url,
+      'price': price,
+      'discount_price': discount_price,
+      'is_favourite': is_favourite,
+      'rating': rating,
+      'is_active': isActive,
+      'is_available': isAvailable,
+      'attributes': attributes,
+    };
+  }
+}
+
+class PriceRange {
+  final double from;
+  final double to;
+
+  PriceRange({
+    required this.from,
+    required this.to,
+  });
+
+  factory PriceRange.fromJson(Map<String, dynamic> json) {
+    return PriceRange(
+      from: (json['from'] as num?)?.toDouble() ?? 0.0,
+      to: (json['to'] as num?)?.toDouble() ?? 0.0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'from': from,
+      'to': to,
+    };
   }
 }
 
@@ -85,9 +146,10 @@ class Product {
       id: json['id'] as int,
       title: Map<String, String>.from(json['title']),
       description: Map<String, String>.from(json['description']),
-      filterData: (json['filter_data'] as List<dynamic>)
-          .map((data) => FilterData.fromJson(data as Map<String, dynamic>))
-          .toList(),
+      filterData: (json['filter_data'] as List<dynamic>?)
+              ?.map((data) => FilterData.fromJson(data as Map<String, dynamic>))
+              .toList() ??
+          [],
       article: json['article'] as String,
       alias: json['alias'] as String,
       category: Category.fromJson(json['category'] as Map<String, dynamic>),
@@ -95,10 +157,25 @@ class Product {
       isColorable: json['is_colorable'] as bool,
       isActive: json['is_active'] as bool,
       priceRange: (json['price_range'] as List<dynamic>)
-          .map((price) => (price as num).toDouble())
+          .map((price) => (price is num
+              ? price.toDouble()
+              : (double.tryParse(price.toString()) ?? 0.0)))
           .toList(),
       isFavourite: json['is_favourite'] as bool,
-      expense: (json['expense'] as num).toDouble(),
+      expense: json['expense'] == null
+          ? 150.0
+          : json['expense'] is num
+              ? (json['expense'] as num).toDouble()
+              : json['expense'] is Map
+                  ? ((json['expense'] as Map)['value'] == null
+                      ? 150.0
+                      : ((json['expense'] as Map)['value'] is num
+                          ? ((json['expense'] as Map)['value'] as num)
+                              .toDouble()
+                          : (double.tryParse(((json['expense'] as Map)['value'])
+                                  .toString()) ??
+                              150.0)))
+                  : 150.0,
       rating:
           json['rating'] == null ? null : (json['rating'] as num).toDouble(),
       group: json['group'] == null

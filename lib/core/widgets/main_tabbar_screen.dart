@@ -24,7 +24,7 @@ class _MainTabBarScreenState extends ConsumerState<MainTabBarScreen>
 
   final Map<String, int> _routesToTabIndex = {
     '/': 0,
-    '/catalog': 1,
+    '/store': 1,
     '/ar': 2,
     '/cart': 3,
     '/profile': 4,
@@ -32,7 +32,7 @@ class _MainTabBarScreenState extends ConsumerState<MainTabBarScreen>
 
   final Map<int, String> _tabIndexToRoutes = {
     0: '/',
-    1: '/catalog',
+    1: '/store',
     2: '/ar',
     3: '/cart',
     4: '/profile',

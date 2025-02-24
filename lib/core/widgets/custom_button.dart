@@ -11,6 +11,8 @@ class CustomButton extends StatefulWidget {
   final bool isFullWidth; // Растягивать ли кнопку на всю ширину
   final bool isLoading; // Add this line
   final bool isBackGradient;
+  final Color? backgroundColor; // Add this line
+  final Color? textColor; // Add this line
 
   const CustomButton({
     super.key,
@@ -21,6 +23,8 @@ class CustomButton extends StatefulWidget {
     this.isFullWidth = true, // По умолчанию на всю ширину
     this.isLoading = false, // Add this line
     this.isBackGradient = false,
+    this.backgroundColor, // Add this line
+    this.textColor, // Add this line
   });
 
   @override
@@ -89,9 +93,10 @@ class _CustomButtonState extends State<CustomButton> {
             : null,
         color: widget.isBackGradient
             ? null
-            : widget.isEnabled
-                ? AppColors.primary
-                : AppColors.buttonDisabled,
+            : widget.backgroundColor ??
+                (widget.isEnabled
+                    ? AppColors.primary
+                    : AppColors.buttonDisabled),
         borderRadius: BorderRadius.circular(AppLength.xs),
       ),
       child: MaterialButton(
@@ -124,9 +129,10 @@ class _CustomButtonState extends State<CustomButton> {
             : AnimatedDefaultTextStyle(
                 duration: const Duration(milliseconds: 200),
                 style: _textStyle.copyWith(
-                  color: widget.isEnabled
-                      ? AppColors.white
-                      : AppColors.textSecondary,
+                  color: widget.textColor ??
+                      (widget.isEnabled
+                          ? AppColors.white
+                          : AppColors.textSecondary),
                 ),
                 child: Text(widget.label),
               ),
