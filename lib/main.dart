@@ -9,49 +9,78 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:remalux_ar/core/providers/auth/auth_state.dart';
 // import 'package:remalux_ar/features/auth/presentation/pages/auth_check_page.dart';
 import 'package:remalux_ar/core/services/analytics_service.dart';
+// import 'package:chucker_flutter/chucker_flutter.dart';
 
 Future<void> main() async {
-  await dotenv.load();
-  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await dotenv.load();
+    WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase
-  // await initializeFirebase();
+    // Initialize Chucker
+    // ChuckerFlutter.showOnRelease = false;
 
-  // Initialize Amplitude
-  final amplitudeApiKey = dotenv.env['AMPLITUDE_API_KEY'];
-  if (amplitudeApiKey != null) {
-    await AnalyticsService.init(amplitudeApiKey);
-  }
+    // Initialize Firebase
+    // await initializeFirebase();
 
-  // Request notification permissions
-  // await requestNotificationPermissions();
+    // Initialize Amplitude
+    final amplitudeApiKey = dotenv.env['AMPLITUDE_API_KEY'];
+    if (amplitudeApiKey != null) {
+      await AnalyticsService.init(amplitudeApiKey);
+    }
 
-  // Set up notification listeners
-  // setupNotificationListeners();
+    // Request notification permissions
+    // await requestNotificationPermissions();
 
-  await initializeDateFormatting('ru', null);
+    // Set up notification listeners
+    // setupNotificationListeners();
 
-  // Check if user has seen onboarding
-  final hasSeenOnboarding = await StorageService.hasSeenOnboarding();
+    await initializeDateFormatting('ru', null);
 
-  runApp(
-    ProviderScope(
-      child: Consumer(
-        builder: (context, ref, child) {
-          // Initialize auth state
-          ref.read(authProvider.notifier).initializeAuth();
+    // Check if user has seen onboarding
+    final hasSeenOnboarding = await StorageService.hasSeenOnboarding();
 
-          // If user hasn't seen onboarding, redirect to it
-          if (!hasSeenOnboarding) {
-            Future.microtask(() => StorageService.setHasSeenOnboarding());
-            return const MyApp(initialRoute: '/onboarding');
-          }
+    runApp(
+      ProviderScope(
+        child: Consumer(
+          builder: (context, ref, child) {
+            try {
+              // Initialize auth state
+              ref.read(authProvider.notifier).initializeAuth();
+            } catch (e) {
+              print('Ошибка инициализации авторизации: $e');
+            }
 
-          return const MyApp(initialRoute: '/');
-        },
+            // If user hasn't seen onboarding, redirect to it
+            if (!hasSeenOnboarding) {
+              Future.microtask(() => StorageService.setHasSeenOnboarding());
+              return const MyApp(initialRoute: '/onboarding');
+            }
+
+            return const MyApp(initialRoute: '/');
+          },
+        ),
       ),
-    ),
-  );
+    );
+  } catch (e) {
+    print('Ошибка запуска: $e');
+    // Запускаем минимальное приложение в случае ошибки
+    runApp(
+      MaterialApp(
+        home: Scaffold(
+          appBar: AppBar(
+            title: const Text('Remalux Error'),
+          ),
+          body: Center(
+            child: Text(
+              'Произошла ошибка при запуске: $e',
+              style: const TextStyle(fontSize: 16, color: Colors.red),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class StorageService {

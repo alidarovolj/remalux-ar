@@ -33,7 +33,7 @@ dependencies:
   google_fonts: ^6.2.1
   fluttertoast: ^8.2.10
   flutter_datetime_picker: ^1.5.1
-  shared_preferences: ^2.2.2
+  shared_preferences: ^2.5.2
   flutter_secure_storage: ^9.2.4
   yandex_mapkit: ^4.1.0
   geolocator: ^13.0.2
@@ -42,6 +42,8 @@ dependencies:
   dots_indicator: ^3.0.0
   amplitude_flutter: ^3.13.0
   shimmer: ^3.0.0
+  chucker_flutter: ^1.8.3
+  flutter_html: ^3.0.0-beta.2
 
 dev_dependencies:
   flutter_test:
@@ -58,6 +60,8 @@ flutter:
     - lib/core/assets/icons/selector/
     - lib/core/assets/icons/sections/
     - lib/core/assets/images/
+    - lib/core/assets/icons/blobs/
     - lib/core/assets/images/logos/
     - lib/core/assets/images/onboarding/
-    - lib/core/assets/icons/pin.png
+    - lib/core/assets/pdf/
+    - lib/core/assets/images/colors/

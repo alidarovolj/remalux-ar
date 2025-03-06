@@ -8,3 +8,15 @@ final newsProvider = FutureProvider<List<News>>((ref) async {
   final repository = ref.watch(newsRepositoryProvider);
   return repository.getNews();
 });
+
+final newsDetailProvider =
+    FutureProvider.family<News, int>((ref, newsId) async {
+  final repository = ref.watch(newsRepositoryProvider);
+  return repository.getNewsDetail(newsId);
+});
+
+// Провайдер для предварительной загрузки
+final preloadedNewsProvider =
+    StateProvider.family<AsyncValue<News>, int>((ref, newsId) {
+  return const AsyncValue.loading();
+});

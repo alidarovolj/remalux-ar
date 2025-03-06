@@ -65,5 +65,15 @@
 	<string>This app needs access to location when open to show nearby clinics and doctors.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>This app needs access to location when in the background to show nearby clinics and doctors.</string>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+<true/>
+<key>UIFileSharingEnabled</key>
+<true/>
+<key>LSApplicationQueriesSchemes</key>
+<array>
+    <string>https</string>
+    <string>http</string>
+    <string>file</string>
+</array>
 </dict>
 </plist>

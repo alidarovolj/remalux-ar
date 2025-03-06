@@ -5,7 +5,6 @@ import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/core/widgets/custom_button.dart';
 import 'package:remalux_ar/features/store/domain/models/filter.dart';
 import 'package:remalux_ar/features/store/presentation/providers/store_providers.dart';
-import 'package:go_router/go_router.dart';
 
 class SingleFilterModal extends ConsumerWidget {
   final Filter filter;
@@ -94,18 +93,17 @@ class SingleFilterModal extends ConsumerWidget {
               child: Column(
                 children: [
                   CustomButton(
-                    onPressed: () async {
+                    onPressed: () {
+                      Navigator.pop(context);
                       if (selectedFilters.isNotEmpty) {
                         final Map<String, dynamic> queryParams = {};
                         for (final id in selectedFilters) {
                           queryParams['filter_ids[$id]'] = id.toString();
                         }
-                        await productsNotifier.fetchProducts(
+                        productsNotifier.fetchProducts(
                             queryParams: queryParams);
-                        if (context.mounted) context.pop();
                       } else {
-                        await productsNotifier.fetchProducts();
-                        if (context.mounted) context.pop();
+                        productsNotifier.fetchProducts();
                       }
                     },
                     label: 'Применить',
@@ -113,15 +111,15 @@ class SingleFilterModal extends ConsumerWidget {
                   ),
                   const SizedBox(height: 8),
                   CustomButton(
-                    onPressed: () async {
+                    onPressed: () {
                       // Reset only this filter's values
                       final newState = Set<int>.from(selectedFilters);
                       for (final value in filter.values) {
                         newState.remove(value.id);
                       }
                       selectedFiltersNotifier.state = newState;
-                      await productsNotifier.fetchProducts();
-                      if (context.mounted) context.pop();
+                      Navigator.pop(context);
+                      productsNotifier.fetchProducts();
                     },
                     label: 'Сбросить',
                     type: ButtonType.normal,

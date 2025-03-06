@@ -22,7 +22,7 @@ class NewsRepository {
       }).toList();
 
       return news;
-    } catch (e, stackTrace) {
+    } catch (e) {
       throw Exception('Failed to load news: $e');
     }
   }

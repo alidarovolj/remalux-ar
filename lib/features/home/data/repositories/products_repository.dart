@@ -23,7 +23,7 @@ class ProductsRepository {
       }).toList();
 
       return products;
-    } catch (e, stackTrace) {
+    } catch (e) {
       throw Exception('Failed to load products: $e');
     }
   }

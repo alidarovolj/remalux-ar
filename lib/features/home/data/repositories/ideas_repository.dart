@@ -19,7 +19,7 @@ class IdeasRepository {
       }).toList();
 
       return ideas;
-    } catch (e, stackTrace) {
+    } catch (e) {
       throw Exception('Failed to load ideas: $e');
     }
   }

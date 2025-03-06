@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "407619563895",
+    "project_id": "remalux-192bf",
+    "storage_bucket": "remalux-192bf.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:407619563895:android:be688a8b8501bbca717172",
+        "android_client_info": {
+          "package_name": "kz.remalux.remaluxar"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDo3gAeZYI81e8MfJGw8RIXuuEQg4zjuik"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -159,7 +159,9 @@ class ProductVariantItem extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            variant.rating?.toString() ?? '0.0',
+                            variant.rating != null
+                                ? '${variant.rating!.toStringAsFixed(1)}${variant.reviewsCount > 0 ? ' (${variant.reviewsCount})' : ''}'
+                                : '0.0',
                             style: const TextStyle(
                               fontSize: 12,
                               color: AppColors.textPrimary,
@@ -168,26 +170,24 @@ class ProductVariantItem extends StatelessWidget {
                         ],
                       ),
                     ),
-                    if (category.isNotEmpty) ...[
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF8F8F8),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          '${variant.value} кг',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: AppColors.textPrimary,
-                          ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF8F8F8),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        '${variant.value} кг',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textPrimary,
                         ),
                       ),
-                    ],
+                    ),
                   ],
                 ),
 

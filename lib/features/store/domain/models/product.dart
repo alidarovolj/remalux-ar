@@ -3,81 +3,93 @@ import 'package:flutter/foundation.dart';
 @immutable
 class ProductVariant {
   final int id;
-  final String sku;
   final String value;
-  final int quantity;
-  final String image_url;
+  final String sku;
   final double price;
   final double? discount_price;
+  final String image_url;
   final bool is_favourite;
-  final double? rating;
-  final bool isActive;
+  final int quantity;
   final bool isAvailable;
   final Map<String, dynamic> attributes;
+  final double? rating;
+  final int reviewsCount;
 
-  ProductVariant({
+  const ProductVariant({
     required this.id,
-    required this.sku,
     required this.value,
-    required this.quantity,
-    required this.image_url,
+    required this.sku,
     required this.price,
     this.discount_price,
+    required this.image_url,
     required this.is_favourite,
-    this.rating,
-    required this.isActive,
+    required this.quantity,
     required this.isAvailable,
     required this.attributes,
+    this.rating,
+    this.reviewsCount = 0,
   });
 
   factory ProductVariant.fromJson(Map<String, dynamic> json) {
-    // Create attributes map with product data
-    final Map<String, dynamic> attributes = {};
+    // Parse rating and reviews count
+    double? rating;
+    int reviewsCount = 0;
 
-    // If product exists in json, add it to attributes
-    if (json['product'] != null) {
-      attributes['product'] = json['product'];
+    if (json['rating'] != null) {
+      if (json['rating'] is Map) {
+        final ratingData = json['rating'] as Map<String, dynamic>;
+        rating = double.tryParse(ratingData['rating']?.toString() ?? '0.0');
+        reviewsCount = (ratingData['count'] as num?)?.toInt() ?? 0;
+      } else if (json['rating'] is num) {
+        rating = (json['rating'] as num).toDouble();
+      } else if (json['rating'] is String) {
+        rating = double.tryParse(json['rating']);
+      }
     }
 
-    // Add any existing attributes
-    if (json['attributes'] != null &&
-        json['attributes'] is Map<String, dynamic>) {
-      attributes.addAll(json['attributes'] as Map<String, dynamic>);
+    // If rating is not found in variant, try to get it from product data
+    if (rating == null && json['attributes']?['product']?['rating'] != null) {
+      final productRating = json['attributes']['product']['rating'];
+      if (productRating is Map) {
+        rating = double.tryParse(productRating['rating']?.toString() ?? '0.0');
+        reviewsCount = (productRating['count'] as num?)?.toInt() ?? 0;
+      } else if (productRating is num) {
+        rating = productRating.toDouble();
+      } else if (productRating is String) {
+        rating = double.tryParse(productRating);
+      }
     }
 
     return ProductVariant(
       id: json['id'] as int,
+      value: json['value']?.toString() ?? '',
       sku: json['sku'] as String? ?? '',
-      value: json['value'] as String? ?? '',
-      quantity: json['quantity'] as int? ?? 0,
-      image_url: json['image_url'] as String? ?? '',
       price: (json['price'] as num?)?.toDouble() ?? 0.0,
-      discount_price: json['discount_price'] == null
-          ? null
-          : (json['discount_price'] as num).toDouble(),
+      discount_price: (json['discount_price'] as num?)?.toDouble(),
+      image_url: json['image_url'] as String? ?? '',
       is_favourite: json['is_favourite'] as bool? ?? false,
-      rating:
-          json['rating'] == null ? null : (json['rating'] as num).toDouble(),
-      isActive: json['is_active'] as bool? ?? false,
-      isAvailable: json['is_available'] as bool? ?? false,
-      attributes: attributes,
+      quantity: json['quantity'] as int? ?? 0,
+      isAvailable: json['quantity'] != null && json['quantity'] > 0,
+      attributes: Map<String, dynamic>.from(json['attributes'] ?? {}),
+      rating: rating,
+      reviewsCount: reviewsCount,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'sku': sku,
       'value': value,
-      'quantity': quantity,
-      'image_url': image_url,
+      'sku': sku,
       'price': price,
       'discount_price': discount_price,
+      'image_url': image_url,
       'is_favourite': is_favourite,
-      'rating': rating,
-      'is_active': isActive,
+      'quantity': quantity,
       'is_available': isAvailable,
       'attributes': attributes,
+      'rating': rating,
+      'reviews_count': reviewsCount,
     };
   }
 }

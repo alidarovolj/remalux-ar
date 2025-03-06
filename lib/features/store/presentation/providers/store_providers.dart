@@ -61,6 +61,7 @@ class ProductsNotifier extends StateNotifier<AsyncValue<ProductsResponse>> {
       final response = await _repository.getProducts(
         filterIds: filterIds,
         orderBy: orderBy,
+        queryParameters: queryParams,
         page: 1,
         perPage: 50,
       );

@@ -23,7 +23,7 @@ class CategoriesRepository {
       }).toList();
 
       return categories;
-    } catch (e, stackTrace) {
+    } catch (e) {
       throw Exception('Failed to load categories: $e');
     }
   }

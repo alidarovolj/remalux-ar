@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+// import 'package:chucker_flutter/chucker_flutter.dart';
 
 class ApiClient {
   // Singleton pattern to ensure a single instance of Dio
@@ -46,6 +47,9 @@ class ApiClient {
   }
 
   void _addInterceptors() {
+    // Add Chucker interceptor
+    // dio.interceptors.add(ChuckerDioInterceptor());
+
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {

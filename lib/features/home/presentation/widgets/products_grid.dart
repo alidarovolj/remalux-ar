@@ -17,7 +17,7 @@ class ProductsGrid extends ConsumerWidget {
       title: 'Популярное',
       buttonTitle: 'Вся продукция',
       onButtonPressed: () {
-        context.push('/products');
+        context.push('/store');
       },
       child: SizedBox(
         height: 285,
@@ -31,15 +31,17 @@ class ProductsGrid extends ConsumerWidget {
 
             return ListView.builder(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 8),
               itemCount: products.length,
               itemBuilder: (context, index) {
                 final product = products[index];
                 return SizedBox(
                   width: 180,
                   child: Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: ProductItem(product: product),
+                    padding: const EdgeInsets.only(left: 8),
+                    child: GestureDetector(
+                      onTap: () => context.push('/products/${product.id}'),
+                      child: ProductItem(product: product),
+                    ),
                   ),
                 );
               },

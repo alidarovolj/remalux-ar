@@ -1,35 +1,51 @@
 class Review {
   final int id;
-  final String comment;
-  final int rating;
   final String authorName;
+  final int rating;
+  final String comment;
+  final bool isVerified;
   final DateTime createdAt;
+  final List<String> images;
+  final Map<String, int> helpfulData;
+  final bool isUserMarked;
 
   Review({
     required this.id,
-    required this.comment,
-    required this.rating,
     required this.authorName,
+    required this.rating,
+    required this.comment,
+    required this.isVerified,
     required this.createdAt,
+    required this.images,
+    required this.helpfulData,
+    required this.isUserMarked,
   });
 
   factory Review.fromJson(Map<String, dynamic> json) {
     return Review(
       id: json['id'] as int,
-      comment: json['comment'] as String,
+      authorName: (json['user'] as Map<String, dynamic>)['name'] as String,
       rating: json['rating'] as int,
-      authorName: json['author_name'] as String,
+      comment: json['comment'] as String,
+      isVerified: json['is_verified'] as bool,
       createdAt: DateTime.parse(json['created_at'] as String),
+      images: (json['images'] as List<dynamic>).cast<String>(),
+      helpfulData: Map<String, int>.from(json['helpful_data'] as Map),
+      isUserMarked: json['is_user_marked'] as bool,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'comment': comment,
+      'user': {'name': authorName},
       'rating': rating,
-      'author_name': authorName,
+      'comment': comment,
+      'is_verified': isVerified,
       'created_at': createdAt.toIso8601String(),
+      'images': images,
+      'helpful_data': helpfulData,
+      'is_user_marked': isUserMarked,
     };
   }
 }

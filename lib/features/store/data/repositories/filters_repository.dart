@@ -22,7 +22,7 @@ class FiltersRepository {
       }).toList();
 
       return filters;
-    } catch (e, stackTrace) {
+    } catch (e) {
       throw Exception('Failed to load filters: $e');
     }
   }

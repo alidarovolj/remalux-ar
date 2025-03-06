@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/painting.dart';
 
 @immutable
 class Idea {
@@ -7,59 +6,57 @@ class Idea {
   final Map<String, String> title;
   final Map<String, String> shortDescription;
   final String? ideaType;
-  final ColorTitle colorTitle;
-  final RoomTitle roomTitle;
+  final Map<String, dynamic>? colorTitle;
+  final Map<String, dynamic>? roomTitle;
   final String imageUrl;
-  final List<List<ContentItem>> values;
-  final List<ColorInfo> colors;
+  final List<List<Map<String, dynamic>>>? values;
+  final List<Map<String, dynamic>>? colors;
 
   const Idea({
     required this.id,
     required this.title,
     required this.shortDescription,
     this.ideaType,
-    required this.colorTitle,
-    required this.roomTitle,
+    this.colorTitle,
+    this.roomTitle,
     required this.imageUrl,
-    required this.values,
-    required this.colors,
+    this.values,
+    this.colors,
   });
 
   factory Idea.fromJson(Map<String, dynamic> json) {
-    try {
-      return Idea(
-        id: json['id'] as int,
-        title: _parseTranslations(json['title']),
-        shortDescription: _parseTranslations(json['short_description']),
-        ideaType: json['idea_type'] as String?,
-        colorTitle:
-            ColorTitle.fromJson(json['color_title'] as Map<String, dynamic>),
-        roomTitle:
-            RoomTitle.fromJson(json['room_title'] as Map<String, dynamic>),
-        imageUrl: json['image_url'] as String,
-        values: (json['values'] as List<dynamic>).map((valueList) {
-          return (valueList as List<dynamic>).map((item) {
-            return ContentItem.fromJson(item as Map<String, dynamic>);
-          }).toList();
-        }).toList(),
-        colors: (json['colors'] as List<dynamic>)
-            .map((color) => ColorInfo.fromJson(color as Map<String, dynamic>))
-            .toList(),
-      );
-    } catch (e, stackTrace) {
-      print('Error parsing Idea: $e');
-      print('JSON: $json');
-      print('Stack trace: $stackTrace');
-      rethrow;
-    }
+    return Idea(
+      id: json['id'],
+      title: _parseTranslations(json['title']),
+      shortDescription: _parseTranslations(json['short_description']),
+      ideaType: json['idea_type'],
+      colorTitle: json['color_title'],
+      roomTitle: json['room_title'],
+      imageUrl: json['image_url'],
+      values: json['values'] != null
+          ? List<List<Map<String, dynamic>>>.from(
+              json['values'].map(
+                (section) => List<Map<String, dynamic>>.from(
+                  section.map((item) => Map<String, dynamic>.from(item)),
+                ),
+              ),
+            )
+          : null,
+      colors: json['colors'] != null
+          ? List<Map<String, dynamic>>.from(
+              json['colors'].map((color) => Map<String, dynamic>.from(color)),
+            )
+          : null,
+    );
   }
 
-  static Map<String, String> _parseTranslations(dynamic data) {
-    if (data == null) return {};
-    if (data is! Map) return {};
-
-    return Map<String, String>.from(data.map(
-        (key, value) => MapEntry(key.toString(), value?.toString() ?? '')));
+  static Map<String, String> _parseTranslations(Map<String, dynamic>? json) {
+    if (json == null) return {};
+    return {
+      'ru': json['ru']?.toString() ?? '',
+      'kz': json['kz']?.toString() ?? '',
+      'en': json['en']?.toString() ?? '',
+    };
   }
 }
 

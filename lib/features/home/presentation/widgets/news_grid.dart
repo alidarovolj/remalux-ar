@@ -31,15 +31,20 @@ class NewsGrid extends ConsumerWidget {
 
             return ListView.builder(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 8),
               itemCount: news.length,
               itemBuilder: (context, index) {
                 final newsItem = news[index];
                 return SizedBox(
                   width: 300,
                   child: Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: NewsItem(news: newsItem),
+                    padding: const EdgeInsets.only(
+                      left: 8,
+                      right: 8,
+                    ),
+                    child: GestureDetector(
+                      onTap: () => context.push('/news/${newsItem.id}'),
+                      child: NewsItem(news: newsItem),
+                    ),
                   ),
                 );
               },
@@ -47,12 +52,15 @@ class NewsGrid extends ConsumerWidget {
           },
           loading: () => ListView.builder(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
             itemCount: 3,
             itemBuilder: (context, index) => const SizedBox(
               width: 300,
               child: Padding(
-                padding: EdgeInsets.only(right: 8),
+                padding: EdgeInsets.only(
+                  left: 8,
+                  right: 8,
+                ),
                 child: _NewsItemSkeleton(),
               ),
             ),

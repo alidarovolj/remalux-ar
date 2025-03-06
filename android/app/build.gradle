@@ -1,56 +1,42 @@
 plugins {
     id "com.android.application"
     id "kotlin-android"
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id "dev.flutter.flutter-gradle-plugin"
+    // Временно отключаем Firebase
+    // id "com.google.gms.google-services"
+}
+
+dependencies {
+  // Временно отключаем Firebase
+  // implementation platform('com.google.firebase:firebase-bom:33.7.0')
+  // implementation 'com.google.firebase:firebase-analytics'
 }
 
 android {
-    // Specify the namespace for R.java and other generated classes (matches the package name)
-    namespace "kz.remalux.remalux_ar"
-
-    // Compile SDK and NDK versions pulled from Flutter's configuration
+    namespace = "kz.remalux.remaluxar"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973" // Explicitly set the NDK version
 
-    // Java compile options for source and target compatibility
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
-    // Kotlin JVM target version
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 
     defaultConfig {
-        // Application ID must be unique for Google Play Store publication
-        applicationId = "kz.remalux.remalux_ar"
-
-        // Minimum SDK version for ARCore support
-        minSdk = 24
+        applicationId = "kz.remalux.remaluxar"
+        minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
-
-        // Versioning for the app, automatically synced with Flutter's version info
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
 
     buildTypes {
         release {
-            // Add your own signing config for the release build.
-            // Default to using debug signing keys to make 'flutter run --release' work.
             signingConfig = signingConfigs.debug
-            shrinkResources true
-            // Configure release build options (optional optimizations can be added)
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-
-        debug {
-            // Configure debug build options (for easier testing)
-            debuggable true
         }
     }
 }
