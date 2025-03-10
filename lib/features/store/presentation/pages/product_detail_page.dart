@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/features/store/domain/models/product_detail.dart';
 import 'package:remalux_ar/features/store/domain/models/product.dart';
-import 'package:remalux_ar/features/store/domain/models/review.dart';
 import 'package:remalux_ar/features/store/presentation/providers/product_detail_provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -13,8 +12,9 @@ import 'package:remalux_ar/core/services/file_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:go_router/go_router.dart';
 import 'package:remalux_ar/features/store/presentation/widgets/paint_calculator_modal.dart';
-import 'package:remalux_ar/features/store/presentation/widgets/review_modal.dart';
 import 'package:remalux_ar/features/store/presentation/widgets/product_detail_skeleton.dart';
+import 'package:remalux_ar/features/home/domain/providers/selected_color_provider.dart';
+import 'package:remalux_ar/features/store/presentation/widgets/color_selection.dart';
 
 class ProductDetailPage extends ConsumerStatefulWidget {
   final int productId;
@@ -100,11 +100,30 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
           children: [
             // Product Image
             AspectRatio(
-              aspectRatio: 1,
-              child: Image.network(
-                product.imageUrl,
-                fit: BoxFit.contain,
-              ),
+              aspectRatio: product.isColorable ? 1.5 : 1,
+              child: product.isColorable
+                  ? Consumer(
+                      builder: (context, ref, child) {
+                        final selectedColor = ref.watch(selectedColorProvider);
+                        return Container(
+                          color: selectedColor != null
+                              ? Color(int.parse(
+                                  '0xFF${selectedColor.hex.substring(1)}'))
+                              : Colors.white,
+                          child: PageView.builder(
+                            itemCount: 5,
+                            itemBuilder: (context, index) {
+                              return Image.asset(
+                                'lib/core/assets/images/store/${index + 1}.png',
+                                fit: BoxFit.contain,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    )
+                  : Image.network(product.imageUrl,
+                      width: double.infinity, fit: BoxFit.cover),
             ),
 
             // AR View Button
@@ -234,38 +253,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          Material(
-                            color: Colors.white,
-                            elevation: 1,
-                            shadowColor: Colors.black.withOpacity(0.05),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              side: const BorderSide(
-                                color: Color(0xFFEEEEEE),
-                                width: 1,
-                              ),
-                            ),
-                            child: InkWell(
-                              onTap: () {
-                                // TODO: Implement color selection
-                              },
-                              child: Container(
-                                width: double.infinity,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 16),
-                                child: const Center(
-                                  child: Text(
-                                    'Выберите цвет',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.links,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
+                          const ColorSelection(),
                           const SizedBox(height: 24),
                         ],
 

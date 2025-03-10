@@ -23,10 +23,91 @@ class ApiClient {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
+      validateStatus: (status) {
+        return status != null && status < 500; // Принимаем все статусы < 500
+      },
     ));
 
     // Add interceptors
     _addInterceptors();
+  }
+
+  void _addInterceptors() {
+    // Interceptor for logging requests, responses, and errors with dividers
+    dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          _logDivider();
+          print("➡️ Запрос");
+          print("Метод: ${options.method}");
+          print("URL: ${options.uri}");
+          if (options.headers.isNotEmpty) {
+            print("Заголовки: ${options.headers}");
+          }
+          if (options.data != null) {
+            print("Данные: ${options.data}");
+          }
+          _logDivider();
+          return handler.next(options);
+        },
+        onResponse: (response, handler) {
+          _logDivider();
+          print("✅ Ответ");
+          print("Статус: ${response.statusCode}");
+          print("Данные: ${response.data}");
+          _logDivider();
+          return handler.next(response);
+        },
+        onError: (DioException e, handler) {
+          _logDivider();
+          print("❌ Ошибка");
+          print("Статус: ${e.response?.statusCode ?? 'Нет ответа'}");
+          print("Сообщение: ${e.message}");
+          if (e.response?.data != null) {
+            print("Данные ошибки: ${e.response?.data}");
+          }
+          _logDivider();
+          return handler.next(e);
+        },
+      ),
+    );
+
+    // LogInterceptor for detailed logs
+    dio.interceptors.add(
+      LogInterceptor(
+        request: true,
+        requestBody: true,
+        requestHeader: true,
+        responseBody: true,
+        responseHeader: false,
+        error: true,
+        logPrint: (log) => print(log), // Redirect logs to console
+      ),
+    );
+
+    // Interceptor to generate cURL commands
+    dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          final curlCommand = _generateCurlCommand(options);
+          print('cURL: $curlCommand');
+          return handler.next(options); // Proceed with the request
+        },
+      ),
+    );
+  }
+
+  // Helper to generate a cURL command for a request
+  String _generateCurlCommand(RequestOptions options) {
+    final headers = options.headers.entries
+        .map((e) => "-H '${e.key}: ${e.value}'")
+        .join(' ');
+    final data = options.data != null ? "--data '${options.data}'" : '';
+    return "curl -X ${options.method} '${options.uri}' $headers $data";
+  }
+
+  void _logDivider() {
+    print("------------------------------------");
   }
 
   Future<Map<String, dynamic>?> get(
@@ -38,6 +119,13 @@ class ApiClient {
         endpoint,
         queryParameters: queryParameters,
       );
+
+      // Проверяем статус ответа
+      if (response.statusCode == 401) {
+        print('❌ Unauthorized request: $endpoint');
+        return null;
+      }
+
       return response.data as Map<String, dynamic>;
     } on DioException catch (e) {
       print('API Error: ${e.message}');
@@ -46,27 +134,29 @@ class ApiClient {
     }
   }
 
-  void _addInterceptors() {
-    // Add Chucker interceptor
-    // dio.interceptors.add(ChuckerDioInterceptor());
+  Future<Map<String, dynamic>?> post(
+    String endpoint, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+  }) async {
+    try {
+      final response = await dio.post(
+        endpoint,
+        data: data,
+        queryParameters: queryParameters,
+      );
 
-    dio.interceptors.add(
-      InterceptorsWrapper(
-        onRequest: (options, handler) {
-          print('➡️ REQUEST[${options.method}] => PATH: ${options.path}');
-          return handler.next(options);
-        },
-        onResponse: (response, handler) {
-          print(
-              '✅ RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}');
-          return handler.next(response);
-        },
-        onError: (DioException e, handler) {
-          print(
-              '❌ ERROR[${e.response?.statusCode}] => PATH: ${e.requestOptions.path}');
-          return handler.next(e);
-        },
-      ),
-    );
+      // Проверяем статус ответа
+      if (response.statusCode == 401) {
+        print('❌ Unauthorized request: $endpoint');
+        return null;
+      }
+
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      print('API Error: ${e.message}');
+      print('Response: ${e.response?.data}');
+      return null;
+    }
   }
 }

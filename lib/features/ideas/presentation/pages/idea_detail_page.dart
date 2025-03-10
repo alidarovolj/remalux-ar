@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
-import 'package:remalux_ar/core/widgets/custom_app_bar.dart';
 import 'package:remalux_ar/features/home/presentation/providers/ideas_provider.dart';
 import 'package:remalux_ar/features/home/domain/models/idea.dart';
 import 'package:remalux_ar/features/ideas/presentation/widgets/idea_detail_skeleton.dart';

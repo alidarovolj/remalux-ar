@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/features/home/presentation/providers/ideas_provider.dart';
 import 'package:remalux_ar/features/home/presentation/widgets/idea_item.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:remalux_ar/core/widgets/custom_app_bar.dart';
 import 'package:remalux_ar/core/widgets/page_banner.dart';

@@ -44,6 +44,7 @@ dependencies:
   shimmer: ^3.0.0
   chucker_flutter: ^1.8.3
   flutter_html: ^3.0.0-beta.2
+  mask_text_input_formatter: ^2.9.0
 
 dev_dependencies:
   flutter_test:
@@ -59,9 +60,11 @@ flutter:
     - lib/core/assets/icons/tabs/
     - lib/core/assets/icons/selector/
     - lib/core/assets/icons/sections/
+    - lib/core/assets/icons/profile/
     - lib/core/assets/images/
     - lib/core/assets/icons/blobs/
     - lib/core/assets/images/logos/
     - lib/core/assets/images/onboarding/
     - lib/core/assets/pdf/
     - lib/core/assets/images/colors/
+    - lib/core/assets/images/store/

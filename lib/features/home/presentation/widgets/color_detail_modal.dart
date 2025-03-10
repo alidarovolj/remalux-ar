@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:remalux_ar/features/home/domain/providers/selected_color_provider.dart';
+import 'package:remalux_ar/core/widgets/custom_snack_bar.dart';
 
 class ColorDetailModal extends ConsumerWidget {
   final DetailedColorModel color;
@@ -42,7 +43,7 @@ class ColorDetailModal extends ConsumerWidget {
 
           // Title
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Text(
               'Цвет',
               textAlign: TextAlign.center,
@@ -165,24 +166,22 @@ class ColorDetailModal extends ConsumerWidget {
                         .setColor(color);
 
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Цвет сохранен'),
-                          duration: Duration(seconds: 2),
-                        ),
+                      CustomSnackBar.show(
+                        context,
+                        message: 'Цвет сохранен',
+                        type: SnackBarType.success,
+                        duration: const Duration(seconds: 2),
                       );
 
-                      context.pop(); // Close modal
                       if (color.parentColor != null) {
-                        context.push('/store', extra: {
+                        context.go('/store', extra: {
                           'filter': {
                             'filters[parentColor.id]':
                                 color.parentColor!.id.toString()
                           }
-                        }); // Navigate to store page with filter
+                        });
                       } else {
-                        context.push(
-                            '/store'); // Navigate to store page without filter
+                        context.go('/store');
                       }
                     }
                   },

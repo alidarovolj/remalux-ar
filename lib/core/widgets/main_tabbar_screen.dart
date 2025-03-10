@@ -72,7 +72,7 @@ class _MainTabBarScreenState extends ConsumerState<MainTabBarScreen>
       if (index == 4) {
         final authState = ref.read(authProvider);
         if (!authState.isAuthenticated) {
-          context.go('/login');
+          context.go('/profile');
           return;
         }
       }

@@ -10,6 +10,8 @@ import 'package:remalux_ar/features/news/presentation/pages/news_detail_page.dar
 import 'package:remalux_ar/features/ideas/presentation/pages/ideas_page.dart';
 import 'package:remalux_ar/features/ideas/presentation/pages/idea_detail_page.dart';
 import 'package:remalux_ar/features/home/presentation/pages/colors_page.dart';
+import 'package:remalux_ar/features/profile/presentation/pages/profile_page.dart';
+import 'package:remalux_ar/features/auth/presentation/pages/login_page.dart';
 // import 'package:chucker_flutter/chucker_flutter.dart';
 
 class AppRouter {
@@ -56,6 +58,11 @@ class AppRouter {
             path: '/ideas',
             name: 'ideas',
             builder: (context, state) => const IdeasPage(),
+          ),
+          GoRoute(
+            path: '/profile',
+            name: 'profile',
+            builder: (context, state) => const ProfilePage(),
           ),
         ],
       ),
@@ -105,6 +112,11 @@ class AppRouter {
           final ideaId = int.parse(state.pathParameters['id']!);
           return IdeaDetailPage(ideaId: ideaId);
         },
+      ),
+      GoRoute(
+        path: '/login',
+        name: 'login',
+        builder: (context, state) => const LoginPage(),
       ),
     ],
   );

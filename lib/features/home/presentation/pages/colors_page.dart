@@ -244,63 +244,59 @@ class _ColorsPageState extends ConsumerState<ColorsPage> {
                         ),
                         const SizedBox(width: 12),
                         // Color Items
-                        ...colors
-                            .map((color) => GestureDetector(
-                                  onTap: () => _onMainColorTap(color.id),
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(right: 12),
-                                    child: Column(
-                                      children: [
-                                        Container(
-                                          width: 80,
-                                          height: 80,
-                                          decoration: BoxDecoration(
+                        ...colors.map((color) => GestureDetector(
+                              onTap: () => _onMainColorTap(color.id),
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 12),
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      width: 80,
+                                      height: 80,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: _selectedColorId == color.id
+                                              ? const Color(0xFF1F1F1F)
+                                              : Colors.transparent,
+                                          width: 1,
+                                        ),
+                                      ),
+                                      child: Stack(
+                                        children: [
+                                          ClipRRect(
                                             borderRadius:
                                                 BorderRadius.circular(12),
-                                            border: Border.all(
-                                              color:
-                                                  _selectedColorId == color.id
-                                                      ? const Color(0xFF1F1F1F)
-                                                      : Colors.transparent,
-                                              width: 1,
+                                            child: Image.asset(
+                                              'lib/core/assets/images/colors/${_getImageName(color.title['ru'] ?? '')}',
+                                              fit: BoxFit.cover,
                                             ),
                                           ),
-                                          child: Stack(
-                                            children: [
-                                              ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                child: Image.asset(
-                                                  'lib/core/assets/images/colors/${_getImageName(color.title['ru'] ?? '')}',
-                                                  fit: BoxFit.cover,
-                                                ),
+                                          if (_selectedColorId == color.id)
+                                            const Positioned(
+                                              top: 8,
+                                              left: 8,
+                                              child: Icon(
+                                                Icons.check_circle,
+                                                color: Color(0xFF1F1F1F),
+                                                size: 20,
                                               ),
-                                              if (_selectedColorId == color.id)
-                                                const Positioned(
-                                                  top: 8,
-                                                  left: 8,
-                                                  child: Icon(
-                                                    Icons.check_circle,
-                                                    color: Color(0xFF1F1F1F),
-                                                    size: 20,
-                                                  ),
-                                                ),
-                                            ],
-                                          ),
-                                        ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          color.title['ru'] ?? '',
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: Color(0xFF1F1F1F),
-                                          ),
-                                        ),
-                                      ],
+                                            ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ))
-                            .toList(),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      color.title['ru'] ?? '',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Color(0xFF1F1F1F),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )),
                       ],
                     ),
                   ),
