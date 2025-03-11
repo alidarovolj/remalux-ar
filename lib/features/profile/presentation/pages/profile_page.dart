@@ -8,6 +8,8 @@ import 'package:remalux_ar/features/auth/domain/models/user.dart';
 import 'package:remalux_ar/features/auth/domain/providers/auth_provider.dart';
 import 'package:remalux_ar/core/services/storage_service.dart';
 import 'package:remalux_ar/features/profile/presentation/widgets/profile_skeleton.dart';
+import 'package:flutter/services.dart';
+import 'package:remalux_ar/core/widgets/custom_app_bar.dart';
 
 final userProvider =
     StateNotifierProvider<UserNotifier, AsyncValue<User?>>((ref) {
@@ -95,6 +97,8 @@ class ProfilePage extends ConsumerStatefulWidget {
 }
 
 class _ProfilePageState extends ConsumerState<ProfilePage> {
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
@@ -109,43 +113,43 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   }
 
   @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final userAsync = ref.watch(userProvider);
     print('🎨 ProfilePage building with state: ${userAsync.toString()}');
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Text(
-          'Профиль',
-          style: TextStyle(
-            color: AppColors.textPrimary,
-            fontSize: 17,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(
-            height: 1,
-            color: AppColors.borderLightGrey,
-          ),
-        ),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Colors.white,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
       ),
-      body: userAsync.when(
-        data: (user) => user != null
-            ? _buildAuthenticatedProfile(context, user)
-            : _buildUnauthenticatedProfile(context),
-        loading: () => const ProfileSkeleton(),
-        error: (_, __) => _buildUnauthenticatedProfile(context),
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: const CustomAppBar(
+          title: 'Профиль',
+          showBottomBorder: true,
+        ),
+        body: userAsync.when(
+          data: (user) => user != null
+              ? _buildAuthenticatedProfile(context, user)
+              : _buildUnauthenticatedProfile(context),
+          loading: () => const ProfileSkeleton(),
+          error: (_, __) => _buildUnauthenticatedProfile(context),
+        ),
       ),
     );
   }
 
   Widget _buildAuthenticatedProfile(BuildContext context, User user) {
     return ListView(
+      controller: _scrollController,
+      physics: const ClampingScrollPhysics(),
       children: [
         // User Info Section
         Padding(
@@ -315,8 +319,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 context,
                 icon: 'lib/core/assets/icons/profile/shopping-bag.svg',
                 title: 'Заказы',
-                subtitle: '0 заказов',
-                onTap: () {},
+                onTap: () {
+                  context.push('/orders');
+                },
               ),
 
               // Favorites Section
@@ -324,7 +329,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 context,
                 icon: 'lib/core/assets/icons/profile/heart.svg',
                 title: 'Избранные товары',
-                subtitle: '0 товаров',
                 onTap: () {},
               ),
 
@@ -333,7 +337,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 context,
                 icon: 'lib/core/assets/icons/profile/palette.svg',
                 title: 'Избранные цвета',
-                subtitle: '0 цветов',
                 onTap: () {},
               ),
 
@@ -342,7 +345,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 context,
                 icon: 'lib/core/assets/icons/profile/star.svg',
                 title: 'Отзывы',
-                subtitle: '0 отзывов',
                 onTap: () {},
               ),
 
@@ -373,7 +375,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 context,
                 icon: 'lib/core/assets/icons/profile/location.svg',
                 title: 'Адреса доставок',
-                subtitle: '2 адреса',
                 onTap: () {},
               ),
 
@@ -382,7 +383,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 context,
                 icon: 'lib/core/assets/icons/profile/person.svg',
                 title: 'Получатели',
-                subtitle: '1 получатель',
                 onTap: () {},
               ),
               const SizedBox(height: 32),
@@ -497,6 +497,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   Widget _buildUnauthenticatedProfile(BuildContext context) {
     return ListView(
+      controller: _scrollController,
+      physics: const ClampingScrollPhysics(),
       padding: const EdgeInsets.all(16),
       children: [
         // Auth Section

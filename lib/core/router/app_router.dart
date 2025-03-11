@@ -12,6 +12,7 @@ import 'package:remalux_ar/features/ideas/presentation/pages/idea_detail_page.da
 import 'package:remalux_ar/features/home/presentation/pages/colors_page.dart';
 import 'package:remalux_ar/features/profile/presentation/pages/profile_page.dart';
 import 'package:remalux_ar/features/auth/presentation/pages/login_page.dart';
+import 'package:remalux_ar/features/orders/presentation/pages/orders_page.dart';
 // import 'package:chucker_flutter/chucker_flutter.dart';
 
 class AppRouter {
@@ -117,6 +118,11 @@ class AppRouter {
         path: '/login',
         name: 'login',
         builder: (context, state) => const LoginPage(),
+      ),
+      GoRoute(
+        path: '/orders',
+        name: 'orders',
+        builder: (context, state) => const OrdersPage(),
       ),
     ],
   );

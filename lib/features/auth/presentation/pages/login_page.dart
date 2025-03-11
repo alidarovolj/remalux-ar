@@ -66,7 +66,20 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       final user = await auth.getCurrentUser();
 
       if (mounted) {
-        context.go('/');
+        // Show success message
+        CustomSnackBar.show(
+          context,
+          message: 'Вы успешно авторизовались',
+          type: SnackBarType.success,
+          duration: const Duration(seconds: 2),
+        );
+
+        // Add a small delay to allow the snackbar to be visible before navigation
+        await Future.delayed(const Duration(milliseconds: 500));
+
+        if (mounted) {
+          context.go('/');
+        }
       }
     } on Exception catch (e) {
       if (mounted) {

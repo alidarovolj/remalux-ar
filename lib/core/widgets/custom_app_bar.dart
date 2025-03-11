@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:go_router/go_router.dart';
+import 'package:remalux_ar/core/theme/colors.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final List<Widget>? actions;
   final bool showTitle;
+  final bool showBottomBorder;
 
   const CustomAppBar({
     super.key,
     required this.title,
     this.actions,
     this.showTitle = true,
+    this.showBottomBorder = false,
   });
 
   @override
@@ -20,6 +22,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
+      scrolledUnderElevation: 0,
       centerTitle: true,
       leading: Navigator.of(context).canPop()
           ? IconButton(
@@ -39,9 +42,20 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             )
           : null,
       actions: actions,
+      bottom: showBottomBorder
+          ? PreferredSize(
+              preferredSize: const Size.fromHeight(1),
+              child: Container(
+                height: 1,
+                color: AppColors.borderLightGrey,
+              ),
+            )
+          : null,
     );
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => showBottomBorder
+      ? const Size.fromHeight(kToolbarHeight + 1)
+      : const Size.fromHeight(kToolbarHeight);
 }
