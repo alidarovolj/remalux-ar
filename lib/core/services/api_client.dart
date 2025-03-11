@@ -37,6 +37,18 @@ class ApiClient {
       options: options,
     );
   }
+
+  Future<Response> delete(
+    String path, {
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
+    return _dio.delete(
+      path,
+      queryParameters: queryParameters,
+      options: options,
+    );
+  }
 }
 
 final apiClientProvider = Provider<ApiClient>((ref) {

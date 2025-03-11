@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/features/store/domain/models/product.dart';
+import 'package:remalux_ar/features/favorites/domain/providers/favorites_providers.dart';
+import 'package:remalux_ar/features/store/presentation/providers/store_providers.dart';
 
-class ProductVariantItem extends StatelessWidget {
+class ProductVariantItem extends ConsumerWidget {
   final ProductVariant variant;
   final VoidCallback? onTap;
   final VoidCallback? onAddToCart;
@@ -15,7 +18,7 @@ class ProductVariantItem extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final product = variant.attributes['product'] as Map<String, dynamic>?;
 
     if (product == null) {
@@ -30,6 +33,8 @@ class ProductVariantItem extends StatelessWidget {
         (product['title'] as Map<String, dynamic>?)?['ru'] as String? ??
             'Без названия';
     final isColorable = product['is_colorable'] as bool? ?? false;
+    final isFavourite = product['is_favourite'] as bool? ?? false;
+    final productId = product['id'] as int?;
     final category = (product['category'] as Map<String, dynamic>?)?['title']
             ?['ru'] as String? ??
         '';
@@ -86,11 +91,51 @@ class ProductVariantItem extends StatelessWidget {
                       height: 24,
                     ),
                   ),
+                // Favorite button
+                if (productId != null)
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: isFavourite
+                            ? AppColors.buttonSecondary
+                            : Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        icon: Icon(
+                          isFavourite ? Icons.favorite : Icons.favorite_border,
+                          color: isFavourite
+                              ? AppColors.primary
+                              : Colors.grey[600],
+                          size: 18,
+                        ),
+                        onPressed: () async {
+                          try {
+                            final service = ref.read(favoritesServiceProvider);
+                            await ref
+                                .read(favoriteProductsProvider.notifier)
+                                .toggleFavorite(
+                                    productId, context, title, isFavourite);
+
+                            // Обновляем список товаров через force-refresh
+                            ref.read(productsProvider.notifier).fetchProducts();
+                          } catch (error) {
+                            // Ошибка уже обработана в toggleFavorite
+                          }
+                        },
+                        padding: EdgeInsets.zero,
+                      ),
+                    ),
+                  ),
                 // Availability indicator
                 if (variant.isAvailable)
                   Positioned(
                     top: 8,
-                    right: 8,
+                    right: 48,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,

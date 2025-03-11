@@ -13,6 +13,8 @@ import 'package:remalux_ar/features/home/presentation/pages/colors_page.dart';
 import 'package:remalux_ar/features/profile/presentation/pages/profile_page.dart';
 import 'package:remalux_ar/features/auth/presentation/pages/login_page.dart';
 import 'package:remalux_ar/features/orders/presentation/pages/orders_page.dart';
+import 'package:remalux_ar/features/favorites/presentation/pages/favorites_page.dart';
+import 'package:remalux_ar/features/recipients/presentation/pages/recipients_page.dart';
 // import 'package:chucker_flutter/chucker_flutter.dart';
 
 class AppRouter {
@@ -77,6 +79,12 @@ class AppRouter {
           return ColorsPage(mainColorId: mainColorId);
         },
       ),
+      // Recipients page route
+      GoRoute(
+        path: '/recipients',
+        name: 'recipients',
+        builder: (context, state) => const RecipientsPage(),
+      ),
       // Product detail route
       GoRoute(
         path: '/products/:id',
@@ -123,6 +131,16 @@ class AppRouter {
         path: '/orders',
         name: 'orders',
         builder: (context, state) => const OrdersPage(),
+      ),
+      GoRoute(
+        path: '/favorites',
+        name: 'favorites',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return FavoritesPage(
+            initialTabIndex: extra?['initialTabIndex'] as int?,
+          );
+        },
       ),
     ],
   );

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/features/home/domain/models/product.dart';
+import 'package:remalux_ar/features/favorites/domain/providers/favorites_providers.dart';
+import 'package:remalux_ar/features/home/presentation/providers/products_provider.dart';
 
-class ProductItem extends StatelessWidget {
+class ProductItem extends ConsumerWidget {
   final Product product;
 
   const ProductItem({
@@ -11,7 +14,7 @@ class ProductItem extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Card(
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
@@ -55,6 +58,49 @@ class ProductItem extends StatelessWidget {
                       ),
                     ),
                   ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: product.isFavourite
+                          ? AppColors.buttonSecondary
+                          : Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      icon: Icon(
+                        product.isFavourite
+                            ? Icons.favorite
+                            : Icons.favorite_border,
+                        color: product.isFavourite
+                            ? AppColors.primary
+                            : Colors.grey[600],
+                        size: 18,
+                      ),
+                      onPressed: () async {
+                        try {
+                          await ref
+                              .read(favoriteProductsProvider.notifier)
+                              .toggleFavorite(
+                                product.id,
+                                context,
+                                product.title['ru'] ?? '',
+                                product.isFavourite,
+                              );
+
+                          // Обновляем список товаров
+                          ref.invalidate(productsProvider);
+                        } catch (error) {
+                          // Ошибка уже обработана в toggleFavorite через custom_snack_bar
+                        }
+                      },
+                      padding: EdgeInsets.zero,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

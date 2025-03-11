@@ -195,6 +195,26 @@ class Product {
           : ProductGroup.fromJson(json['group'] as Map<String, dynamic>),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'filter_data': filterData.map((data) => data.toJson()).toList(),
+      'article': article,
+      'alias': alias,
+      'category': category.toJson(),
+      'image_url': imageUrl,
+      'is_colorable': isColorable,
+      'is_active': isActive,
+      'price_range': priceRange,
+      'is_favourite': isFavourite,
+      'expense': expense,
+      'rating': rating,
+      'group': group?.toJson(),
+    };
+  }
 }
 
 class FilterData {
@@ -220,6 +240,16 @@ class FilterData {
       measure: Map<String, String?>.from(json['measure']),
       value: Map<String, String>.from(json['value']),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'value_id': valueId,
+      'title': title,
+      'measure': measure,
+      'value': value,
+    };
   }
 }
 
@@ -247,6 +277,16 @@ class Category {
       createdAt: DateTime.parse(json['created_at'] as String),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'image_url': imageUrl,
+      'is_active': isActive,
+      'created_at': createdAt.toIso8601String(),
+    };
+  }
 }
 
 class ProductGroup {
@@ -263,5 +303,12 @@ class ProductGroup {
       id: json['id'] as int,
       name: json['name'] as String,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+    };
   }
 }

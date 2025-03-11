@@ -8,6 +8,7 @@ import 'package:remalux_ar/features/auth/domain/models/user.dart';
 import 'package:remalux_ar/features/auth/domain/providers/auth_provider.dart';
 import 'package:remalux_ar/core/services/storage_service.dart';
 import 'package:remalux_ar/features/profile/presentation/widgets/profile_skeleton.dart';
+import 'package:remalux_ar/features/profile/presentation/widgets/logout_confirmation_modal.dart';
 import 'package:flutter/services.dart';
 import 'package:remalux_ar/core/widgets/custom_app_bar.dart';
 
@@ -329,7 +330,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 context,
                 icon: 'lib/core/assets/icons/profile/heart.svg',
                 title: 'Избранные товары',
-                onTap: () {},
+                onTap: () {
+                  context.push('/favorites');
+                },
               ),
 
               // Colors Section
@@ -337,16 +340,18 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 context,
                 icon: 'lib/core/assets/icons/profile/palette.svg',
                 title: 'Избранные цвета',
-                onTap: () {},
+                onTap: () {
+                  context.push('/favorites', extra: {'initialTabIndex': 1});
+                },
               ),
 
               // Reviews Section
-              _buildSettingsItem(
-                context,
-                icon: 'lib/core/assets/icons/profile/star.svg',
-                title: 'Отзывы',
-                onTap: () {},
-              ),
+              // _buildSettingsItem(
+              //   context,
+              //   icon: 'lib/core/assets/icons/profile/star.svg',
+              //   title: 'Отзывы',
+              //   onTap: () {},
+              // ),
 
               const SizedBox(height: 32),
 
@@ -383,7 +388,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 context,
                 icon: 'lib/core/assets/icons/profile/person.svg',
                 title: 'Получатели',
-                onTap: () {},
+                onTap: () {
+                  context.push('/recipients');
+                },
               ),
               const SizedBox(height: 32),
 
@@ -484,8 +491,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 icon: 'lib/core/assets/icons/profile/logout.svg',
                 title: 'Выйти из профиля',
                 titleColor: Colors.red,
-                onTap: () async {
-                  await ref.read(userProvider.notifier).logout();
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => const LogoutConfirmationModal(),
+                  );
                 },
               ),
             ],

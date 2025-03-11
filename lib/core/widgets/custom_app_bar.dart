@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:remalux_ar/core/theme/colors.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final List<Widget>? actions;
   final bool showTitle;
   final bool showBottomBorder;
+  final bool showFavoritesButton;
+  final PreferredSizeWidget? bottom;
 
   const CustomAppBar({
     super.key,
@@ -15,6 +18,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.actions,
     this.showTitle = true,
     this.showBottomBorder = false,
+    this.showFavoritesButton = false,
+    this.bottom,
   });
 
   @override
@@ -41,21 +46,36 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
             )
           : null,
-      actions: actions,
-      bottom: showBottomBorder
-          ? PreferredSize(
-              preferredSize: const Size.fromHeight(1),
-              child: Container(
-                height: 1,
-                color: AppColors.borderLightGrey,
-              ),
-            )
-          : null,
+      actions: [
+        if (showFavoritesButton)
+          IconButton(
+            icon: SvgPicture.asset(
+              'lib/core/assets/icons/profile/heart.svg',
+              width: 24,
+              height: 24,
+              color: AppColors.textPrimary,
+            ),
+            onPressed: () => context.push('/favorites'),
+          ),
+        if (actions != null) ...actions!,
+      ],
+      bottom: bottom ??
+          (showBottomBorder
+              ? PreferredSize(
+                  preferredSize: const Size.fromHeight(1),
+                  child: Container(
+                    height: 1,
+                    color: AppColors.borderLightGrey,
+                  ),
+                )
+              : null),
     );
   }
 
   @override
-  Size get preferredSize => showBottomBorder
-      ? const Size.fromHeight(kToolbarHeight + 1)
-      : const Size.fromHeight(kToolbarHeight);
+  Size get preferredSize {
+    final bottomHeight =
+        bottom?.preferredSize.height ?? (showBottomBorder ? 1 : 0);
+    return Size.fromHeight(kToolbarHeight + bottomHeight);
+  }
 }

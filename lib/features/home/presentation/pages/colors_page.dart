@@ -9,6 +9,9 @@ import 'package:remalux_ar/features/home/domain/providers/detailed_colors_provid
 import 'package:remalux_ar/features/home/presentation/widgets/color_card_skeleton.dart';
 import 'package:remalux_ar/features/home/presentation/widgets/main_color_skeleton.dart';
 import 'package:remalux_ar/features/home/presentation/widgets/color_detail_modal.dart';
+import 'package:remalux_ar/core/widgets/detailed_color_card.dart';
+import 'package:remalux_ar/core/widgets/custom_app_bar.dart';
+import 'package:remalux_ar/features/favorites/domain/providers/favorites_providers.dart';
 import 'dart:async';
 
 class ColorsPage extends ConsumerStatefulWidget {
@@ -103,41 +106,10 @@ class _ColorsPageState extends ConsumerState<ColorsPage> {
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
-          onPressed: () => context.pop(),
-        ),
-        title: const Text(
-          'Палитры',
-          style: TextStyle(
-            color: AppColors.textPrimary,
-            fontSize: 17,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: SvgPicture.asset(
-              'lib/core/assets/icons/scale.svg',
-              width: 24,
-              height: 24,
-            ),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: SvgPicture.asset(
-              'lib/core/assets/icons/heart.svg',
-              width: 24,
-              height: 24,
-            ),
-            onPressed: () {},
-          ),
-        ],
+      appBar: const CustomAppBar(
+        title: 'Палитры',
+        showBottomBorder: true,
+        showFavoritesButton: true,
       ),
       body: Column(
         children: [
@@ -336,102 +308,30 @@ class _ColorsPageState extends ConsumerState<ColorsPage> {
                       }
 
                       final color = colors[index];
-                      return GestureDetector(
+                      return DetailedColorCard(
+                        color: color,
                         onTap: () {
                           showModalBottomSheet(
                             context: context,
                             isScrollControlled: true,
                             backgroundColor: Colors.transparent,
-                            builder: (context) => Padding(
-                              padding: EdgeInsets.only(
-                                bottom:
-                                    MediaQuery.of(context).viewInsets.bottom,
-                              ),
-                              child: ColorDetailModal(color: color),
-                            ),
+                            builder: (context) =>
+                                ColorDetailModal(color: color),
                           );
                         },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Color.fromRGBO(59, 77, 139, 0.1),
-                                blurRadius: 5,
-                                offset: Offset(0, 1),
-                                spreadRadius: 1,
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Stack(
-                                  children: [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        color: Color(int.parse(
-                                            '0xFF${color.hex.substring(1)}')),
-                                        borderRadius: const BorderRadius.only(
-                                          topLeft: Radius.circular(12),
-                                          topRight: Radius.circular(12),
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      top: 8,
-                                      right: 8,
-                                      child: Container(
-                                        width: 32,
-                                        height: 32,
-                                        decoration: const BoxDecoration(
-                                          color: Colors.white,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Center(
-                                          child: Icon(
-                                            color.isFavourite
-                                                ? Icons.favorite
-                                                : Icons.favorite_border,
-                                            size: 18,
-                                            color: Colors.grey[600],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(12),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      color.title['ru'] ?? '',
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      color.ral,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.grey[600],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                        onFavoritePressed: () async {
+                          await ref
+                              .read(favoriteColorsProvider.notifier)
+                              .toggleFavorite(
+                                color.id,
+                                context,
+                                color.title['ru'] ?? '',
+                                color.isFavourite,
+                              );
+                          ref
+                              .read(detailedColorsProvider.notifier)
+                              .loadColors();
+                        },
                       );
                     },
                   );

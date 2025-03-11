@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:remalux_ar/core/theme/colors.dart';
 import 'package:remalux_ar/core/widgets/custom_app_bar.dart';
+import 'package:remalux_ar/core/widgets/custom_button.dart';
 import 'package:remalux_ar/features/orders/domain/providers/orders_provider.dart';
 import 'package:remalux_ar/features/orders/presentation/widgets/order_item.dart';
 import 'package:remalux_ar/features/orders/presentation/widgets/order_skeleton.dart';
+import 'package:remalux_ar/features/store/presentation/providers/store_providers.dart';
+import 'package:remalux_ar/features/store/presentation/widgets/product_variant_item.dart';
+import 'package:shimmer/shimmer.dart';
 
 class OrdersPage extends ConsumerStatefulWidget {
   const OrdersPage({super.key});
@@ -40,6 +48,7 @@ class _OrdersPageState extends ConsumerState<OrdersPage> {
   @override
   Widget build(BuildContext context) {
     final ordersAsync = ref.watch(ordersNotifierProvider);
+    final productsAsync = ref.watch(productsProvider);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
@@ -57,100 +66,265 @@ class _OrdersPageState extends ConsumerState<OrdersPage> {
           onRefresh: () async {
             await ref.read(ordersNotifierProvider.notifier).refresh();
           },
-          child: ordersAsync.when(
-            data: (orders) {
-              if (orders.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        'lib/core/assets/images/empty_orders.png',
-                        width: 120,
-                        height: 120,
-                      ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'У вас пока нет заказов',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
+          child: SingleChildScrollView(
+            controller: _scrollController,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ordersAsync.when(
+                  data: (orders) {
+                    if (orders.isEmpty) {
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const SizedBox(height: 40),
+                            SvgPicture.asset(
+                              'lib/core/assets/icons/profile/empty.svg',
+                              width: 120,
+                              height: 120,
+                            ),
+                            const SizedBox(height: 24),
+                            Text(
+                              'У вас пока нет заказов',
+                              style: GoogleFonts.ysabeau(
+                                fontSize: 23,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'Здесь будут отображаться ваши заказы',
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            CustomButton(
+                              label: 'К каталогу',
+                              isFullWidth: false,
+                              onPressed: () {
+                                context.go('/store');
+                              },
+                            )
+                          ],
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Здесь будут отображаться ваши заказы',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
+                      );
+                    }
+
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: const EdgeInsets.all(16),
+                      itemCount: orders.length + 1,
+                      itemBuilder: (context, index) {
+                        if (index == orders.length) {
+                          return const SizedBox(height: 40);
+                        }
+
+                        final order = orders[index];
+                        return OrderItem(
+                          order: order,
+                          onTap: () {
+                            // Navigate to order details
+                          },
+                        );
+                      },
+                    );
+                  },
+                  loading: () => ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: const EdgeInsets.all(16),
+                    itemCount: 3,
+                    itemBuilder: (context, index) => const OrderSkeleton(),
+                  ),
+                  error: (error, stackTrace) => Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.error_outline,
+                          size: 48,
+                          color: Colors.red,
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              }
-
-              return ListView.builder(
-                controller: _scrollController,
-                padding: const EdgeInsets.all(16),
-                itemCount: orders.length + 1, // +1 for loading indicator
-                itemBuilder: (context, index) {
-                  if (index == orders.length) {
-                    return const SizedBox(height: 40);
-                  }
-
-                  final order = orders[index];
-                  return OrderItem(
-                    order: order,
-                    onTap: () {
-                      // Navigate to order details
-                    },
-                  );
-                },
-              );
-            },
-            loading: () => ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: 3,
-              itemBuilder: (context, index) => const OrderSkeleton(),
-            ),
-            error: (error, stackTrace) => Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.error_outline,
-                    size: 48,
-                    color: Colors.red,
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Не удалось загрузить заказы',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Не удалось загрузить заказы',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          error.toString(),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () {
+                            ref.read(ordersNotifierProvider.notifier).refresh();
+                          },
+                          child: const Text('Попробовать снова'),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    error.toString(),
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
+                ),
+                const SizedBox(height: 32),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Text(
+                    'Рекомендуемые товары',
+                    style: GoogleFonts.ysabeau(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
                     ),
-                    textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      ref.read(ordersNotifierProvider.notifier).refresh();
-                    },
-                    child: const Text('Попробовать снова'),
+                ),
+                const SizedBox(height: 16),
+                productsAsync.when(
+                  data: (response) {
+                    if (response.data.isEmpty) {
+                      return const Center(
+                        child: Text('Нет доступных товаров'),
+                      );
+                    }
+                    return GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 16,
+                        crossAxisSpacing: 16,
+                        childAspectRatio: 0.56,
+                      ),
+                      itemCount: response.data.length,
+                      itemBuilder: (context, index) {
+                        final variant = response.data[index];
+                        return GestureDetector(
+                          onTap: () {
+                            final productId = (variant.attributes['product']
+                                as Map<String, dynamic>)['id'] as int;
+                            context.push(
+                              '/products/$productId',
+                              extra: {'initialWeight': variant.value},
+                            );
+                          },
+                          child: ProductVariantItem(
+                            variant: variant,
+                            onAddToCart: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                      'Added ${variant.attributes['title']['ru']} to cart'),
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    );
+                  },
+                  loading: () => GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 16,
+                      crossAxisSpacing: 16,
+                      childAspectRatio: 0.56,
+                    ),
+                    itemCount: 4,
+                    itemBuilder: (context, index) => _buildProductSkeleton(),
                   ),
-                ],
-              ),
+                  error: (error, stackTrace) => Center(
+                    child: Text('Error: $error'),
+                  ),
+                ),
+                const SizedBox(height: 32),
+              ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProductSkeleton() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Shimmer.fromColors(
+        baseColor: Colors.grey[300]!,
+        highlightColor: Colors.grey[100]!,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Image skeleton
+            Container(
+              height: 180,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            const SizedBox(height: 8),
+            // Title skeleton
+            Container(
+              height: 16,
+              width: double.infinity,
+              margin: const EdgeInsets.symmetric(horizontal: 8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            const SizedBox(height: 4),
+            // Subtitle skeleton
+            Container(
+              height: 14,
+              width: 100,
+              margin: const EdgeInsets.symmetric(horizontal: 8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            const SizedBox(height: 8),
+            // Price skeleton
+            Container(
+              height: 20,
+              width: 80,
+              margin: const EdgeInsets.symmetric(horizontal: 8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            const SizedBox(height: 8),
+            // Button skeleton
+            Container(
+              height: 32,
+              margin: const EdgeInsets.symmetric(horizontal: 8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ],
         ),
       ),
     );
