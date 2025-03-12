@@ -142,7 +142,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       Expanded(
                         child: SingleChildScrollView(
                           child: Padding(
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(12),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
@@ -189,7 +189,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                         ),
                                         contentPadding:
                                             const EdgeInsets.symmetric(
-                                          horizontal: 16,
+                                          horizontal: 12,
                                           vertical: 16,
                                         ),
                                       ),
@@ -228,7 +228,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                         ),
                                         contentPadding:
                                             const EdgeInsets.symmetric(
-                                          horizontal: 16,
+                                          horizontal: 12,
                                           vertical: 16,
                                         ),
                                       ),

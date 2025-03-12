@@ -8,6 +8,7 @@ import 'package:remalux_ar/features/recipients/presentation/pages/recipients_pag
 import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/core/widgets/custom_button.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:remalux_ar/features/recipients/domain/providers/recipients_provider.dart';
 
 class AddRecipientSheet extends ConsumerStatefulWidget {
   const AddRecipientSheet({super.key});
@@ -95,45 +96,7 @@ class _AddRecipientSheetState extends ConsumerState<AddRecipientSheet> {
               onPressed: _isLoading
                   ? () {}
                   : () async {
-                      if (_formKey.currentState!.validate()) {
-                        setState(() {
-                          _isLoading = true;
-                        });
-
-                        try {
-                          await ref
-                              .read(recipientsServiceProvider)
-                              .addRecipient(
-                                _nameController.text,
-                                _phoneMaskFormatter.getUnmaskedText(),
-                              );
-
-                          ref.refresh(recipientsProvider);
-
-                          if (mounted) {
-                            Navigator.pop(context);
-                            CustomSnackBar.show(
-                              context,
-                              message: 'Получатель добавлен',
-                              type: SnackBarType.success,
-                            );
-                          }
-                        } catch (e) {
-                          if (mounted) {
-                            CustomSnackBar.show(
-                              context,
-                              message: 'Ошибка при добавлении получателя',
-                              type: SnackBarType.error,
-                            );
-                          }
-                        } finally {
-                          if (mounted) {
-                            setState(() {
-                              _isLoading = false;
-                            });
-                          }
-                        }
-                      }
+                      await _saveRecipient();
                     },
               isEnabled: !_isLoading,
               isLoading: _isLoading,
@@ -143,5 +106,45 @@ class _AddRecipientSheetState extends ConsumerState<AddRecipientSheet> {
         ),
       ),
     );
+  }
+
+  Future<void> _saveRecipient() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        await ref.read(recipientsProvider.notifier).addRecipient(
+              name: _nameController.text,
+              phoneNumber: _phoneController.text,
+            );
+
+        if (mounted) {
+          Navigator.pop(context);
+          CustomSnackBar.show(
+            context,
+            message: 'Получатель успешно добавлен',
+            type: SnackBarType.success,
+          );
+          // Force refresh recipients list
+          ref.read(recipientsProvider.notifier).refreshRecipients();
+        }
+      } catch (e) {
+        if (mounted) {
+          CustomSnackBar.show(
+            context,
+            message: 'Ошибка при добавлении получателя',
+            type: SnackBarType.error,
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
+    }
   }
 }

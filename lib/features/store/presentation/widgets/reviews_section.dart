@@ -87,7 +87,7 @@ class _ReviewCard extends StatelessWidget {
     final formattedDate = dateFormat.format(review.createdAt);
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),

@@ -78,7 +78,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     // App Bar
                     Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0, vertical: 8.0),
+                          horizontal: 12.0, vertical: 8.0),
                       child: Row(
                         children: [
                           const Expanded(child: SizedBox()),
@@ -203,7 +203,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                               // Visualize Button
                               Padding(
                                 padding:
-                                    const EdgeInsets.symmetric(horizontal: 16),
+                                    const EdgeInsets.symmetric(horizontal: 12),
                                 child: CustomButton(
                                   label: 'Визуализировать',
                                   onPressed: () {},

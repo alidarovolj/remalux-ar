@@ -65,7 +65,7 @@ class PageBanner extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Container(
         width: double.infinity,
         height: screenWidth < 768 ? 150 : 200, // Уменьшаем высоту на мобильных

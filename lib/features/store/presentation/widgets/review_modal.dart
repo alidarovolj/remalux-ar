@@ -41,7 +41,7 @@ class _ReviewModalState extends ConsumerState<ReviewModal> {
         children: [
           // Header
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(12),
             decoration: const BoxDecoration(
               border: Border(
                 bottom: BorderSide(
@@ -72,7 +72,7 @@ class _ReviewModalState extends ConsumerState<ReviewModal> {
 
           if (!isAuthorized) ...[
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
@@ -138,7 +138,7 @@ class _ReviewModalState extends ConsumerState<ReviewModal> {
             // Content
             Flexible(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -268,7 +268,7 @@ class _ReviewModalState extends ConsumerState<ReviewModal> {
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
                         ),
-                        contentPadding: const EdgeInsets.all(16),
+                        contentPadding: const EdgeInsets.all(12),
                       ),
                     ),
                   ],

@@ -75,7 +75,7 @@ class _PaintCalculatorModalState extends State<PaintCalculatorModal> {
             ],
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Column(
               children: [
                 Row(
@@ -103,7 +103,7 @@ class _PaintCalculatorModalState extends State<PaintCalculatorModal> {
                               decoration: const InputDecoration(
                                 border: InputBorder.none,
                                 contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 12),
+                                    horizontal: 12, vertical: 12),
                               ),
                               onChanged: (_) => setState(() {}),
                             ),
@@ -135,7 +135,7 @@ class _PaintCalculatorModalState extends State<PaintCalculatorModal> {
                               decoration: const InputDecoration(
                                 border: InputBorder.none,
                                 contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 12),
+                                    horizontal: 12, vertical: 12),
                               ),
                               onChanged: (_) => setState(() {}),
                             ),
@@ -167,7 +167,7 @@ class _PaintCalculatorModalState extends State<PaintCalculatorModal> {
                               decoration: const InputDecoration(
                                 border: InputBorder.none,
                                 contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 12),
+                                    horizontal: 12, vertical: 12),
                               ),
                               onChanged: (_) => setState(() {}),
                             ),

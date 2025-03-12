@@ -46,7 +46,7 @@ class CategoriesGrid extends ConsumerWidget {
         ),
         loading: () => GridView.builder(
           shrinkWrap: true,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 4,

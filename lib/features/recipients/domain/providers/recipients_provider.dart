@@ -8,45 +8,50 @@ final recipientsServiceProvider = Provider<RecipientsService>((ref) {
   return RecipientsService(apiClient, ref);
 });
 
-class RecipientsNotifier extends StateNotifier<AsyncValue<List<Recipient>>> {
-  final RecipientsService _service;
+final recipientsProvider =
+    AsyncNotifierProvider<RecipientsNotifier, List<Recipient>>(() {
+  return RecipientsNotifier();
+});
 
-  RecipientsNotifier(this._service) : super(const AsyncValue.loading()) {
-    loadRecipients();
+class RecipientsNotifier extends AsyncNotifier<List<Recipient>> {
+  @override
+  Future<List<Recipient>> build() async {
+    return _fetchRecipients();
   }
 
-  Future<void> loadRecipients() async {
-    try {
-      state = const AsyncValue.loading();
-      final recipients = await _service.getRecipients();
-      state = AsyncValue.data(recipients);
-    } catch (error, stackTrace) {
-      state = AsyncValue.error(error, stackTrace);
-    }
+  Future<List<Recipient>> _fetchRecipients() async {
+    final recipientsService = ref.read(recipientsServiceProvider);
+    return await recipientsService.getRecipients(forceRefresh: true);
   }
 
-  Future<void> addRecipient(String name, String phoneNumber) async {
-    try {
-      await _service.addRecipient(name, phoneNumber);
-      await loadRecipients();
-    } catch (error) {
-      rethrow;
-    }
+  Future<void> refreshRecipients() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() => _fetchRecipients());
   }
 
   Future<void> deleteRecipient(int id) async {
     try {
-      await _service.deleteRecipient(id);
-      await loadRecipients();
-    } catch (error) {
+      final recipientsService = ref.read(recipientsServiceProvider);
+      await recipientsService.deleteRecipient(id);
+      state = const AsyncValue.loading();
+      state = await AsyncValue.guard(() => _fetchRecipients());
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
+    }
+  }
+
+  Future<void> addRecipient({
+    required String name,
+    required String phoneNumber,
+  }) async {
+    try {
+      final recipientsService = ref.read(recipientsServiceProvider);
+      await recipientsService.addRecipient(name, phoneNumber);
+      state = const AsyncValue.loading();
+      state = await AsyncValue.guard(() => _fetchRecipients());
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
       rethrow;
     }
   }
 }
-
-final recipientsProvider =
-    StateNotifierProvider<RecipientsNotifier, AsyncValue<List<Recipient>>>(
-        (ref) {
-  final service = ref.read(recipientsServiceProvider);
-  return RecipientsNotifier(service);
-});

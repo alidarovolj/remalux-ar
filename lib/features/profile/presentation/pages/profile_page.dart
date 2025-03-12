@@ -11,6 +11,7 @@ import 'package:remalux_ar/features/profile/presentation/widgets/profile_skeleto
 import 'package:remalux_ar/features/profile/presentation/widgets/logout_confirmation_modal.dart';
 import 'package:flutter/services.dart';
 import 'package:remalux_ar/core/widgets/custom_app_bar.dart';
+import 'package:remalux_ar/features/profile/presentation/widgets/profile_menu_item.dart';
 
 final userProvider =
     StateNotifierProvider<UserNotifier, AsyncValue<User?>>((ref) {
@@ -380,7 +381,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 context,
                 icon: 'lib/core/assets/icons/profile/location.svg',
                 title: 'Адреса доставок',
-                onTap: () {},
+                onTap: () {
+                  context.push('/addresses');
+                },
               ),
 
               // Recipients
@@ -392,6 +395,20 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   context.push('/recipients');
                 },
               ),
+
+              // Menu Items
+              const SizedBox(height: 16),
+              ProfileMenuItem(
+                icon: Icons.location_on_outlined,
+                title: 'Адреса доставок',
+                onTap: () => context.push('/addresses'),
+              ),
+              ProfileMenuItem(
+                icon: Icons.business_outlined,
+                title: 'Наши филиалы',
+                onTap: () => context.push('/contacts'),
+              ),
+
               const SizedBox(height: 32),
 
               // About Section
@@ -510,7 +527,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     return ListView(
       controller: _scrollController,
       physics: const ClampingScrollPhysics(),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       children: [
         // Auth Section
         Column(

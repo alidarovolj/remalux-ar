@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
-import 'package:remalux_ar/core/widgets/app_bar_widget.dart';
 import 'package:remalux_ar/features/home/domain/providers/colors_provider.dart';
 import 'package:remalux_ar/features/home/domain/providers/detailed_colors_provider.dart';
 import 'package:remalux_ar/features/home/presentation/widgets/color_card_skeleton.dart';

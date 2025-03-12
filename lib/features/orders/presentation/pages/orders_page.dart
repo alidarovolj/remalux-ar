@@ -116,7 +116,7 @@ class _OrdersPageState extends ConsumerState<OrdersPage> {
                     return ListView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(12),
                       itemCount: orders.length + 1,
                       itemBuilder: (context, index) {
                         if (index == orders.length) {
@@ -136,7 +136,7 @@ class _OrdersPageState extends ConsumerState<OrdersPage> {
                   loading: () => ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(12),
                     itemCount: 3,
                     itemBuilder: (context, index) => const OrderSkeleton(),
                   ),
@@ -179,7 +179,7 @@ class _OrdersPageState extends ConsumerState<OrdersPage> {
                 ),
                 const SizedBox(height: 32),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Text(
                     'Рекомендуемые товары',
                     style: GoogleFonts.ysabeau(
@@ -199,7 +199,7 @@ class _OrdersPageState extends ConsumerState<OrdersPage> {
                     return GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
@@ -237,7 +237,7 @@ class _OrdersPageState extends ConsumerState<OrdersPage> {
                   loading: () => GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,

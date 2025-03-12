@@ -45,7 +45,7 @@ class IdeasGrid extends ConsumerWidget {
           },
           loading: () => ListView.builder(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
             itemCount: 3,
             itemBuilder: (context, index) => const SizedBox(
               width: 300,

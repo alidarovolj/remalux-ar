@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:remalux_ar/core/widgets/section_widget.dart';
 import 'package:remalux_ar/features/home/domain/providers/colors_provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 class ColorsGrid extends ConsumerWidget {
   const ColorsGrid({super.key});
@@ -46,7 +47,7 @@ class ColorsGrid extends ConsumerWidget {
         height: 120,
         child: colorsAsync.when(
           data: (colors) => ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
             scrollDirection: Axis.horizontal,
             itemCount: colors.length,
             itemBuilder: (context, index) {
@@ -86,7 +87,39 @@ class ColorsGrid extends ConsumerWidget {
               );
             },
           ),
-          loading: () => const Center(child: CircularProgressIndicator()),
+          loading: () => ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            scrollDirection: Axis.horizontal,
+            itemCount: 6, // Show 6 skeleton items
+            itemBuilder: (context, index) => Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: Shimmer.fromColors(
+                baseColor: Colors.grey[300]!,
+                highlightColor: Colors.grey[100]!,
+                child: Column(
+                  children: [
+                    Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      width: 60,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
           error: (error, stack) => Center(
             child: Text('Error: $error'),
           ),

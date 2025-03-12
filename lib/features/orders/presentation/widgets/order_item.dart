@@ -33,7 +33,7 @@ class OrderItem extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -123,7 +123,7 @@ class OrderItem extends StatelessWidget {
                 height: 60,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
                   itemCount: order.orderItems.length,
                   itemBuilder: (context, index) {
                     final item = order.orderItems[index];
@@ -153,7 +153,7 @@ class OrderItem extends StatelessWidget {
                 height: 60,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
                   itemCount: 3, // Placeholder for product images
                   itemBuilder: (context, index) {
                     return Container(

@@ -122,8 +122,9 @@ class ProductCard extends ConsumerWidget {
         if (productData == null) return const SizedBox.shrink();
 
         final priceRange = productData['price_range'] as List<dynamic>?;
-        if (priceRange == null || priceRange.length != 2)
+        if (priceRange == null || priceRange.length != 2) {
           return const SizedBox.shrink();
+        }
 
         final from = (priceRange[0] as num).toInt();
         final to = (priceRange[1] as num).toInt();
@@ -131,7 +132,7 @@ class ProductCard extends ConsumerWidget {
         if (from == 0 && to == 0) return const SizedBox.shrink();
 
         return Text(
-          'от ${from} ₸',
+          'от $from ₸',
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,

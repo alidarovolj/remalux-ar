@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:remalux_ar/core/theme/colors.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ProfileSkeleton extends StatelessWidget {

@@ -15,6 +15,8 @@ import 'package:remalux_ar/features/auth/presentation/pages/login_page.dart';
 import 'package:remalux_ar/features/orders/presentation/pages/orders_page.dart';
 import 'package:remalux_ar/features/favorites/presentation/pages/favorites_page.dart';
 import 'package:remalux_ar/features/recipients/presentation/pages/recipients_page.dart';
+import 'package:remalux_ar/features/addresses/presentation/pages/addresses_page.dart';
+import 'package:remalux_ar/features/contacts/presentation/pages/contacts_page.dart';
 // import 'package:chucker_flutter/chucker_flutter.dart';
 
 class AppRouter {
@@ -85,6 +87,12 @@ class AppRouter {
         name: 'recipients',
         builder: (context, state) => const RecipientsPage(),
       ),
+      // Addresses page route
+      GoRoute(
+        path: '/addresses',
+        name: 'addresses',
+        builder: (context, state) => const AddressesPage(),
+      ),
       // Product detail route
       GoRoute(
         path: '/products/:id',
@@ -141,6 +149,10 @@ class AppRouter {
             initialTabIndex: extra?['initialTabIndex'] as int?,
           );
         },
+      ),
+      GoRoute(
+        path: '/contacts',
+        builder: (context, state) => const ContactsPage(),
       ),
     ],
   );

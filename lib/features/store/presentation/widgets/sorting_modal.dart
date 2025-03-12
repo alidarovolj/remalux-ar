@@ -34,7 +34,7 @@ class SortingModal extends ConsumerWidget {
                   color: const Color(0xFFEEEEEE),
                   borderRadius: BorderRadius.circular(2),
                 ),
-                margin: const EdgeInsets.symmetric(horizontal: 16),
+                margin: const EdgeInsets.symmetric(horizontal: 12),
               ),
               const SizedBox(height: 8),
               Text(

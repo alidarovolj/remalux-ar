@@ -9,6 +9,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:remalux_ar/core/providers/auth/auth_state.dart';
 // import 'package:remalux_ar/features/auth/presentation/pages/auth_check_page.dart';
 import 'package:remalux_ar/core/services/analytics_service.dart';
+import 'package:remalux_ar/core/router/app_router.dart';
+// import 'package:yandex_mapkit/yandex_mapkit.dart';
+// import 'package:yandex_search/yandex_search.dart';
 // import 'package:chucker_flutter/chucker_flutter.dart';
 
 Future<void> main() async {
@@ -38,6 +41,11 @@ Future<void> main() async {
 
     // Check if user has seen onboarding
     final hasSeenOnboarding = await StorageService.hasSeenOnboarding();
+
+    // Initialize Yandex MapKit
+    // await YandexMapKit.init(
+    //   apiKey: dotenv.env['YANDEX_MAPKIT_API_KEY'] ?? '',
+    // );
 
     runApp(
       ProviderScope(

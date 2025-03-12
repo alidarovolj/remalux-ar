@@ -12,7 +12,6 @@ import 'package:remalux_ar/features/store/presentation/widgets/sorting_modal.dar
 import 'package:shimmer/shimmer.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:remalux_ar/features/home/domain/providers/selected_color_provider.dart';
-import 'package:remalux_ar/core/widgets/custom_app_bar.dart';
 import 'dart:async';
 
 class StorePage extends ConsumerStatefulWidget {

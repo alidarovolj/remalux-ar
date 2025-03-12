@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
-import 'package:remalux_ar/features/favorites/domain/services/favorites_service.dart';
-import 'package:remalux_ar/features/favorites/domain/providers/favorites_providers.dart';
-import 'package:remalux_ar/features/home/domain/providers/detailed_colors_provider.dart';
 import 'package:remalux_ar/features/favorites/domain/models/favorite_color.dart';
 
 class DetailedColorCard extends ConsumerWidget {

@@ -40,7 +40,7 @@ class ColorSelection extends ConsumerWidget {
                         ),
                       ),
                       Text(
-                        '${selectedColor.ral}',
+                        selectedColor.ral,
                         style: const TextStyle(
                           fontSize: 13,
                           color: AppColors.textSecondary,

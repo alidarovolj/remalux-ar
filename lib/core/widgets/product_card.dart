@@ -28,8 +28,9 @@ class ProductCard extends StatelessWidget {
   });
 
   Widget _buildPrice() {
-    if (priceRange == null || priceRange!.isEmpty)
+    if (priceRange == null || priceRange!.isEmpty) {
       return const SizedBox.shrink();
+    }
 
     return Text(
       'от ${priceRange![0]} ₸',

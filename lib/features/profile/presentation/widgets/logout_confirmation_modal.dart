@@ -16,7 +16,7 @@ class LogoutConfirmationModal extends ConsumerWidget {
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -27,7 +27,7 @@ class LogoutConfirmationModal extends ConsumerWidget {
               color: const Color(0xFFEEEEEE),
               borderRadius: BorderRadius.circular(2),
             ),
-            margin: const EdgeInsets.symmetric(horizontal: 16),
+            margin: const EdgeInsets.symmetric(horizontal: 12),
           ),
           const SizedBox(height: 24),
           Text(

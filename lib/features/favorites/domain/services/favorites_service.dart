@@ -11,7 +11,7 @@ class FavoritesService {
   FavoritesService(this._apiClient, this._ref);
 
   void _ensureToken() {
-    final authState = _ref.read(authProvider);
+    final authState = _ref.watch(authProvider);
     if (!authState.isAuthenticated || authState.token == null) {
       throw Exception('User is not authenticated');
     }
@@ -52,7 +52,7 @@ class FavoritesService {
       );
     } catch (error) {
       print('Error adding favorite product: $error');
-      throw error;
+      rethrow;
     }
   }
 
@@ -65,7 +65,7 @@ class FavoritesService {
       );
     } catch (error) {
       print('Error removing favorite product: $error');
-      throw error;
+      rethrow;
     }
   }
 
@@ -78,7 +78,7 @@ class FavoritesService {
       );
     } catch (error) {
       print('Error adding favorite color: $error');
-      throw error;
+      rethrow;
     }
   }
 
@@ -91,7 +91,7 @@ class FavoritesService {
       );
     } catch (error) {
       print('Error removing favorite color: $error');
-      throw error;
+      rethrow;
     }
   }
 

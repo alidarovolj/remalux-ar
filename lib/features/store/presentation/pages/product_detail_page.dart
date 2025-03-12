@@ -139,7 +139,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                     borderRadius: BorderRadius.circular(12),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
+                          horizontal: 12, vertical: 12),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -284,7 +284,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                   },
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
+                                      horizontal: 12,
                                       vertical: 8,
                                     ),
                                     decoration: BoxDecoration(

@@ -29,7 +29,6 @@ class ColorCard extends ConsumerWidget {
   String _getTitle() {
     try {
       final title = color.color.title;
-      if (title == null) return '';
       return title['ru']?.toString() ?? '';
     } catch (e) {
       print('Error getting color title: $e');

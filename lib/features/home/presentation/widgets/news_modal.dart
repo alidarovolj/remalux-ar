@@ -31,7 +31,7 @@ class NewsModal extends ConsumerWidget {
             ),
             Flexible(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(12),
                 child: newsAsync.when(
                   data: (news) => Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
