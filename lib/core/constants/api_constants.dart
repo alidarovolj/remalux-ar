@@ -1,3 +1,3 @@
 class ApiConstants {
-  static const String baseUrl = 'https://api.remalux.kz';
+  static const String baseUrl = 'https://api.remalux.kz/api';
 }

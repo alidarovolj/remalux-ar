@@ -1,22 +1,22 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:remalux_ar/core/api/api_client.dart';
-import 'package:remalux_ar/features/contacts/data/models/contact_model.dart';
+import 'package:remalux_ar/features/projects/data/models/project_model.dart';
 
-final contactsServiceProvider = Provider<ContactsService>((ref) {
+final projectsServiceProvider = Provider<ProjectsService>((ref) {
   final dio = ApiClient().dio;
-  return ContactsService(dio: dio);
+  return ProjectsService(dio: dio);
 });
 
-class ContactsService {
+class ProjectsService {
   final Dio dio;
 
-  ContactsService({required this.dio});
+  ProjectsService({required this.dio});
 
-  Future<List<Contact>> getContacts({bool forceRefresh = false}) async {
+  Future<List<ProjectModel>> getProjects({bool forceRefresh = false}) async {
     try {
       final response = await dio.get(
-        '/contacts',
+        '/projects',
         options: Options(
           headers: {
             'Cache-Control':
@@ -33,17 +33,17 @@ class ContactsService {
         final List<dynamic> data = response.data['data'] ?? [];
         return data.map((json) {
           try {
-            return Contact.fromJson(json as Map<String, dynamic>);
+            return ProjectModel.fromJson(json as Map<String, dynamic>);
           } catch (e) {
-            print('Error parsing contact: $e');
-            print('Contact data: $json');
+            print('Error parsing project: $e');
+            print('Project data: $json');
             rethrow;
           }
         }).toList();
       }
-      throw Exception('Failed to load contacts');
+      throw Exception('Failed to load projects');
     } catch (e) {
-      print('Error getting contacts: $e');
+      print('Error getting projects: $e');
       rethrow;
     }
   }

@@ -11,6 +11,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool showBottomBorder;
   final bool showFavoritesButton;
   final PreferredSizeWidget? bottom;
+  final bool showLogo;
+  final String? logoAssetPath;
+  final double? logoHeight;
 
   const CustomAppBar({
     super.key,
@@ -20,6 +23,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.showBottomBorder = false,
     this.showFavoritesButton = false,
     this.bottom,
+    this.showLogo = false,
+    this.logoAssetPath,
+    this.logoHeight = 40,
   });
 
   @override
@@ -36,16 +42,21 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               onPressed: () => context.pop(),
             )
           : null,
-      title: showTitle
-          ? Text(
-              title,
-              style: GoogleFonts.ysabeau(
-                color: AppColors.textPrimary,
-                fontSize: 23,
-                fontWeight: FontWeight.w600,
-              ),
+      title: showLogo
+          ? Image.asset(
+              logoAssetPath ?? 'lib/core/assets/images/logos/main.png',
+              height: logoHeight,
             )
-          : null,
+          : (showTitle
+              ? Text(
+                  title,
+                  style: GoogleFonts.ysabeau(
+                    color: AppColors.textPrimary,
+                    fontSize: 23,
+                    fontWeight: FontWeight.w600,
+                  ),
+                )
+              : null),
       actions: [
         if (showFavoritesButton)
           IconButton(

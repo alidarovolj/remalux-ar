@@ -17,6 +17,8 @@ import 'package:remalux_ar/features/favorites/presentation/pages/favorites_page.
 import 'package:remalux_ar/features/recipients/presentation/pages/recipients_page.dart';
 import 'package:remalux_ar/features/addresses/presentation/pages/addresses_page.dart';
 import 'package:remalux_ar/features/contacts/presentation/pages/contacts_page.dart';
+import 'package:remalux_ar/features/projects/presentation/pages/projects_page.dart';
+import 'package:remalux_ar/features/faq/presentation/pages/faq_page.dart';
 // import 'package:chucker_flutter/chucker_flutter.dart';
 
 class AppRouter {
@@ -153,6 +155,16 @@ class AppRouter {
       GoRoute(
         path: '/contacts',
         builder: (context, state) => const ContactsPage(),
+      ),
+      GoRoute(
+        path: '/projects',
+        name: 'projects',
+        builder: (context, state) => const ProjectsPage(),
+      ),
+      GoRoute(
+        path: '/faq',
+        name: 'faq',
+        builder: (context, state) => const FaqPage(),
       ),
     ],
   );

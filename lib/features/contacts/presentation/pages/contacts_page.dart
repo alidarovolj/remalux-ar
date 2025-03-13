@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/core/widgets/custom_app_bar.dart';
-import 'package:remalux_ar/features/contacts/domain/providers/contacts_provider.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:remalux_ar/features/contacts/data/models/contact_model.dart';
+import 'package:remalux_ar/features/contacts/presentation/providers/contacts_provider.dart';
+import 'package:remalux_ar/features/contacts/presentation/widgets/contact_list.dart';
+import 'package:remalux_ar/features/contacts/presentation/widgets/contact_map.dart';
+import 'package:shimmer/shimmer.dart';
 
 class ContactsPage extends ConsumerStatefulWidget {
   const ContactsPage({super.key});
@@ -14,26 +18,281 @@ class ContactsPage extends ConsumerStatefulWidget {
 
 class _ContactsPageState extends ConsumerState<ContactsPage>
     with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  int _selectedIndex = 0;
+  TabController? _tabController;
+
+  String _getAddressText(int count) {
+    if (count == 1) return '1 адрес';
+    if (count >= 2 && count <= 4) return '$count адреса';
+    return '$count адресов';
+  }
 
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
-      ref.read(contactsProvider.notifier).refreshContacts();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(contactsProvider.notifier).fetchContacts();
     });
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
+    _tabController?.dispose();
     super.dispose();
+  }
+
+  void _initializeTabController(int length) {
+    if (_tabController?.length != length) {
+      _tabController?.dispose();
+      _tabController = TabController(
+        length: length,
+        vsync: this,
+      );
+      _tabController?.addListener(() {
+        if (mounted) setState(() {});
+      });
+    }
+  }
+
+  Widget _buildSkeleton() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Title skeleton
+        Padding(
+          padding: const EdgeInsets.all(12),
+          child: Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              width: 200,
+              height: 28,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+          ),
+        ),
+        // Tabs skeleton
+        Padding(
+          padding: const EdgeInsets.only(left: 12),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: List.generate(
+                4,
+                (index) => Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: Shimmer.fromColors(
+                    baseColor: Colors.grey[300]!,
+                    highlightColor: Colors.grey[100]!,
+                    child: Container(
+                      width: 80,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        // City info skeleton
+        Padding(
+          padding: const EdgeInsets.only(right: 12, top: 24, left: 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Shimmer.fromColors(
+                baseColor: Colors.grey[300]!,
+                highlightColor: Colors.grey[100]!,
+                child: Container(
+                  width: 120,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+              Shimmer.fromColors(
+                baseColor: Colors.grey[300]!,
+                highlightColor: Colors.grey[100]!,
+                child: Container(
+                  width: 80,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        // Divider skeleton
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 24, horizontal: 12),
+          child: Divider(height: 1),
+        ),
+        // Contact list skeleton
+        Expanded(
+          child: ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            itemCount: 3,
+            itemBuilder: (context, index) => Padding(
+              padding: const EdgeInsets.only(bottom: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Address skeleton
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(
+                        Icons.location_on_outlined,
+                        size: 24,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Shimmer.fromColors(
+                          baseColor: Colors.grey[300]!,
+                          highlightColor: Colors.grey[100]!,
+                          child: Container(
+                            height: 20,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  // Phone skeleton
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.phone_outlined,
+                          size: 24,
+                          color: Colors.grey,
+                        ),
+                        const SizedBox(width: 8),
+                        Shimmer.fromColors(
+                          baseColor: Colors.grey[300]!,
+                          highlightColor: Colors.grey[100]!,
+                          child: Container(
+                            width: 120,
+                            height: 20,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Map and schedule skeleton
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Shimmer.fromColors(
+                              baseColor: Colors.grey[300]!,
+                              highlightColor: Colors.grey[100]!,
+                              child: Container(
+                                width: 100,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            ...List.generate(
+                              7,
+                              (index) => Padding(
+                                padding: const EdgeInsets.only(bottom: 4),
+                                child: Row(
+                                  children: [
+                                    Shimmer.fromColors(
+                                      baseColor: Colors.grey[300]!,
+                                      highlightColor: Colors.grey[100]!,
+                                      child: Container(
+                                        width: 32,
+                                        height: 16,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Shimmer.fromColors(
+                                      baseColor: Colors.grey[300]!,
+                                      highlightColor: Colors.grey[100]!,
+                                      child: Container(
+                                        width: 80,
+                                        height: 16,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Shimmer.fromColors(
+                          baseColor: Colors.grey[300]!,
+                          highlightColor: Colors.grey[100]!,
+                          child: Container(
+                            height: 200,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: AppColors.backgroundLight,
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final contacts = ref.watch(contactsProvider);
+    final contactsState = ref.watch(contactsProvider);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -41,296 +300,100 @@ class _ContactsPageState extends ConsumerState<ContactsPage>
         title: 'Наши филиалы',
         showBottomBorder: true,
       ),
-      body: contacts.when(
-        data: (contactsList) {
-          if (_tabController == null ||
-              _tabController.length != contactsList.length) {
-            _tabController = TabController(
-              length: contactsList.length,
-              vsync: this,
-              initialIndex: _selectedIndex,
-            );
-            _tabController.addListener(() {
-              setState(() {
-                _selectedIndex = _tabController.index;
-              });
-            });
+      body: contactsState.when(
+        data: (contacts) {
+          if (contacts.isEmpty) {
+            return const Center(child: Text('Нет доступных контактов'));
           }
 
+          if (!mounted) return const SizedBox.shrink();
+
+          final cities = contacts.map((c) => c.city).toSet().toList()
+            ..sort((a, b) => a.title.ru.compareTo(b.title.ru));
+
+          _initializeTabController(cities.length);
+
+          final currentCity = cities[_tabController?.index ?? 0];
+          final currentCityContacts =
+              contacts.where((c) => c.city.id == currentCity.id).toList();
+
           return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Text(
+                  'Наши филиалы',
+                  style: GoogleFonts.ysabeau(
+                    fontSize: 23,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
               TabBar(
-                controller: _tabController,
-                isScrollable: true,
+                controller: _tabController!,
                 labelColor: AppColors.primary,
                 unselectedLabelColor: AppColors.textSecondary,
                 indicatorColor: AppColors.primary,
-                tabs: contactsList
-                    .map((contact) => Tab(
-                          text: contact.city.title.ru,
-                        ))
-                    .toList(),
+                isScrollable: true,
+                padding: const EdgeInsets.only(left: 12),
+                tabs: cities.map((city) => Tab(text: city.title.ru)).toList(),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 12, top: 24, left: 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      currentCity.title.ru,
+                      style: const TextStyle(
+                        fontSize: 19,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    Text(
+                      _getAddressText(currentCityContacts.length),
+                      style: const TextStyle(
+                        fontSize: 15,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 24, horizontal: 12),
+                child: Divider(height: 1),
               ),
               Expanded(
                 child: TabBarView(
-                  controller: _tabController,
-                  children: contactsList.map((contact) {
-                    return ListView.builder(
-                      padding: const EdgeInsets.all(12),
-                      itemCount: contact.innerItems.length,
-                      itemBuilder: (context, index) {
-                        final item = contact.innerItems[index];
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 12),
-                          decoration: BoxDecoration(
-                            color: AppColors.backgroundLight,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(12),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      item.address.ru,
-                                      style: const TextStyle(
-                                        fontSize: 15,
-                                        color: AppColors.textPrimary,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    GestureDetector(
-                                      onTap: () => launchUrl(
-                                        Uri.parse('tel:${item.mainPhone}'),
-                                      ),
-                                      child: Text(
-                                        item.mainPhone,
-                                        style: const TextStyle(
-                                          fontSize: 15,
-                                          color: Colors.blue,
-                                          decoration: TextDecoration.underline,
-                                        ),
-                                      ),
-                                    ),
-                                    if (item.contactItems.phone.isNotEmpty) ...[
-                                      const SizedBox(height: 4),
-                                      ...item.contactItems.phone.map(
-                                        (phone) => GestureDetector(
-                                          onTap: () => launchUrl(
-                                            Uri.parse('tel:${phone.value}'),
-                                          ),
-                                          child: Text(
-                                            phone.value,
-                                            style: const TextStyle(
-                                              fontSize: 15,
-                                              color: Colors.blue,
-                                              decoration:
-                                                  TextDecoration.underline,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                    const SizedBox(height: 8),
-                                    GestureDetector(
-                                      onTap: () => launchUrl(
-                                        Uri.parse('mailto:${item.mainEmail}'),
-                                      ),
-                                      child: Text(
-                                        item.mainEmail,
-                                        style: const TextStyle(
-                                          fontSize: 15,
-                                          color: Colors.blue,
-                                          decoration: TextDecoration.underline,
-                                        ),
-                                      ),
-                                    ),
-                                    if (item.contactItems.email.isNotEmpty) ...[
-                                      const SizedBox(height: 4),
-                                      ...item.contactItems.email.map(
-                                        (email) => GestureDetector(
-                                          onTap: () => launchUrl(
-                                            Uri.parse('mailto:${email.value}'),
-                                          ),
-                                          child: Text(
-                                            email.value,
-                                            style: const TextStyle(
-                                              fontSize: 15,
-                                              color: Colors.blue,
-                                              decoration:
-                                                  TextDecoration.underline,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: const BoxDecoration(
-                                  border: Border(
-                                    top: BorderSide(
-                                      color: Color(0xFFEEEEEE),
-                                      width: 1,
-                                    ),
-                                  ),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'График работы',
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        color: AppColors.textPrimary,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Row(
-                                      children: [
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Пн',
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                color: item.workTime[0]
-                                                            .startTime !=
-                                                        null
-                                                    ? AppColors.textPrimary
-                                                    : AppColors.textSecondary,
-                                              ),
-                                            ),
-                                            Text(
-                                              'Вт',
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                color: item.workTime[1]
-                                                            .startTime !=
-                                                        null
-                                                    ? AppColors.textPrimary
-                                                    : AppColors.textSecondary,
-                                              ),
-                                            ),
-                                            Text(
-                                              'Ср',
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                color: item.workTime[2]
-                                                            .startTime !=
-                                                        null
-                                                    ? AppColors.textPrimary
-                                                    : AppColors.textSecondary,
-                                              ),
-                                            ),
-                                            Text(
-                                              'Чт',
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                color: item.workTime[3]
-                                                            .startTime !=
-                                                        null
-                                                    ? AppColors.textPrimary
-                                                    : AppColors.textSecondary,
-                                              ),
-                                            ),
-                                            Text(
-                                              'Пт',
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                color: item.workTime[4]
-                                                            .startTime !=
-                                                        null
-                                                    ? AppColors.textPrimary
-                                                    : AppColors.textSecondary,
-                                              ),
-                                            ),
-                                            Text(
-                                              'Сб',
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                color: item.workTime[5]
-                                                            .startTime !=
-                                                        null
-                                                    ? AppColors.textPrimary
-                                                    : AppColors.textSecondary,
-                                              ),
-                                            ),
-                                            Text(
-                                              'Вс',
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                color: item.workTime[6]
-                                                            .startTime !=
-                                                        null
-                                                    ? AppColors.textPrimary
-                                                    : AppColors.textSecondary,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(width: 12),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: item.workTime
-                                              .map(
-                                                (workTime) => Text(
-                                                  workTime.startTime != null
-                                                      ? '${workTime.startTime} - ${workTime.endTime}'
-                                                      : 'Выходной',
-                                                  style: TextStyle(
-                                                    fontSize: 15,
-                                                    color: workTime.startTime !=
-                                                            null
-                                                        ? AppColors.textPrimary
-                                                        : AppColors
-                                                            .textSecondary,
-                                                  ),
-                                                ),
-                                              )
-                                              .toList(),
-                                        ),
-                                      ],
-                                    ),
-                                    if (item.breakTime.startTime != null) ...[
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        'Перерыв: ${item.breakTime.startTime} - ${item.breakTime.endTime}',
-                                        style: const TextStyle(
-                                          fontSize: 15,
-                                          color: AppColors.textSecondary,
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    );
+                  controller: _tabController!,
+                  children: cities.map((city) {
+                    final cityContacts =
+                        contacts.where((c) => c.city.id == city.id).toList();
+                    return ContactList(contacts: cityContacts);
                   }).toList(),
                 ),
               ),
             ],
           );
         },
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
+        loading: () => _buildSkeleton(),
         error: (error, stackTrace) => Center(
-          child: Text('Error: $error'),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(error.toString()),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () =>
+                    ref.read(contactsProvider.notifier).fetchContacts(),
+                child: const Text('Повторить'),
+              ),
+            ],
+          ),
         ),
       ),
     );

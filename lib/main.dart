@@ -10,6 +10,7 @@ import 'package:remalux_ar/core/providers/auth/auth_state.dart';
 // import 'package:remalux_ar/features/auth/presentation/pages/auth_check_page.dart';
 import 'package:remalux_ar/core/services/analytics_service.dart';
 import 'package:remalux_ar/core/router/app_router.dart';
+// import 'package:remalux_ar/core/database/database_initializer.dart';
 // import 'package:yandex_mapkit/yandex_mapkit.dart';
 // import 'package:yandex_search/yandex_search.dart';
 // import 'package:chucker_flutter/chucker_flutter.dart';
@@ -19,23 +20,11 @@ Future<void> main() async {
     await dotenv.load();
     WidgetsFlutterBinding.ensureInitialized();
 
-    // Initialize Chucker
-    // ChuckerFlutter.showOnRelease = false;
-
-    // Initialize Firebase
-    // await initializeFirebase();
-
     // Initialize Amplitude
     final amplitudeApiKey = dotenv.env['AMPLITUDE_API_KEY'];
     if (amplitudeApiKey != null) {
       await AnalyticsService.init(amplitudeApiKey);
     }
-
-    // Request notification permissions
-    // await requestNotificationPermissions();
-
-    // Set up notification listeners
-    // setupNotificationListeners();
 
     await initializeDateFormatting('ru', null);
 

@@ -9,11 +9,14 @@ class LocalizedText {
     required this.en,
   });
 
-  factory LocalizedText.fromJson(Map<String, dynamic> json) {
+  factory LocalizedText.fromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return LocalizedText(ru: '', kz: '', en: '');
+    }
     return LocalizedText(
-      ru: json['ru'] as String,
-      kz: json['kz'] as String,
-      en: json['en'] as String,
+      ru: json['ru'] as String? ?? '',
+      kz: json['kz'] as String? ?? '',
+      en: json['en'] as String? ?? '',
     );
   }
 
@@ -35,10 +38,13 @@ class City {
     required this.title,
   });
 
-  factory City.fromJson(Map<String, dynamic> json) {
+  factory City.fromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return City(id: 0, title: LocalizedText(ru: '', kz: '', en: ''));
+    }
     return City(
-      id: json['id'] as int,
-      title: LocalizedText.fromJson(json['title'] as Map<String, dynamic>),
+      id: json['id'] as int? ?? 0,
+      title: LocalizedText.fromJson(json['title'] as Map<String, dynamic>?),
     );
   }
 
@@ -63,12 +69,15 @@ class ContactItem {
     required this.type,
   });
 
-  factory ContactItem.fromJson(Map<String, dynamic> json) {
+  factory ContactItem.fromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return ContactItem(id: 0, title: '', value: '', type: '');
+    }
     return ContactItem(
-      id: json['id'] as int,
-      title: json['title'] as String,
-      value: json['value'] as String,
-      type: json['type'] as String,
+      id: json['id'] as int? ?? 0,
+      title: json['title'] as String? ?? '',
+      value: json['value'] as String? ?? '',
+      type: json['type'] as String? ?? '',
     );
   }
 
@@ -91,14 +100,19 @@ class ContactItems {
     required this.phone,
   });
 
-  factory ContactItems.fromJson(Map<String, dynamic> json) {
+  factory ContactItems.fromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return ContactItems(email: [], phone: []);
+    }
     return ContactItems(
-      email: (json['email'] as List)
-          .map((e) => ContactItem.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      phone: (json['phone'] as List)
-          .map((e) => ContactItem.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      email: (json['email'] as List<dynamic>?)
+              ?.map((e) => ContactItem.fromJson(e as Map<String, dynamic>?))
+              .toList() ??
+          [],
+      phone: (json['phone'] as List<dynamic>?)
+              ?.map((e) => ContactItem.fromJson(e as Map<String, dynamic>?))
+              .toList() ??
+          [],
     );
   }
 
@@ -119,7 +133,10 @@ class WorkTime {
     this.endTime,
   });
 
-  factory WorkTime.fromJson(Map<String, dynamic> json) {
+  factory WorkTime.fromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return WorkTime();
+    }
     return WorkTime(
       startTime: json['start_time'] as String?,
       endTime: json['end_time'] as String?,
@@ -143,7 +160,10 @@ class BreakTime {
     this.endTime,
   });
 
-  factory BreakTime.fromJson(Map<String, dynamic> json) {
+  factory BreakTime.fromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return BreakTime();
+    }
     return BreakTime(
       startTime: json['start_time'] as String?,
       endTime: json['end_time'] as String?,
@@ -185,22 +205,37 @@ class ContactInnerItem {
     required this.city,
   });
 
-  factory ContactInnerItem.fromJson(Map<String, dynamic> json) {
+  factory ContactInnerItem.fromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return ContactInnerItem(
+        latitude: '',
+        longitude: '',
+        contactItems: ContactItems(email: [], phone: []),
+        address: LocalizedText(ru: '', kz: '', en: ''),
+        mainPhone: '',
+        mainEmail: '',
+        workTime: [],
+        breakTime: BreakTime(),
+        city: City(id: 0, title: LocalizedText(ru: '', kz: '', en: '')),
+      );
+    }
     return ContactInnerItem(
-      latitude: json['latitude'] as String,
-      longitude: json['longitude'] as String,
+      latitude: json['latitude'] as String? ?? '',
+      longitude: json['longitude'] as String? ?? '',
       contactItems:
-          ContactItems.fromJson(json['contact_items'] as Map<String, dynamic>),
-      address: LocalizedText.fromJson(json['address'] as Map<String, dynamic>),
-      mainPhone: json['main_phone'] as String,
-      mainEmail: json['main_email'] as String,
+          ContactItems.fromJson(json['contact_items'] as Map<String, dynamic>?),
+      address: LocalizedText.fromJson(json['address'] as Map<String, dynamic>?),
+      mainPhone: json['main_phone'] as String? ?? '',
+      mainEmail: json['main_email'] as String? ?? '',
       office: json['office'] as String?,
       floor: json['floor'] as String?,
-      workTime: (json['work_time'] as List)
-          .map((e) => WorkTime.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      breakTime: BreakTime.fromJson(json['break_time'] as Map<String, dynamic>),
-      city: City.fromJson(json['city'] as Map<String, dynamic>),
+      workTime: (json['work_time'] as List<dynamic>?)
+              ?.map((e) => WorkTime.fromJson(e as Map<String, dynamic>?))
+              .toList() ??
+          [],
+      breakTime:
+          BreakTime.fromJson(json['break_time'] as Map<String, dynamic>?),
+      city: City.fromJson(json['city'] as Map<String, dynamic>?),
     );
   }
 
@@ -238,16 +273,28 @@ class Contact {
     required this.innerItems,
   });
 
-  factory Contact.fromJson(Map<String, dynamic> json) {
+  factory Contact.fromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return Contact(
+        id: 0,
+        city: City(id: 0, title: LocalizedText(ru: '', kz: '', en: '')),
+        address: LocalizedText(ru: '', kz: '', en: ''),
+        mainPhone: '',
+        mainEmail: '',
+        innerItems: [],
+      );
+    }
     return Contact(
-      id: json['id'] as int,
-      city: City.fromJson(json['city'] as Map<String, dynamic>),
-      address: LocalizedText.fromJson(json['address'] as Map<String, dynamic>),
-      mainPhone: json['main_phone'] as String,
-      mainEmail: json['main_email'] as String,
-      innerItems: (json['inner_items'] as List)
-          .map((e) => ContactInnerItem.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      id: json['id'] as int? ?? 0,
+      city: City.fromJson(json['city'] as Map<String, dynamic>?),
+      address: LocalizedText.fromJson(json['address'] as Map<String, dynamic>?),
+      mainPhone: json['main_phone'] as String? ?? '',
+      mainEmail: json['main_email'] as String? ?? '',
+      innerItems: (json['inner_items'] as List<dynamic>?)
+              ?.map(
+                  (e) => ContactInnerItem.fromJson(e as Map<String, dynamic>?))
+              .toList() ??
+          [],
     );
   }
 

@@ -397,17 +397,17 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               ),
 
               // Menu Items
-              const SizedBox(height: 16),
-              ProfileMenuItem(
-                icon: Icons.location_on_outlined,
-                title: 'Адреса доставок',
-                onTap: () => context.push('/addresses'),
-              ),
-              ProfileMenuItem(
-                icon: Icons.business_outlined,
-                title: 'Наши филиалы',
-                onTap: () => context.push('/contacts'),
-              ),
+              // const SizedBox(height: 16),
+              // ProfileMenuItem(
+              //   icon: Icons.location_on_outlined,
+              //   title: 'Адреса доставок',
+              //   onTap: () => context.push('/addresses'),
+              // ),
+              // ProfileMenuItem(
+              //   icon: Icons.business_outlined,
+              //   title: 'Наши филиалы',
+              //   onTap: () => context.push('/contacts'),
+              // ),
 
               const SizedBox(height: 32),
 
@@ -444,7 +444,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 context,
                 icon: 'lib/core/assets/icons/profile/phone.svg',
                 title: 'Контакты',
-                onTap: () {},
+                onTap: () {
+                  context.push('/contacts');
+                },
               ),
 
               // Projects
@@ -452,7 +454,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 context,
                 icon: 'lib/core/assets/icons/profile/projects.svg',
                 title: 'Проекты',
-                onTap: () {},
+                onTap: () {
+                  context.push('/projects');
+                },
               ),
 
               // Become a Partner
@@ -642,7 +646,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           icon: 'lib/core/assets/icons/profile/phone.svg',
           title: 'Контакты',
           onTap: () {
-            // TODO: Navigate to Contacts page
+            context.push('/contacts');
           },
         ),
         _buildSettingsItem(
@@ -650,7 +654,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           icon: 'lib/core/assets/icons/profile/projects.svg',
           title: 'Проекты',
           onTap: () {
-            // TODO: Navigate to Projects page
+            context.push('/projects');
           },
         ),
         _buildSettingsItem(
