@@ -460,19 +460,21 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               ),
 
               // Become a Partner
-              _buildSettingsItem(
-                context,
-                icon: 'lib/core/assets/icons/profile/handshake.svg',
-                title: 'Стать партнером',
-                onTap: () {},
-              ),
+              // _buildSettingsItem(
+              //   context,
+              //   icon: 'lib/core/assets/icons/profile/handshake.svg',
+              //   title: 'Стать партнером',
+              //   onTap: () {},
+              // ),
 
               // FAQ
               _buildSettingsItem(
                 context,
                 icon: 'lib/core/assets/icons/profile/question.svg',
                 title: 'Часто задаваемые вопросы',
-                onTap: () {},
+                onTap: () {
+                  context.push('/faq');
+                },
               ),
 
               const SizedBox(height: 32),

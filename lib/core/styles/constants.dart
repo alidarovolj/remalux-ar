@@ -24,6 +24,7 @@ class AppColors {
   // Text colors
   static const Color textPrimary = Color.fromRGBO(38, 53, 79, 1);
   static const Color textSecondary = Color.fromRGBO(133, 132, 153, 1);
+  static const Color textIconsSecondary = Color.fromRGBO(91, 107, 139, 1);
 
   static const Color links = Color.fromRGBO(62, 120, 235, 1);
 

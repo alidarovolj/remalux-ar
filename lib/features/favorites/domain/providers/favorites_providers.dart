@@ -12,7 +12,7 @@ void showFavoriteSnackBar(
     context,
     message:
         'Товар "$itemName" ${isAdding ? "добавлен в" : "удален из"} избранного',
-    type: isAdding ? SnackBarType.success : SnackBarType.neutral,
+    type: isAdding ? SnackBarType.success : SnackBarType.info,
   );
 }
 
