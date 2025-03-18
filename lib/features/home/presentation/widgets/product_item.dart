@@ -4,6 +4,7 @@ import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/features/home/domain/models/product.dart';
 import 'package:remalux_ar/features/favorites/domain/providers/favorites_providers.dart';
 import 'package:remalux_ar/features/home/presentation/providers/products_provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ProductItem extends ConsumerWidget {
   final Product product;
@@ -15,6 +16,8 @@ class ProductItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final currentLocale = context.locale.languageCode;
+
     return Card(
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
@@ -87,7 +90,9 @@ class ProductItem extends ConsumerWidget {
                               .toggleFavorite(
                                 product.id,
                                 context,
-                                product.title['ru'] ?? '',
+                                product.title[currentLocale] ??
+                                    product.title['ru'] ??
+                                    '',
                                 product.isFavourite,
                               );
 
@@ -111,7 +116,7 @@ class ProductItem extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    product.title['ru'] ?? '',
+                    product.title[currentLocale] ?? product.title['ru'] ?? '',
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(

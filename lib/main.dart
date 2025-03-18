@@ -6,7 +6,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'app.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:remalux_ar/core/providers/auth/auth_state.dart';
+import 'package:remalux_ar/core/providers/auth/auth_state.dart' as auth_state;
 // import 'package:remalux_ar/features/auth/presentation/pages/auth_check_page.dart';
 import 'package:remalux_ar/core/services/analytics_service.dart';
 import 'package:remalux_ar/core/router/app_router.dart';
@@ -14,11 +14,16 @@ import 'package:remalux_ar/core/router/app_router.dart';
 // import 'package:yandex_mapkit/yandex_mapkit.dart';
 // import 'package:yandex_search/yandex_search.dart';
 // import 'package:chucker_flutter/chucker_flutter.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:remalux_ar/core/services/storage_service.dart';
+import 'package:remalux_ar/features/auth/domain/providers/auth_provider.dart';
+import 'package:go_router/go_router.dart';
 
-Future<void> main() async {
+void main() async {
   try {
     await dotenv.load();
     WidgetsFlutterBinding.ensureInitialized();
+    await EasyLocalization.ensureInitialized();
 
     // Initialize Amplitude
     final amplitudeApiKey = dotenv.env['AMPLITUDE_API_KEY'];
@@ -27,9 +32,7 @@ Future<void> main() async {
     }
 
     await initializeDateFormatting('ru', null);
-
-    // Check if user has seen onboarding
-    final hasSeenOnboarding = await StorageService.hasSeenOnboarding();
+    final router = AppRouter.router;
 
     // Initialize Yandex MapKit
     // await YandexMapKit.init(
@@ -37,29 +40,31 @@ Future<void> main() async {
     // );
 
     runApp(
-      ProviderScope(
-        child: Consumer(
-          builder: (context, ref, child) {
-            try {
-              // Initialize auth state
-              ref.read(authProvider.notifier).initializeAuth();
-            } catch (e) {
-              print('Ошибка инициализации авторизации: $e');
-            }
+      EasyLocalization(
+        supportedLocales: const [
+          Locale('en'),
+          Locale('ru'),
+          Locale('kk'),
+        ],
+        path: 'lib/core/assets/translations',
+        fallbackLocale: const Locale('en'),
+        child: ProviderScope(
+          child: Consumer(
+            builder: (context, ref, child) {
+              try {
+                ref.read(auth_state.authProvider.notifier).initializeAuth();
+              } catch (e) {
+                print('Ошибка инициализации авторизации: $e');
+              }
 
-            // If user hasn't seen onboarding, redirect to it
-            if (!hasSeenOnboarding) {
-              Future.microtask(() => StorageService.setHasSeenOnboarding());
-              return const MyApp(initialRoute: '/onboarding');
-            }
-
-            return const MyApp(initialRoute: '/');
-          },
+              return App(router: router, initialRoute: '/');
+            },
+          ),
         ),
       ),
     );
   } catch (e) {
-    print('Ошибка запуска: $e');
+    print('Error initializing app: $e');
     // Запускаем минимальное приложение в случае ошибки
     runApp(
       MaterialApp(
@@ -101,5 +106,30 @@ class StorageService {
 
   static Future<void> setHasSeenOnboarding() async {
     await _storage.write(key: _hasSeenOnboardingKey, value: 'true');
+  }
+}
+
+class App extends StatelessWidget {
+  final String initialRoute;
+  final GoRouter router;
+
+  const App({
+    super.key,
+    required this.initialRoute,
+    required this.router,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      title: 'Remalux',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
+      routerConfig: router,
+    );
   }
 }

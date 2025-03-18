@@ -4,7 +4,6 @@ import 'package:remalux_ar/features/store/presentation/pages/store_page.dart';
 import 'package:remalux_ar/features/store/presentation/pages/product_detail_page.dart';
 import 'package:remalux_ar/features/storybook/presentation/pages/storybook.dart';
 import 'package:remalux_ar/core/widgets/main_tabbar_screen.dart';
-import 'package:remalux_ar/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:remalux_ar/features/news/presentation/pages/news_page.dart';
 import 'package:remalux_ar/features/news/presentation/pages/news_detail_page.dart';
 import 'package:remalux_ar/features/ideas/presentation/pages/ideas_page.dart';
@@ -120,10 +119,6 @@ class AppRouter {
       GoRoute(
         path: '/storybook',
         builder: (context, state) => const StorybookScreen(),
-      ),
-      GoRoute(
-        path: '/onboarding',
-        builder: (context, state) => const OnboardingPage(),
       ),
       GoRoute(
         path: '/ideas/:id',

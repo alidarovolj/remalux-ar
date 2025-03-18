@@ -1,0 +1,80 @@
+{
+  "common": {
+    "search": "Поиск",
+    "cancel": "Отмена",
+    "save": "Сохранить",
+    "delete": "Удалить",
+    "edit": "Редактировать",
+    "back": "Назад",
+    "next": "Далее",
+    "done": "Готово"
+  },
+  "auth": {
+    "login": "Войти",
+    "register": "Регистрация",
+    "email": "Эл. почта",
+    "password": "Пароль",
+    "forgot_password": "Забыли пароль?"
+  },
+  "store": {
+    "catalog": "Каталог",
+    "search_products": "Поиск по продукции",
+    "filters": "Фильтры",
+    "sorting": "Сортировка",
+    "products_count": "{count} продуктов",
+    "no_products_found": "К сожалению, по заданным критериям товаров не найдено",
+    "try_different_filters": "Измените или ослабьте фильтры и попробуйте снова"
+  },
+  "orders": {
+    "my_orders": "Мои заказы",
+    "order_from": "Заказ от {date}",
+    "order_number": "№{number}",
+    "delivery_courier": "Доставка курьером, {date}",
+    "products_worth": "Товары на {amount} ₸",
+    "positions": {
+      "one": "позиция",
+      "few": "позиции",
+      "many": "позиций",
+      "other": "позиций"
+    },
+    "status": {
+      "delivered": "Доставлен",
+      "processing": "В обработке",
+      "cancelled": "Отменен"
+    }
+  },
+  "profile": {
+    "my_profile": "Мой профиль",
+    "personal_info": "Личная информация",
+    "addresses": "Адреса",
+    "orders": "Заказы",
+    "favorites": "Избранное",
+    "settings": "Настройки",
+    "logout": "Выйти"
+  },
+  "home": {
+    "try_colors": "Примерьте краски",
+    "try_colors_description": "Подберите оттенок и представьте\nбудущий интерьер",
+    "visualize": "Визуализировать",
+    "categories": {
+      "title": "Категории",
+      "view_all": "Смотреть все"
+    },
+    "colors": {
+      "title": "Цвета",
+      "view_all": "Смотреть все"
+    },
+    "ideas": {
+      "title": "Идеи",
+      "view_all": "Смотреть все"
+    },
+    "products": {
+      "title": "Продукты",
+      "view_all": "Смотреть все"
+    },
+    "news": {
+      "title": "Новости",
+      "view_all": "Смотреть все"
+    }
+  }
+} 

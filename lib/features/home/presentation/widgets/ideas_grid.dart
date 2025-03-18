@@ -5,6 +5,7 @@ import 'package:remalux_ar/features/home/presentation/providers/ideas_provider.d
 import 'package:remalux_ar/features/home/presentation/widgets/idea_item.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:go_router/go_router.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class IdeasGrid extends ConsumerWidget {
   const IdeasGrid({super.key});
@@ -14,8 +15,8 @@ class IdeasGrid extends ConsumerWidget {
     final ideasAsync = ref.watch(ideasProvider);
 
     return SectionWidget(
-      title: 'Идеи для дома',
-      buttonTitle: 'Все идеи',
+      title: 'home.ideas.title'.tr(),
+      buttonTitle: 'home.ideas.view_all'.tr(),
       onButtonPressed: () => context.push('/ideas'),
       child: SizedBox(
         height: 270,

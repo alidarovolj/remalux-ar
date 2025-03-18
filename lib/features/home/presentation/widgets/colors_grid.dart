@@ -4,12 +4,16 @@ import 'package:go_router/go_router.dart';
 import 'package:remalux_ar/core/widgets/section_widget.dart';
 import 'package:remalux_ar/features/home/domain/providers/colors_provider.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ColorsGrid extends ConsumerWidget {
   const ColorsGrid({super.key});
 
-  String _getImageName(String colorName) {
-    switch (colorName.toLowerCase()) {
+  String _getImageName(Map<String, String> colorTitles) {
+    // Пробуем получить русское название для определения картинки
+    final ruTitle = colorTitles['ru']?.toLowerCase() ?? '';
+
+    switch (ruTitle) {
       case 'серый':
         return 'grey.png';
       case 'синий':
@@ -36,13 +40,12 @@ class ColorsGrid extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorsAsync = ref.watch(colorsProvider);
+    final currentLocale = context.locale.languageCode;
 
     return SectionWidget(
-      title: 'Цветовые палитры',
-      buttonTitle: 'Все цвета',
-      onButtonPressed: () {
-        context.push('/colors');
-      },
+      title: 'home.colors.title'.tr(),
+      buttonTitle: 'home.colors.view_all'.tr(),
+      onButtonPressed: () => context.push('/colors'),
       child: SizedBox(
         height: 120,
         child: colorsAsync.when(
@@ -68,14 +71,14 @@ class ColorsGrid extends ConsumerWidget {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12),
                           child: Image.asset(
-                            'lib/core/assets/images/colors/${_getImageName(color.title['ru'] ?? '')}',
+                            'lib/core/assets/images/colors/${_getImageName(color.title)}',
                             fit: BoxFit.cover,
                           ),
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        color.title['ru'] ?? '',
+                        color.title[currentLocale] ?? color.title['ru'] ?? '',
                         style: const TextStyle(
                           fontSize: 12,
                           color: Color(0xFF1F1F1F),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/features/home/domain/models/news.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class NewsItem extends ConsumerWidget {
   final News news;
@@ -13,6 +14,8 @@ class NewsItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final currentLocale = context.locale.languageCode;
+
     return Card(
       clipBehavior: Clip.antiAlias,
       elevation: 0,
@@ -43,7 +46,7 @@ class NewsItem extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          news.title['ru'] ?? '',
+                          news.title[currentLocale] ?? news.title['ru'] ?? '',
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
@@ -56,7 +59,9 @@ class NewsItem extends ConsumerWidget {
                         const SizedBox(height: 4),
                         Expanded(
                           child: Text(
-                            _stripHtmlTags(news.description['ru'] ?? ''),
+                            _stripHtmlTags(news.description[currentLocale] ??
+                                news.description['ru'] ??
+                                ''),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(

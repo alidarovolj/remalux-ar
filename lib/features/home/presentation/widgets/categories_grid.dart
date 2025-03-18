@@ -6,6 +6,7 @@ import 'package:remalux_ar/features/home/domain/models/category.dart';
 import 'package:remalux_ar/features/home/presentation/providers/categories_provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:go_router/go_router.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class CategoriesGrid extends ConsumerWidget {
   final bool showStoreButton;
@@ -19,48 +20,53 @@ class CategoriesGrid extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final categoriesAsync = ref.watch(categoriesProvider);
 
-    return SectionWidget(
-      title: 'Категории',
-      buttonTitle: showStoreButton ? 'В магазин' : null,
-      onButtonPressed: showStoreButton
-          ? () {
-              context.push('/store');
-            }
-          : null,
-      child: categoriesAsync.when(
-        data: (categories) => GridView.builder(
-          shrinkWrap: true,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 4,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            childAspectRatio: 1,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionWidget(
+          title: 'home.categories.title'.tr(),
+          buttonTitle: showStoreButton ? 'home.categories.view_all'.tr() : null,
+          onButtonPressed: showStoreButton
+              ? () {
+                  context.push('/store');
+                }
+              : null,
+          child: categoriesAsync.when(
+            data: (categories) => GridView.builder(
+              shrinkWrap: true,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4,
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+                childAspectRatio: 1,
+              ),
+              itemCount: categories.length,
+              itemBuilder: (context, index) {
+                final category = categories[index];
+                return _CategoryItem(category: category);
+              },
+            ),
+            loading: () => GridView.builder(
+              shrinkWrap: true,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4,
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+                childAspectRatio: 1,
+              ),
+              itemCount: 8,
+              itemBuilder: (context, index) => const _CategoryItemSkeleton(),
+            ),
+            error: (error, stack) => Center(
+              child: Text('Error: $error'),
+            ),
           ),
-          itemCount: categories.length,
-          itemBuilder: (context, index) {
-            final category = categories[index];
-            return _CategoryItem(category: category);
-          },
         ),
-        loading: () => GridView.builder(
-          shrinkWrap: true,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 4,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            childAspectRatio: 1,
-          ),
-          itemCount: 8,
-          itemBuilder: (context, index) => const _CategoryItemSkeleton(),
-        ),
-        error: (error, stack) => Center(
-          child: Text('Error: $error'),
-        ),
-      ),
+      ],
     );
   }
 }
@@ -72,6 +78,8 @@ class _CategoryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentLocale = context.locale.languageCode;
+
     return GestureDetector(
       onTap: () {
         context.push('/store', extra: {'filter_id': category.id});
@@ -116,7 +124,7 @@ class _CategoryItem extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: Text(
-                    category.title['ru'] ?? '',
+                    category.title[currentLocale] ?? category.title['ru'] ?? '',
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,

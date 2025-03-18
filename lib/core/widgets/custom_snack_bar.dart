@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 enum SnackBarType {
   success,
@@ -27,7 +28,7 @@ class CustomSnackBar {
           borderRadius: BorderRadius.circular(8),
         ),
         action: SnackBarAction(
-          label: 'OK',
+          label: 'common.done'.tr(),
           textColor: Colors.white,
           onPressed: () {
             ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -35,6 +36,19 @@ class CustomSnackBar {
         ),
       ),
     );
+  }
+
+  static String getTranslatedMessage(SnackBarType type) {
+    switch (type) {
+      case SnackBarType.success:
+        return 'common.snackbar.success'.tr();
+      case SnackBarType.error:
+        return 'common.snackbar.error'.tr();
+      case SnackBarType.warning:
+        return 'common.error'.tr();
+      case SnackBarType.info:
+        return '';
+    }
   }
 
   static Color _getBackgroundColor(SnackBarType type) {

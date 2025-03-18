@@ -5,6 +5,7 @@ import 'package:remalux_ar/core/widgets/section_widget.dart';
 import 'package:remalux_ar/features/home/presentation/providers/news_provider.dart';
 import 'package:remalux_ar/features/home/presentation/widgets/news_item.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class NewsGrid extends ConsumerWidget {
   const NewsGrid({super.key});
@@ -14,11 +15,9 @@ class NewsGrid extends ConsumerWidget {
     final newsAsync = ref.watch(newsProvider);
 
     return SectionWidget(
-      title: 'Новости',
-      buttonTitle: 'Все новости',
-      onButtonPressed: () {
-        context.push('/news');
-      },
+      title: 'home.news.title'.tr(),
+      buttonTitle: 'home.news.view_all'.tr(),
+      onButtonPressed: () => context.push('/news'),
       child: SizedBox(
         height: 270,
         child: newsAsync.when(
@@ -57,16 +56,13 @@ class NewsGrid extends ConsumerWidget {
             itemBuilder: (context, index) => const SizedBox(
               width: 300,
               child: Padding(
-                padding: EdgeInsets.only(
-                  left: 8,
-                  right: 8,
-                ),
+                padding: EdgeInsets.symmetric(horizontal: 8),
                 child: _NewsItemSkeleton(),
               ),
             ),
           ),
           error: (error, stackTrace) => Center(
-            child: Text('Ошибка: $error'),
+            child: Text('Error: $error'),
           ),
         ),
       ),
@@ -79,48 +75,40 @@ class _NewsItemSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Shimmer.fromColors(
-        baseColor: Colors.grey[300]!,
-        highlightColor: Colors.grey[100]!,
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AspectRatio(
-              aspectRatio: 16 / 9,
-              child: Container(
+            Container(
+              height: 160,
+              decoration: BoxDecoration(
                 color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      height: 14,
-                      color: Colors.white,
-                    ),
-                    const SizedBox(height: 4),
-                    Container(
-                      width: 200,
-                      height: 14,
-                      color: Colors.white,
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      width: 150,
-                      height: 12,
-                      color: Colors.white,
-                    ),
-                  ],
-                ),
+            const SizedBox(height: 12),
+            Container(
+              height: 16,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              height: 14,
+              width: 100,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(4),
               ),
             ),
           ],

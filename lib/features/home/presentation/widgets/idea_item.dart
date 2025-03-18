@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/features/home/domain/models/idea.dart';
 import 'package:go_router/go_router.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class IdeaItem extends StatelessWidget {
   final Idea idea;
@@ -26,6 +27,8 @@ class IdeaItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentLocale = context.locale.languageCode;
+
     // Get first two colors from the idea's colors list
     final firstColor = idea.colors?.isNotEmpty == true
         ? _parseHexColor(idea.colors?[0]['hex'] ?? '')
@@ -88,7 +91,7 @@ class IdeaItem extends StatelessWidget {
                         children: [
                           // Title
                           Text(
-                            idea.title['ru'] ?? '',
+                            idea.title[currentLocale] ?? idea.title['ru'] ?? '',
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
@@ -113,7 +116,9 @@ class IdeaItem extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
-                                  idea.roomTitle?['ru'] ?? '',
+                                  idea.roomTitle?[currentLocale] ??
+                                      idea.roomTitle?['ru'] ??
+                                      '',
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
@@ -132,7 +137,9 @@ class IdeaItem extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
-                                  idea.colorTitle?['ru'] ?? '',
+                                  idea.colorTitle?[currentLocale] ??
+                                      idea.colorTitle?['ru'] ??
+                                      '',
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,

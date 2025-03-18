@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:remalux_ar/core/widgets/custom_button.dart';
 import 'package:remalux_ar/features/home/presentation/widgets/categories_grid.dart';
 import 'package:remalux_ar/features/home/presentation/widgets/products_grid.dart';
@@ -178,9 +179,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               // Text
-                              const Text(
-                                'Примерьте краски',
-                                style: TextStyle(
+                              Text(
+                                'home.try_colors'.tr(),
+                                style: const TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.w600,
                                   color: Color(0xFF1F1F1F),
@@ -189,10 +190,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                                 textAlign: TextAlign.center,
                               ),
                               const SizedBox(height: 8),
-                              const Text(
-                                'Подберите оттенок и представьте\nбудущий интерьер',
+                              Text(
+                                'home.try_colors_description'.tr(),
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 16,
                                   color: Color(0xFF1F1F1F),
                                   height: 1.3,
@@ -205,7 +206,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 12),
                                 child: CustomButton(
-                                  label: 'Визуализировать',
+                                  label: 'home.visualize'.tr(),
                                   onPressed: () {},
                                   type: ButtonType.normal,
                                   isFullWidth: true,

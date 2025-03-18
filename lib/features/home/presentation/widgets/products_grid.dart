@@ -5,6 +5,7 @@ import 'package:remalux_ar/features/home/presentation/providers/products_provide
 import 'package:remalux_ar/features/home/presentation/widgets/product_item.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ProductsGrid extends ConsumerWidget {
   const ProductsGrid({super.key});
@@ -14,11 +15,9 @@ class ProductsGrid extends ConsumerWidget {
     final productsAsync = ref.watch(productsProvider);
 
     return SectionWidget(
-      title: 'Популярное',
-      buttonTitle: 'Вся продукция',
-      onButtonPressed: () {
-        context.push('/store');
-      },
+      title: 'home.products.title'.tr(),
+      buttonTitle: 'home.products.view_all'.tr(),
+      onButtonPressed: () => context.push('/store'),
       child: SizedBox(
         height: 285,
         child: productsAsync.when(

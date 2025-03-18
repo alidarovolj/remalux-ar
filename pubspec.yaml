@@ -46,6 +46,7 @@ dependencies:
   flutter_html: ^3.0.0-beta.2
   mask_text_input_formatter: ^2.9.0
   google_maps_flutter: ^2.10.1
+  easy_localization: ^3.0.5
 
 dev_dependencies:
   flutter_test:
@@ -69,3 +70,4 @@ flutter:
     - lib/core/assets/pdf/
     - lib/core/assets/images/colors/
     - lib/core/assets/images/store/
+    - lib/core/assets/translations/

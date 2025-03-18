@@ -1,0 +1,95 @@
+{
+  "common": {
+    "search": "Search",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "error": "Error",
+    "empty_states": {
+      "no_products": "No products",
+      "no_ideas": "No ideas",
+      "no_news": "No news",
+      "no_colors": "No colors",
+      "no_categories": "No categories"
+    },
+    "snackbar": {
+      "error": "Error occurred",
+      "success": "Success",
+      "added_to_cart": "Added to cart",
+      "removed_from_cart": "Removed from cart",
+      "added_to_favorites": "Added to favorites",
+      "removed_from_favorites": "Removed from favorites",
+      "try_again": "Please try again"
+    }
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "forgot_password": "Forgot Password?"
+  },
+  "store": {
+    "catalog": "Catalog",
+    "search_products": "Search products",
+    "filters": "Filters",
+    "sorting": "Sorting",
+    "products_count": "{count} products",
+    "no_products_found": "No products found",
+    "try_different_filters": "Try different filters"
+  },
+  "orders": {
+    "my_orders": "My Orders",
+    "order_from": "Order from {date}",
+    "order_number": "Order #{number}",
+    "delivery_courier": "Courier delivery, {date}",
+    "products_worth": "Products worth {amount} ₸",
+    "positions": {
+      "one": "position",
+      "other": "positions"
+    },
+    "status": {
+      "delivered": "Delivered",
+      "processing": "Processing",
+      "cancelled": "Cancelled"
+    }
+  },
+  "profile": {
+    "my_profile": "My Profile",
+    "personal_info": "Personal Information",
+    "addresses": "Addresses",
+    "orders": "Orders",
+    "favorites": "Favorites",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "home": {
+    "try_colors": "Try colors",
+    "try_colors_description": "Choose a shade and visualize\nyour future interior",
+    "visualize": "Visualize",
+    "categories": {
+      "title": "Categories",
+      "view_all": "View all"
+    },
+    "colors": {
+      "title": "Colors",
+      "view_all": "View all"
+    },
+    "ideas": {
+      "title": "Ideas",
+      "view_all": "View all"
+    },
+    "products": {
+      "title": "Products",
+      "view_all": "View all"
+    },
+    "news": {
+      "title": "News",
+      "view_all": "View all"
+    }
+  }
+} 

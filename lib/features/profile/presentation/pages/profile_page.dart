@@ -12,6 +12,8 @@ import 'package:remalux_ar/features/profile/presentation/widgets/logout_confirma
 import 'package:flutter/services.dart';
 import 'package:remalux_ar/core/widgets/custom_app_bar.dart';
 import 'package:remalux_ar/features/profile/presentation/widgets/profile_menu_item.dart';
+import 'package:remalux_ar/features/profile/presentation/widgets/language_selection_modal.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 final userProvider =
     StateNotifierProvider<UserNotifier, AsyncValue<User?>>((ref) {
@@ -504,8 +506,18 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 context,
                 icon: 'lib/core/assets/icons/profile/language.svg',
                 title: 'Язык приложения',
-                subtitle: 'Русский',
-                onTap: () {},
+                subtitle: context.locale.languageCode == 'kk'
+                    ? 'Қазақша'
+                    : context.locale.languageCode == 'ru'
+                        ? 'Русский'
+                        : 'English',
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => const LanguageSelectionModal(),
+                  );
+                },
               ),
 
               // Logout
@@ -618,9 +630,17 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           context,
           icon: 'lib/core/assets/icons/profile/language.svg',
           title: 'Язык приложения',
-          subtitle: 'Русский',
+          subtitle: context.locale.languageCode == 'kk'
+              ? 'Қазақша'
+              : context.locale.languageCode == 'ru'
+                  ? 'Русский'
+                  : 'English',
           onTap: () {
-            // TODO: Implement language selection
+            showModalBottomSheet(
+              context: context,
+              backgroundColor: Colors.transparent,
+              builder: (context) => const LanguageSelectionModal(),
+            );
           },
         ),
         const SizedBox(height: 32),
@@ -659,20 +679,20 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             context.push('/projects');
           },
         ),
-        _buildSettingsItem(
-          context,
-          icon: 'lib/core/assets/icons/profile/handshake.svg',
-          title: 'Стать партнером',
-          onTap: () {
-            // TODO: Navigate to Partnership page
-          },
-        ),
+        // _buildSettingsItem(
+        //   context,
+        //   icon: 'lib/core/assets/icons/profile/handshake.svg',
+        //   title: 'Стать партнером',
+        //   onTap: () {
+        //     // TODO: Navigate to Partnership page
+        //   },
+        // ),
         _buildSettingsItem(
           context,
           icon: 'lib/core/assets/icons/profile/question.svg',
           title: 'Часто задаваемые вопросы',
           onTap: () {
-            // TODO: Navigate to FAQ page
+            context.push('/faq');
           },
         ),
       ],

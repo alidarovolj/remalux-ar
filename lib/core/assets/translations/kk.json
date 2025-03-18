@@ -1,0 +1,95 @@
+{
+  "common": {
+    "search": "Іздеу",
+    "cancel": "Болдырмау",
+    "save": "Сақтау",
+    "delete": "Жою",
+    "edit": "Өңдеу",
+    "back": "Артқа",
+    "next": "Келесі",
+    "done": "Дайын",
+    "error": "Қате",
+    "empty_states": {
+      "no_products": "Тауарлар жоқ",
+      "no_ideas": "Идеялар жоқ",
+      "no_news": "Жаңалықтар жоқ",
+      "no_colors": "Түстер жоқ",
+      "no_categories": "Санаттар жоқ"
+    },
+    "snackbar": {
+      "error": "Қате орын алды",
+      "success": "Сәтті",
+      "added_to_cart": "Себетке қосылды",
+      "removed_from_cart": "Себеттен алынды",
+      "added_to_favorites": "Таңдаулыларға қосылды",
+      "removed_from_favorites": "Таңдаулылардан алынды",
+      "try_again": "Қайталап көріңіз"
+    }
+  },
+  "auth": {
+    "login": "Кіру",
+    "register": "Тіркелу",
+    "email": "Эл. пошта",
+    "password": "Құпия сөз",
+    "forgot_password": "Құпия сөзді ұмыттыңыз ба?"
+  },
+  "store": {
+    "catalog": "Каталог",
+    "search_products": "Өнімдерді іздеу",
+    "filters": "Сүзгілер",
+    "sorting": "Сұрыптау",
+    "products_count": "{count} өнім",
+    "no_products_found": "Өкінішке орай, берілген критерийлер бойынша тауарлар табылмады",
+    "try_different_filters": "Сүзгілерді өзгертіп немесе әлсіретіп, қайталап көріңіз"
+  },
+  "orders": {
+    "my_orders": "Менің тапсырыстарым",
+    "order_from": "{date} тапсырысы",
+    "order_number": "№{number}",
+    "delivery_courier": "Курьермен жеткізу, {date}",
+    "products_worth": "Тауарлар {amount} ₸",
+    "positions": {
+      "one": "позиция",
+      "other": "позиция"
+    },
+    "status": {
+      "delivered": "Жеткізілді",
+      "processing": "Өңделуде",
+      "cancelled": "Бас тартылды"
+    }
+  },
+  "profile": {
+    "my_profile": "Менің профилім",
+    "personal_info": "Жеке ақпарат",
+    "addresses": "Мекенжайлар",
+    "orders": "Тапсырыстар",
+    "favorites": "Таңдаулылар",
+    "settings": "Параметрлер",
+    "logout": "Шығу"
+  },
+  "home": {
+    "try_colors": "Бояуларды көріңіз",
+    "try_colors_description": "Реңкті таңдап,\nболашақ интерьерді елестетіңіз",
+    "visualize": "Визуализациялау",
+    "categories": {
+      "title": "Санаттар",
+      "view_all": "Барлығын көру"
+    },
+    "colors": {
+      "title": "Түстер",
+      "view_all": "Барлығын көру"
+    },
+    "ideas": {
+      "title": "Идеялар",
+      "view_all": "Барлығын көру"
+    },
+    "products": {
+      "title": "Өнімдер",
+      "view_all": "Барлығын көру"
+    },
+    "news": {
+      "title": "Жаңалықтар",
+      "view_all": "Барлығын көру"
+    }
+  }
+} 
