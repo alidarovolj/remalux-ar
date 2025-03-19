@@ -7,6 +7,7 @@ import 'package:remalux_ar/core/theme/colors.dart';
 import 'package:remalux_ar/core/widgets/custom_snack_bar.dart';
 import 'package:remalux_ar/features/auth/domain/models/login_request.dart';
 import 'package:remalux_ar/features/auth/domain/providers/auth_provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -39,7 +40,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     if (phoneNumber.isEmpty || password.isEmpty) {
       CustomSnackBar.show(
         context,
-        message: 'Пожалуйста, заполните все поля',
+        message: 'auth.fill_all_fields'.tr(),
         type: SnackBarType.error,
       );
       return;
@@ -69,7 +70,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         // Show success message
         CustomSnackBar.show(
           context,
-          message: 'Вы успешно авторизовались',
+          message: 'auth.login_success'.tr(),
           type: SnackBarType.success,
           duration: const Duration(seconds: 2),
         );
@@ -148,7 +149,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                               children: [
                                 // Welcome Text
                                 Text(
-                                  'Добро пожаловать!',
+                                  'auth.welcome'.tr(),
                                   textAlign: TextAlign.center,
                                   style: GoogleFonts.ysabeau(
                                     fontSize: 23,
@@ -162,9 +163,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      'Номер телефона',
-                                      style: TextStyle(
+                                    Text(
+                                      'auth.phone_number'.tr(),
+                                      style: const TextStyle(
                                         fontSize: 13,
                                         color: AppColors.textPrimary,
                                       ),
@@ -175,7 +176,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                       keyboardType: TextInputType.phone,
                                       inputFormatters: [_phoneMaskFormatter],
                                       decoration: InputDecoration(
-                                        hintText: '+7 (___) ___ __ __',
+                                        hintText: 'auth.phone_hint'.tr(),
                                         hintStyle: TextStyle(
                                           color: AppColors.textSecondary
                                               .withOpacity(0.5),
@@ -202,9 +203,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      'Пароль',
-                                      style: TextStyle(
+                                    Text(
+                                      'auth.password'.tr(),
+                                      style: const TextStyle(
                                         fontSize: 13,
                                         color: AppColors.textPrimary,
                                       ),
@@ -214,7 +215,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                       controller: _passwordController,
                                       obscureText: true,
                                       decoration: InputDecoration(
-                                        hintText: 'Пароль',
+                                        hintText: 'auth.password_hint'.tr(),
                                         hintStyle: TextStyle(
                                           color: AppColors.textSecondary
                                               .withOpacity(0.5),
@@ -252,9 +253,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                       tapTargetSize:
                                           MaterialTapTargetSize.shrinkWrap,
                                     ),
-                                    child: const Text(
-                                      'Забыли пароль?',
-                                      style: TextStyle(
+                                    child: Text(
+                                      'auth.forgot_password'.tr(),
+                                      style: const TextStyle(
                                         fontSize: 13,
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -263,7 +264,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                 ),
                                 const SizedBox(height: 24),
 
-                                // Register Button
+                                // Login Button
                                 ElevatedButton(
                                   onPressed: _isLoading ? null : _handleLogin,
                                   style: ElevatedButton.styleFrom(
@@ -287,9 +288,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                                     Colors.white),
                                           ),
                                         )
-                                      : const Text(
-                                          'Авторизоваться',
-                                          style: TextStyle(
+                                      : Text(
+                                          'auth.login_button'.tr(),
+                                          style: const TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.w600,
                                           ),
@@ -300,7 +301,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           ),
                         ),
                       ),
-                      // Login Link
+                      // Register Link
                       Padding(
                         padding: EdgeInsets.only(
                           left: 16,
@@ -309,9 +310,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         ),
                         child: Column(
                           children: [
-                            const Text(
-                              'Еще нет аккаунта?',
-                              style: TextStyle(
+                            Text(
+                              'auth.no_account'.tr(),
+                              style: const TextStyle(
                                 fontSize: 15,
                                 color: AppColors.textPrimary,
                               ),
@@ -327,9 +328,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                 minimumSize: Size.zero,
                                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               ),
-                              child: const Text(
-                                'Пожалуйста, зарегистрируйтесь',
-                                style: TextStyle(
+                              child: Text(
+                                'auth.register_link'.tr(),
+                                style: const TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w400,
                                 ),

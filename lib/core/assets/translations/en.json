@@ -8,7 +8,12 @@
     "back": "Back",
     "next": "Next",
     "done": "Done",
+    "no_data": "No product data",
+    "no_title": "No title",
     "error": "Error",
+    "kg": "kg",
+    "currency": "₸",
+    "update_language": "Update language",
     "empty_states": {
       "no_products": "No products",
       "no_ideas": "No ideas",
@@ -24,33 +29,103 @@
       "added_to_favorites": "Added to favorites",
       "removed_from_favorites": "Removed from favorites",
       "try_again": "Please try again"
+    },
+    "tabs": {
+      "home": "Home",
+      "catalog": "Catalog",
+      "ar": "AR",
+      "cart": "Cart",
+      "profile": "Profile"
     }
   },
   "auth": {
-    "login": "Login",
-    "register": "Register",
-    "email": "Email",
+    "welcome": "Welcome!",
+    "phone_number": "Phone Number",
+    "phone_hint": "+7 (___) ___ __ __",
     "password": "Password",
-    "forgot_password": "Forgot Password?"
+    "password_hint": "Password",
+    "forgot_password": "Forgot password?",
+    "login_button": "Login",
+    "no_account": "Don't have an account?",
+    "register_link": "Please register",
+    "fill_all_fields": "Please fill in all fields",
+    "login_success": "You have successfully logged in",
+    "password_requirements": "Password requirements",
+    "password_min_length": "Minimum 8 characters",
+    "password_contains_letter": "Must contain letters",
+    "password_contains_number": "Must contain numbers",
+    "password_contains_special": "Must contain special characters",
+    "password_match": "Passwords must match",
+    "password_reset": "Reset password",
+    "password_reset_sent": "Password reset instructions sent to your email",
+    "password_reset_error": "Error resetting password",
+    "password_reset_success": "Password successfully changed"
   },
   "store": {
     "catalog": "Catalog",
     "search_products": "Search products",
     "filters": "Filters",
     "sorting": "Sorting",
-    "products_count": "{count} products",
+    "products_count": "{} products found",
     "no_products_found": "No products found",
-    "try_different_filters": "Try different filters"
+    "try_different_filters": "Try different filters",
+    "categories": {
+      "title": "Categories"
+    },
+    "in_stock": "In stock",
+    "weight_value": "{} kg",
+    "price_value": "{} ₸",
+    "added_to_cart": "Added {} to cart",
+    "product": {
+      "visualize": "Visualize",
+      "article": "Article: {article}",
+      "color": "Color",
+      "weight": "Weight",
+      "weight_unit": "kg",
+      "usage_rate": "Usage rate: {rate} g/m2",
+      "coverage_calculation": "Paint coverage calculation: {area} m2",
+      "paint_calculator": "Paint calculator",
+      "compare": "Compare",
+      "add_to_favorites": "Add to favorites",
+      "about_product": "About product",
+      "product_data": "Product data",
+      "reviews": "Reviews ({count})",
+      "certificates": "Product certificates",
+      "certificate": "Certificate",
+      "open": "Open",
+      "download": "Download",
+      "file_saved": "File saved to: {path}",
+      "file_error": "Error opening file: {error}",
+      "download_error": "Error downloading file: {error}",
+      "similar_products": "Similar products",
+      "add_to_cart": "Add to cart",
+      "reviews_error": "Error loading reviews: {error}"
+    },
+    "paint_calculator": {
+      "title": "Paint Calculator",
+      "width": "Width, m",
+      "height": "Height, m",
+      "layers": "Layers",
+      "total_area": "Total area:",
+      "required_paint": "Paint required:",
+      "packages_count": "Number of packages:",
+      "packages_format": "%1$s pcs of %2$s kg",
+      "add_to_cart_format": "Add %s pcs to cart",
+      "area_format": "%s m²",
+      "paint_format": "%s kg"
+    }
   },
   "orders": {
-    "my_orders": "My Orders",
+    "my_orders": "My orders",
     "order_from": "Order from {date}",
-    "order_number": "Order #{number}",
+    "order_number": "#{number}",
     "delivery_courier": "Courier delivery, {date}",
     "products_worth": "Products worth {amount} ₸",
     "positions": {
-      "one": "position",
-      "other": "positions"
+      "one": "item",
+      "few": "items",
+      "many": "items",
+      "other": "items"
     },
     "status": {
       "delivered": "Delivered",
@@ -59,13 +134,34 @@
     }
   },
   "profile": {
-    "my_profile": "My Profile",
-    "personal_info": "Personal Information",
+    "my_profile": "My profile",
+    "personal_info": "Personal information",
     "addresses": "Addresses",
     "orders": "Orders",
     "favorites": "Favorites",
     "settings": "Settings",
-    "logout": "Logout"
+    "logout": "Log out",
+    "title": "Profile",
+    "edit_profile": "Edit profile",
+    "phone": "Phone",
+    "email": "Email",
+    "not_specified": "Not specified",
+    "favorite_products": "Favorite products",
+    "favorite_colors": "Favorite colors",
+    "saved_data": "Saved data",
+    "delivery_addresses": "Delivery addresses",
+    "recipients": "Recipients",
+    "about_section": "About us",
+    "about_remalux": "About Remalux",
+    "contacts": "Contacts",
+    "projects": "Projects",
+    "faq": "Frequently asked questions",
+    "app_settings": "App settings",
+    "app_language": "App language",
+    "no_account": "Don't have an account?",
+    "register": "Register",
+    "have_account": "Already have an account?",
+    "login": "Login"
   },
   "home": {
     "try_colors": "Try colors",
@@ -92,4 +188,4 @@
       "view_all": "View all"
     }
   }
-} 
+}

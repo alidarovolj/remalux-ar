@@ -135,8 +135,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       ),
       child: Scaffold(
         backgroundColor: Colors.white,
-        appBar: const CustomAppBar(
-          title: 'Профиль',
+        appBar: CustomAppBar(
+          title: 'profile.title'.tr(),
           showBottomBorder: true,
         ),
         body: userAsync.when(
@@ -193,7 +193,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Редактировать профиль',
+                      'profile.edit_profile'.tr(),
                       style: TextStyle(
                         fontSize: 13,
                         color: AppColors.primary.withOpacity(0.8),
@@ -240,8 +240,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Text(
-                        'Телефон',
+                      Text(
+                        'profile.phone'.tr(),
                         style: TextStyle(
                           fontSize: 15,
                           color: AppColors.textPrimary,
@@ -287,8 +287,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Text(
-                        'Почта',
+                      Text(
+                        'profile.email'.tr(),
                         style: TextStyle(
                           fontSize: 15,
                           color: AppColors.textPrimary,
@@ -296,7 +296,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        user.email ?? 'Не указано',
+                        user.email ?? 'profile.not_specified'.tr(),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -322,7 +322,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               _buildSettingsItem(
                 context,
                 icon: 'lib/core/assets/icons/profile/shopping-bag.svg',
-                title: 'Заказы',
+                title: 'profile.orders'.tr(),
                 onTap: () {
                   context.push('/orders');
                 },
@@ -332,7 +332,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               _buildSettingsItem(
                 context,
                 icon: 'lib/core/assets/icons/profile/heart.svg',
-                title: 'Избранные товары',
+                title: 'profile.favorite_products'.tr(),
                 onTap: () {
                   context.push('/favorites');
                 },
@@ -342,7 +342,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               _buildSettingsItem(
                 context,
                 icon: 'lib/core/assets/icons/profile/palette.svg',
-                title: 'Избранные цвета',
+                title: 'profile.favorite_colors'.tr(),
                 onTap: () {
                   context.push('/favorites', extra: {'initialTabIndex': 1});
                 },
@@ -365,7 +365,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Сохраненные данные',
+                      'profile.saved_data'.tr(),
                       style: GoogleFonts.ysabeau(
                         fontSize: 19,
                         fontWeight: FontWeight.w600,
@@ -382,7 +382,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               _buildSettingsItem(
                 context,
                 icon: 'lib/core/assets/icons/profile/location.svg',
-                title: 'Адреса доставок',
+                title: 'profile.delivery_addresses'.tr(),
                 onTap: () {
                   context.push('/addresses');
                 },
@@ -392,7 +392,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               _buildSettingsItem(
                 context,
                 icon: 'lib/core/assets/icons/profile/person.svg',
-                title: 'Получатели',
+                title: 'profile.recipients'.tr(),
                 onTap: () {
                   context.push('/recipients');
                 },
@@ -420,7 +420,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'О нас',
+                      'profile.about_section'.tr(),
                       style: GoogleFonts.ysabeau(
                         fontSize: 19,
                         fontWeight: FontWeight.w600,
@@ -437,7 +437,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               _buildSettingsItem(
                 context,
                 icon: 'lib/core/assets/icons/profile/info.svg',
-                title: 'О Remalux',
+                title: 'profile.about_remalux'.tr(),
                 onTap: () {},
               ),
 
@@ -445,7 +445,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               _buildSettingsItem(
                 context,
                 icon: 'lib/core/assets/icons/profile/phone.svg',
-                title: 'Контакты',
+                title: 'profile.contacts'.tr(),
                 onTap: () {
                   context.push('/contacts');
                 },
@@ -455,7 +455,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               _buildSettingsItem(
                 context,
                 icon: 'lib/core/assets/icons/profile/projects.svg',
-                title: 'Проекты',
+                title: 'profile.projects'.tr(),
                 onTap: () {
                   context.push('/projects');
                 },
@@ -473,7 +473,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               _buildSettingsItem(
                 context,
                 icon: 'lib/core/assets/icons/profile/question.svg',
-                title: 'Часто задаваемые вопросы',
+                title: 'profile.faq'.tr(),
                 onTap: () {
                   context.push('/faq');
                 },
@@ -488,7 +488,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Настройки приложения',
+                      'profile.app_settings'.tr(),
                       style: GoogleFonts.ysabeau(
                         fontSize: 19,
                         fontWeight: FontWeight.w600,
@@ -505,7 +505,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               _buildSettingsItem(
                 context,
                 icon: 'lib/core/assets/icons/profile/language.svg',
-                title: 'Язык приложения',
+                title: 'profile.app_language'.tr(),
                 subtitle: context.locale.languageCode == 'kk'
                     ? 'Қазақша'
                     : context.locale.languageCode == 'ru'
@@ -524,7 +524,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               _buildSettingsItem(
                 context,
                 icon: 'lib/core/assets/icons/profile/logout.svg',
-                title: 'Выйти из профиля',
+                title: 'profile.logout'.tr(),
                 titleColor: Colors.red,
                 onTap: () {
                   showModalBottomSheet(
@@ -550,9 +550,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         // Auth Section
         Column(
           children: [
-            const Text(
-              'Еще нет аккаунта?',
-              style: TextStyle(
+            Text(
+              'profile.no_account'.tr(),
+              style: const TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
@@ -572,9 +572,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 ),
                 minimumSize: const Size(double.infinity, 52),
               ),
-              child: const Text(
-                'Зарегистрироваться',
-                style: TextStyle(
+              child: Text(
+                'profile.register'.tr(),
+                style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
                 ),
@@ -584,9 +584,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  'Уже есть аккаунт?',
-                  style: TextStyle(
+                Text(
+                  'profile.have_account'.tr(),
+                  style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -602,9 +602,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
-                  child: const Text(
-                    'Войти',
-                    style: TextStyle(
+                  child: Text(
+                    'profile.login'.tr(),
+                    style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                     ),
@@ -618,7 +618,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
         // App Settings Section
         Text(
-          'Настройки приложения',
+          'profile.app_settings'.tr(),
           style: GoogleFonts.ysabeau(
             fontSize: 19,
             fontWeight: FontWeight.w600,
@@ -629,7 +629,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         _buildSettingsItem(
           context,
           icon: 'lib/core/assets/icons/profile/language.svg',
-          title: 'Язык приложения',
+          title: 'profile.app_language'.tr(),
           subtitle: context.locale.languageCode == 'kk'
               ? 'Қазақша'
               : context.locale.languageCode == 'ru'
@@ -647,7 +647,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
         // About Section
         Text(
-          'О нас',
+          'profile.about_section'.tr(),
           style: GoogleFonts.ysabeau(
             fontSize: 19,
             fontWeight: FontWeight.w600,
@@ -658,7 +658,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         _buildSettingsItem(
           context,
           icon: 'lib/core/assets/icons/profile/info.svg',
-          title: 'О Remalux',
+          title: 'profile.about_remalux'.tr(),
           onTap: () {
             // TODO: Navigate to About page
           },
@@ -666,7 +666,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         _buildSettingsItem(
           context,
           icon: 'lib/core/assets/icons/profile/phone.svg',
-          title: 'Контакты',
+          title: 'profile.contacts'.tr(),
           onTap: () {
             context.push('/contacts');
           },
@@ -674,7 +674,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         _buildSettingsItem(
           context,
           icon: 'lib/core/assets/icons/profile/projects.svg',
-          title: 'Проекты',
+          title: 'profile.projects'.tr(),
           onTap: () {
             context.push('/projects');
           },
@@ -690,7 +690,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         _buildSettingsItem(
           context,
           icon: 'lib/core/assets/icons/profile/question.svg',
-          title: 'Часто задаваемые вопросы',
+          title: 'profile.faq'.tr(),
           onTap: () {
             context.push('/faq');
           },

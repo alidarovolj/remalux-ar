@@ -5,6 +5,7 @@ import 'package:remalux_ar/features/home/domain/models/category.dart';
 import 'package:remalux_ar/features/home/presentation/providers/categories_provider.dart';
 import 'package:remalux_ar/features/store/presentation/providers/store_providers.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class StoreCategoriesGrid extends ConsumerWidget {
   const StoreCategoriesGrid({super.key});
@@ -13,16 +14,17 @@ class StoreCategoriesGrid extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final categoriesAsync = ref.watch(categoriesProvider);
     final selectedFilters = ref.watch(selectedFiltersProvider);
+    final currentLocale = context.locale.languageCode;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Text(
-            'Категории',
-            style: TextStyle(
+            'store.categories.title'.tr(),
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
@@ -48,6 +50,7 @@ class StoreCategoriesGrid extends ConsumerWidget {
               return _CategoryItem(
                 category: category,
                 isSelected: isSelected,
+                currentLocale: currentLocale,
               );
             },
           ),
@@ -65,7 +68,7 @@ class StoreCategoriesGrid extends ConsumerWidget {
             itemBuilder: (context, index) => const _CategoryItemSkeleton(),
           ),
           error: (error, stack) => Center(
-            child: Text('Error: $error'),
+            child: Text('common.error'.tr()),
           ),
         ),
       ],
@@ -76,10 +79,12 @@ class StoreCategoriesGrid extends ConsumerWidget {
 class _CategoryItem extends ConsumerWidget {
   final Category category;
   final bool isSelected;
+  final String currentLocale;
 
   const _CategoryItem({
     required this.category,
     required this.isSelected,
+    required this.currentLocale,
   });
 
   @override
@@ -140,7 +145,7 @@ class _CategoryItem extends ConsumerWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Text(
-                  category.title['ru'] ?? '',
+                  category.title[currentLocale] ?? category.title['ru'] ?? '',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,

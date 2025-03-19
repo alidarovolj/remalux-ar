@@ -15,6 +15,7 @@ import 'package:remalux_ar/features/store/presentation/widgets/paint_calculator_
 import 'package:remalux_ar/features/store/presentation/widgets/product_detail_skeleton.dart';
 import 'package:remalux_ar/features/home/domain/providers/selected_color_provider.dart';
 import 'package:remalux_ar/features/store/presentation/widgets/color_selection.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ProductDetailPage extends ConsumerStatefulWidget {
   final int productId;
@@ -45,6 +46,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
   Widget build(BuildContext context) {
     final productDetailAsync =
         ref.watch(productDetailProvider(widget.productId));
+    final currentLocale = context.locale.languageCode;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -76,16 +78,18 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
         ],
       ),
       body: productDetailAsync.when(
-        data: (product) => _buildProductDetail(context, product),
+        data: (product) => _buildProductDetail(context, product, currentLocale),
         loading: () => const ProductDetailSkeleton(),
         error: (error, stackTrace) => Center(
-          child: Text('Ошибка при загрузке: $error'),
+          child:
+              Text('store.product.reviews_error'.tr(args: [error.toString()])),
         ),
       ),
     );
   }
 
-  Widget _buildProductDetail(BuildContext context, ProductDetail product) {
+  Widget _buildProductDetail(
+      BuildContext context, ProductDetail product, String currentLocale) {
     // Set initial variant if weight is selected but variant is not
     if (selectedWeight != null && selectedVariant == null) {
       selectedVariant = product.productVariants.firstWhere(
@@ -149,9 +153,9 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                             height: 32,
                           ),
                           const SizedBox(width: 8),
-                          const Text(
-                            'Визуализировать',
-                            style: TextStyle(
+                          Text(
+                            'store.product.visualize'.tr(),
+                            style: const TextStyle(
                               fontSize: 15,
                               color: AppColors.textPrimary,
                             ),
@@ -197,7 +201,9 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                           const SizedBox(height: 8),
                         ],
                         Text(
-                          product.title['ru'] ?? '',
+                          product.title[currentLocale] ??
+                              product.title['ru'] ??
+                              '',
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.w600,
@@ -206,7 +212,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Артикул: ${product.article}',
+                          'store.product.article'.tr(args: [product.article]),
                           style: const TextStyle(
                             fontSize: 12,
                             color: AppColors.textSecondary,
@@ -245,7 +251,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                         // Color Selection
                         if (product.isColorable) ...[
                           Text(
-                            'Цвет',
+                            'store.product.color'.tr(),
                             style: GoogleFonts.ysabeau(
                               fontSize: 19,
                               fontWeight: FontWeight.w600,
@@ -259,7 +265,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
 
                         // Weight Selection
                         Text(
-                          'Вес',
+                          'store.product.weight'.tr(),
                           style: GoogleFonts.ysabeau(
                             fontSize: 19,
                             fontWeight: FontWeight.w600,
@@ -297,7 +303,8 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
-                                      '${variant.value} кг',
+                                      'store.weight_value'
+                                          .tr(args: [variant.value]),
                                       style: const TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.normal,
@@ -317,20 +324,14 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text.rich(
+                              Text.rich(
                                 TextSpan(
                                   children: [
                                     TextSpan(
-                                      text: 'Норма расхода: ',
-                                      style: TextStyle(
+                                      text: 'store.product.usage_rate'
+                                          .tr(args: ['150.00']),
+                                      style: const TextStyle(
                                         color: AppColors.textSecondary,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: '150.00 г/м2',
-                                      style: TextStyle(
-                                        color: AppColors.primary,
-                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                   ],
@@ -341,20 +342,14 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                 ),
                               ),
                               const SizedBox(height: 4),
-                              const Text.rich(
+                              Text.rich(
                                 TextSpan(
                                   children: [
                                     TextSpan(
-                                      text: 'Расчет площади покрытия краской: ',
-                                      style: TextStyle(
+                                      text: 'store.product.coverage_calculation'
+                                          .tr(args: ['6.67']),
+                                      style: const TextStyle(
                                         color: AppColors.textSecondary,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: '6.67 кг/м2',
-                                      style: TextStyle(
-                                        color: AppColors.primary,
-                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                   ],
@@ -404,19 +399,19 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                     width: double.infinity,
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 12),
-                                    child: const Row(
+                                    child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                        Icon(
+                                        const Icon(
                                           Icons.calculate_outlined,
                                           color: AppColors.textPrimary,
                                           size: 20,
                                         ),
-                                        SizedBox(width: 8),
+                                        const SizedBox(width: 8),
                                         Text(
-                                          'Калькулятор краски',
-                                          style: TextStyle(
+                                          'store.product.paint_calculator'.tr(),
+                                          style: const TextStyle(
                                             fontSize: 15,
                                             color: AppColors.textPrimary,
                                           ),
@@ -459,9 +454,9 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                                 ),
                                               ),
                                               const SizedBox(width: 12),
-                                              const Text(
-                                                'Сравнить',
-                                                style: TextStyle(
+                                              Text(
+                                                'store.product.compare'.tr(),
+                                                style: const TextStyle(
                                                   fontSize: 15,
                                                   color: AppColors.textPrimary,
                                                 ),
@@ -503,9 +498,10 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                                 ),
                                               ),
                                               const SizedBox(width: 12),
-                                              const Text(
-                                                'В избранное',
-                                                style: TextStyle(
+                                              Text(
+                                                'store.product.add_to_favorites'
+                                                    .tr(),
+                                                style: const TextStyle(
                                                   fontSize: 15,
                                                   color: AppColors.textPrimary,
                                                 ),
@@ -525,7 +521,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
 
                         // Description
                         Text(
-                          'О продукте',
+                          'store.product.about_product'.tr(),
                           style: GoogleFonts.ysabeau(
                             fontSize: 19,
                             fontWeight: FontWeight.w600,
@@ -534,7 +530,9 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                         ),
                         const SizedBox(height: 16),
                         Html(
-                          data: product.description['ru'] ?? '',
+                          data: product.description[currentLocale] ??
+                              product.description['ru'] ??
+                              '',
                           style: {
                             "body": Style(
                               fontSize: FontSize(14),
@@ -553,7 +551,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
 
                         // Usage Area
                         Text(
-                          'Данные продукта',
+                          'store.product.product_data'.tr(),
                           style: GoogleFonts.ysabeau(
                             fontSize: 19,
                             fontWeight: FontWeight.w600,
@@ -577,14 +575,16 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                 TextSpan(
                                   children: [
                                     TextSpan(
-                                      text: '${titleMap['ru']}: ',
+                                      text:
+                                          '${titleMap[currentLocale] ?? titleMap['ru']}: ',
                                       style: const TextStyle(
                                         fontSize: 14,
                                         color: AppColors.textSecondary,
                                       ),
                                     ),
                                     TextSpan(
-                                      text: '${valueMap['ru']}',
+                                      text:
+                                          '${valueMap[currentLocale] ?? valueMap['ru']}',
                                       style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
@@ -593,7 +593,8 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                     ),
                                     if (measureMap != null)
                                       TextSpan(
-                                        text: ' ${measureMap['ru']}',
+                                        text:
+                                            ' ${measureMap[currentLocale] ?? measureMap['ru']}',
                                         style: const TextStyle(
                                           fontSize: 14,
                                           color: AppColors.primary,
@@ -610,20 +611,16 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                           Text.rich(
                             TextSpan(
                               children: [
-                                const TextSpan(
-                                  text: 'Расчет площади покрытия краской: ',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: AppColors.textSecondary,
-                                  ),
-                                ),
                                 TextSpan(
-                                  text:
-                                      '${((double.parse(selectedWeight!) * 1000) / product.expense).toStringAsFixed(2)} м2',
+                                  text: 'store.product.coverage_calculation'
+                                      .tr(args: [
+                                    ((double.parse(selectedWeight!) * 1000) /
+                                            product.expense)
+                                        .toStringAsFixed(2)
+                                  ]),
                                   style: const TextStyle(
                                     fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.primary,
+                                    color: AppColors.textSecondary,
                                   ),
                                 ),
                               ],
@@ -633,20 +630,18 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                         // Reviews
                         Consumer(
                           builder: (context, ref, child) {
-                            print(
-                                '🔍 Loading reviews for product ${widget.productId}');
                             final reviewsAsync = ref.watch(
                                 productReviewsProvider(widget.productId));
 
                             return reviewsAsync.when(
                               data: (reviewsResponse) {
-                                print(
-                                    '✅ Reviews loaded: ${reviewsResponse.data.length} reviews');
                                 return Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Отзывы (${reviewsResponse.meta.total})',
+                                      'store.product.reviews'.tr(args: [
+                                        reviewsResponse.meta.total.toString()
+                                      ]),
                                       style: GoogleFonts.ysabeau(
                                         fontSize: 19,
                                         fontWeight: FontWeight.w600,
@@ -657,34 +652,31 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                     ReviewsSection(
                                       reviews: reviewsResponse.data,
                                       totalReviews: reviewsResponse.meta.total,
-                                      productTitle: product.title['ru'] ?? '',
+                                      productTitle:
+                                          product.title[currentLocale] ??
+                                              product.title['ru'] ??
+                                              '',
                                       productImage: product.imageUrl,
                                     ),
                                   ],
                                 );
                               },
-                              loading: () {
-                                print('⏳ Loading reviews...');
-                                return const Center(
-                                  child: Padding(
-                                    padding: EdgeInsets.all(16.0),
-                                    child: CircularProgressIndicator(),
+                              loading: () => const Center(
+                                child: Padding(
+                                  padding: EdgeInsets.all(16.0),
+                                  child: CircularProgressIndicator(),
+                                ),
+                              ),
+                              error: (error, stackTrace) => Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Text(
+                                    'store.product.reviews_error'
+                                        .tr(args: [error.toString()]),
+                                    style: const TextStyle(color: Colors.red),
                                   ),
-                                );
-                              },
-                              error: (error, stackTrace) {
-                                print('❌ Error loading reviews: $error');
-                                print('Stack trace: $stackTrace');
-                                return Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Text(
-                                      'Ошибка при загрузке отзывов: $error',
-                                      style: const TextStyle(color: Colors.red),
-                                    ),
-                                  ),
-                                );
-                              },
+                                ),
+                              ),
                             );
                           },
                         ),
@@ -692,7 +684,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
 
                         // Certificates
                         Text(
-                          'Сертификаты продукции',
+                          'store.product.certificates'.tr(),
                           style: GoogleFonts.ysabeau(
                             fontSize: 19,
                             fontWeight: FontWeight.w600,
@@ -711,8 +703,8 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                               } catch (e) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content:
-                                        Text('Ошибка при открытии файла: $e'),
+                                    content: Text('store.product.file_error'
+                                        .tr(args: [e.toString()])),
                                     backgroundColor: Colors.red,
                                   ),
                                 );
@@ -729,10 +721,10 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                     height: 24,
                                   ),
                                   const SizedBox(width: 12),
-                                  const Expanded(
+                                  Expanded(
                                     child: Text(
-                                      'Сертификат',
-                                      style: TextStyle(
+                                      'store.product.certificate'.tr(),
+                                      style: const TextStyle(
                                         fontSize: 15,
                                         color: AppColors.textPrimary,
                                       ),
@@ -751,12 +743,14 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                               .showSnackBar(
                                             SnackBar(
                                               content: Text(
-                                                  'Файл сохранен в: $filePath'),
+                                                  'store.product.file_saved'
+                                                      .tr(args: [filePath])),
                                               backgroundColor: Colors.green,
                                               duration:
                                                   const Duration(seconds: 5),
                                               action: SnackBarAction(
-                                                label: 'Открыть',
+                                                label:
+                                                    'store.product.open'.tr(),
                                                 textColor: Colors.white,
                                                 onPressed: () async {
                                                   final url =
@@ -775,7 +769,10 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                               .showSnackBar(
                                             SnackBar(
                                               content: Text(
-                                                  'Ошибка при скачивании файла: $e'),
+                                                  'store.product.download_error'
+                                                      .tr(args: [
+                                                e.toString()
+                                              ])),
                                               backgroundColor: Colors.red,
                                             ),
                                           );
@@ -812,7 +809,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Похожие товары',
+                                      'store.product.similar_products'.tr(),
                                       style: GoogleFonts.ysabeau(
                                         fontSize: 19,
                                         fontWeight: FontWeight.w600,
@@ -838,8 +835,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                             child: GestureDetector(
                                               onTap: () {
                                                 context.pushReplacement(
-                                                  '/products/${product.id}',
-                                                );
+                                                    '/products/${product.id}');
                                               },
                                               child: Container(
                                                 decoration: BoxDecoration(
@@ -887,6 +883,8 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                                         children: [
                                                           Text(
                                                             product.title[
+                                                                    currentLocale] ??
+                                                                product.title[
                                                                     'ru'] ??
                                                                 '',
                                                             maxLines: 2,
@@ -1097,12 +1095,12 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                               // TODO: Implement add to cart
                             }
                           : null,
-                      child: const SizedBox(
+                      child: SizedBox(
                         height: 48,
                         child: Center(
                           child: Text(
-                            'В корзину',
-                            style: TextStyle(
+                            'store.product.add_to_cart'.tr(),
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                               color: Colors.white,

@@ -7,23 +7,100 @@
     "edit": "Редактировать",
     "back": "Назад",
     "next": "Далее",
-    "done": "Готово"
+    "done": "Готово",
+    "no_data": "Нет данных о продукте",
+    "no_title": "Без названия",
+    "error": "Ошибка",
+    "kg": "кг",
+    "currency": "₸",
+    "update_language": "Обновить язык",
+    "tabs": {
+      "home": "Главная",
+      "catalog": "Каталог",
+      "ar": "AR",
+      "cart": "Корзина",
+      "profile": "Профиль"
+    }
   },
   "auth": {
     "login": "Войти",
     "register": "Регистрация",
     "email": "Эл. почта",
     "password": "Пароль",
-    "forgot_password": "Забыли пароль?"
+    "forgot_password": "Забыли пароль?",
+    "welcome": "Добро пожаловать!",
+    "phone_number": "Номер телефона",
+    "phone_hint": "+7 (___) ___ __ __",
+    "password_hint": "Пароль",
+    "login_button": "Авторизоваться",
+    "no_account": "Еще нет аккаунта?",
+    "register_link": "Пожалуйста, зарегистрируйтесь",
+    "fill_all_fields": "Пожалуйста, заполните все поля",
+    "login_success": "Вы успешно авторизовались",
+    "password_requirements": "Требования к паролю",
+    "password_min_length": "Минимум 8 символов",
+    "password_contains_letter": "Должен содержать буквы",
+    "password_contains_number": "Должен содержать цифры",
+    "password_contains_special": "Должен содержать специальные символы",
+    "password_match": "Пароли должны совпадать",
+    "password_reset": "Сброс пароля",
+    "password_reset_sent": "Инструкции по сбросу пароля отправлены на ваш email",
+    "password_reset_error": "Ошибка при сбросе пароля",
+    "password_reset_success": "Пароль успешно изменен"
   },
   "store": {
     "catalog": "Каталог",
     "search_products": "Поиск по продукции",
     "filters": "Фильтры",
     "sorting": "Сортировка",
-    "products_count": "{count} продуктов",
+    "products_count": "Найдено {} товаров",
     "no_products_found": "К сожалению, по заданным критериям товаров не найдено",
-    "try_different_filters": "Измените или ослабьте фильтры и попробуйте снова"
+    "try_different_filters": "Измените или ослабьте фильтры и попробуйте снова",
+    "categories": {
+      "title": "Категории"
+    },
+    "in_stock": "В наличии",
+    "weight_value": "{} кг",
+    "price_value": "{} ₸",
+    "added_to_cart": "Добавлено {} в корзину",
+    "product": {
+      "visualize": "Визуализировать",
+      "article": "Артикул: {article}",
+      "color": "Цвет",
+      "weight": "Вес",
+      "weight_unit": "кг",
+      "usage_rate": "Норма расхода: {rate} г/м2",
+      "coverage_calculation": "Расчет площади покрытия краской: {area} м2",
+      "paint_calculator": "Калькулятор краски",
+      "compare": "Сравнить",
+      "add_to_favorites": "В избранное",
+      "about_product": "О продукте",
+      "product_data": "Данные продукта",
+      "reviews": "Отзывы ({count})",
+      "certificates": "Сертификаты продукции",
+      "certificate": "Сертификат",
+      "open": "Открыть",
+      "download": "Скачать",
+      "file_saved": "Файл сохранен в: {path}",
+      "file_error": "Ошибка при открытии файла: {error}",
+      "download_error": "Ошибка при скачивании файла: {error}",
+      "similar_products": "Похожие товары",
+      "add_to_cart": "В корзину",
+      "reviews_error": "Ошибка при загрузке отзывов: {error}"
+    },
+    "paint_calculator": {
+      "title": "Калькулятор краски",
+      "width": "Ширина, м",
+      "height": "Высота, м",
+      "layers": "Слои",
+      "total_area": "Общая площадь:",
+      "required_paint": "Требуется краски:",
+      "packages_count": "Количество упаковок:",
+      "packages_format": "%1$s шт по %2$s кг",
+      "add_to_cart_format": "Добавить %s шт в корзину",
+      "area_format": "%s м²",
+      "paint_format": "%s кг"
+    }
   },
   "orders": {
     "my_orders": "Мои заказы",
@@ -50,7 +127,28 @@
     "orders": "Заказы",
     "favorites": "Избранное",
     "settings": "Настройки",
-    "logout": "Выйти"
+    "logout": "Выйти",
+    "title": "Профиль",
+    "edit_profile": "Редактировать профиль",
+    "phone": "Телефон",
+    "email": "Почта",
+    "not_specified": "Не указано",
+    "favorite_products": "Избранные товары",
+    "favorite_colors": "Избранные цвета",
+    "saved_data": "Сохраненные данные",
+    "delivery_addresses": "Адреса доставок",
+    "recipients": "Получатели",
+    "about_section": "О нас",
+    "about_remalux": "О Remalux",
+    "contacts": "Контакты",
+    "projects": "Проекты",
+    "faq": "Часто задаваемые вопросы",
+    "app_settings": "Настройки приложения",
+    "app_language": "Язык приложения",
+    "no_account": "Еще нет аккаунта?",
+    "register": "Зарегистрироваться",
+    "have_account": "Уже есть аккаунт?",
+    "login": "Войти"
   },
   "home": {
     "try_colors": "Примерьте краски",
@@ -77,4 +175,4 @@
       "view_all": "Смотреть все"
     }
   }
-} 
+}

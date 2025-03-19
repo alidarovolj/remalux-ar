@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/core/widgets/custom_button.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class PaintCalculatorModal extends StatefulWidget {
   final double expense;
@@ -35,8 +36,7 @@ class _PaintCalculatorModalState extends State<PaintCalculatorModal> {
 
   int get requiredPackages {
     final selectedWeight = double.tryParse(widget.selectedWeight) ?? 1;
-    return (requiredPaint / selectedWeight)
-        .ceil(); // Округляем вверх до целого числа
+    return (requiredPaint / selectedWeight).ceil();
   }
 
   @override
@@ -63,7 +63,7 @@ class _PaintCalculatorModalState extends State<PaintCalculatorModal> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Калькулятор краски',
+                'store.paint_calculator.title'.tr(),
                 style: GoogleFonts.ysabeau(
                   fontSize: 22,
                   fontWeight: FontWeight.w600,
@@ -84,9 +84,9 @@ class _PaintCalculatorModalState extends State<PaintCalculatorModal> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Ширина, м',
-                            style: TextStyle(
+                          Text(
+                            'store.paint_calculator.width'.tr(),
+                            style: const TextStyle(
                               fontSize: 14,
                               color: AppColors.textSecondary,
                             ),
@@ -116,9 +116,9 @@ class _PaintCalculatorModalState extends State<PaintCalculatorModal> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Высота, м',
-                            style: TextStyle(
+                          Text(
+                            'store.paint_calculator.height'.tr(),
+                            style: const TextStyle(
                               fontSize: 14,
                               color: AppColors.textSecondary,
                             ),
@@ -148,9 +148,9 @@ class _PaintCalculatorModalState extends State<PaintCalculatorModal> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Слои',
-                            style: TextStyle(
+                          Text(
+                            'store.paint_calculator.layers'.tr(),
+                            style: const TextStyle(
                               fontSize: 14,
                               color: AppColors.textSecondary,
                             ),
@@ -181,15 +181,16 @@ class _PaintCalculatorModalState extends State<PaintCalculatorModal> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Общая площадь:',
-                      style: TextStyle(
+                    Text(
+                      'store.paint_calculator.total_area'.tr(),
+                      style: const TextStyle(
                         fontSize: 15,
                         color: AppColors.textSecondary,
                       ),
                     ),
                     Text(
-                      '${totalArea.toStringAsFixed(0)} м²',
+                      'store.paint_calculator.area_format'
+                          .tr(args: [totalArea.toStringAsFixed(0)]),
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
@@ -202,15 +203,16 @@ class _PaintCalculatorModalState extends State<PaintCalculatorModal> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Требуется краски:',
-                      style: TextStyle(
+                    Text(
+                      'store.paint_calculator.required_paint'.tr(),
+                      style: const TextStyle(
                         fontSize: 15,
                         color: AppColors.textSecondary,
                       ),
                     ),
                     Text(
-                      '${requiredPaint.toStringAsFixed(1)} кг',
+                      'store.paint_calculator.paint_format'
+                          .tr(args: [requiredPaint.toStringAsFixed(1)]),
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
@@ -223,15 +225,18 @@ class _PaintCalculatorModalState extends State<PaintCalculatorModal> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Количество упаковок:',
-                      style: TextStyle(
+                    Text(
+                      'store.paint_calculator.packages_count'.tr(),
+                      style: const TextStyle(
                         fontSize: 15,
                         color: AppColors.textSecondary,
                       ),
                     ),
                     Text(
-                      '$requiredPackages шт по ${widget.selectedWeight} кг',
+                      'store.paint_calculator.packages_format'.tr(args: [
+                        requiredPackages.toString(),
+                        widget.selectedWeight,
+                      ]),
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
@@ -242,7 +247,8 @@ class _PaintCalculatorModalState extends State<PaintCalculatorModal> {
                 ),
                 const SizedBox(height: 24),
                 CustomButton(
-                  label: 'Добавить $requiredPackages шт в корзину',
+                  label: 'store.paint_calculator.add_to_cart_format'
+                      .tr(args: [requiredPackages.toString()]),
                   onPressed: () {
                     Navigator.pop(context, requiredPackages);
                   },

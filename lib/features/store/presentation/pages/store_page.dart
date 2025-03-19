@@ -12,6 +12,7 @@ import 'package:remalux_ar/features/store/presentation/widgets/sorting_modal.dar
 import 'package:shimmer/shimmer.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:remalux_ar/features/home/domain/providers/selected_color_provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'dart:async';
 
 class StorePage extends ConsumerStatefulWidget {
@@ -132,6 +133,7 @@ class _StorePageState extends ConsumerState<StorePage> {
     final productsAsync = ref.watch(productsProvider);
     final filtersAsync = ref.watch(filtersProvider);
     final selectedColor = ref.watch(selectedColorProvider);
+    final currentLocale = context.locale.languageCode;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
@@ -172,10 +174,12 @@ class _StorePageState extends ConsumerState<StorePage> {
                         children: [
                           Text(
                             productsAsync.when(
-                              data: (response) =>
-                                  '${response.meta.total} продуктов',
-                              loading: () => '0 продуктов',
-                              error: (_, __) => '0 продуктов',
+                              data: (response) => 'store.products_count'
+                                  .tr(args: [response.meta.total.toString()]),
+                              loading: () =>
+                                  'store.products_count'.tr(args: ['0']),
+                              error: (_, __) =>
+                                  'store.products_count'.tr(args: ['0']),
                             ),
                             style: TextStyle(
                               fontSize: 14,
@@ -219,7 +223,7 @@ class _StorePageState extends ConsumerState<StorePage> {
                                             )
                                           : null,
                                       child: Text(
-                                        'Сортировка',
+                                        'store.sorting'.tr(),
                                         style: TextStyle(
                                           fontSize: 14,
                                           color: isActive
@@ -255,9 +259,9 @@ class _StorePageState extends ConsumerState<StorePage> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Text(
-                                  'К сожалению, по заданным критериям товаров не найдено',
-                                  style: TextStyle(
+                                Text(
+                                  'store.no_products_found'.tr(),
+                                  style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
                                     color: AppColors.textPrimary,
@@ -266,7 +270,7 @@ class _StorePageState extends ConsumerState<StorePage> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  'Измените или ослабьте фильтры и попробуйте снова',
+                                  'store.try_different_filters'.tr(),
                                   style: TextStyle(
                                     fontSize: 14,
                                     color:
@@ -308,7 +312,7 @@ class _StorePageState extends ConsumerState<StorePage> {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(
-                                            'Added ${variant.attributes['title']['ru']} to cart'),
+                                            'Added ${variant.attributes['title'][currentLocale] ?? variant.attributes['title']['ru'] ?? ''} to cart'),
                                       ),
                                     );
                                   },
@@ -448,7 +452,7 @@ class _StorePageState extends ConsumerState<StorePage> {
                               controller: _searchController,
                               onChanged: _onSearchChanged,
                               decoration: InputDecoration(
-                                hintText: 'Поиск по продукции',
+                                hintText: 'store.search_products'.tr(),
                                 hintStyle: TextStyle(
                                   color: AppColors.textPrimary.withOpacity(0.5),
                                   fontSize: 15,
@@ -629,7 +633,9 @@ class _StorePageState extends ConsumerState<StorePage> {
                                                 );
                                               },
                                               child: _buildFilterButton(
-                                                filter.title['ru'] ?? '',
+                                                filter.title[currentLocale] ??
+                                                    filter.title['ru'] ??
+                                                    '',
                                                 selectedCount > 0,
                                                 selectedCount: selectedCount,
                                               ),
@@ -682,7 +688,9 @@ class _StorePageState extends ConsumerState<StorePage> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text(
-                                        selectedColor.title['ru'] ?? '',
+                                        selectedColor.title[currentLocale] ??
+                                            selectedColor.title['ru'] ??
+                                            '',
                                         style: const TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class CustomTabBar extends StatelessWidget {
   final TabController tabController;
@@ -38,78 +39,80 @@ class CustomTabBar extends StatelessWidget {
               topLeft: Radius.circular(20),
               topRight: Radius.circular(20),
             ),
-            child: TabBar(
-              controller: tabController,
-              indicatorColor: Colors.transparent,
-              labelColor: AppColors.primary,
-              unselectedLabelColor: AppColors.textPrimary,
-              labelStyle: const TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w500,
-              ),
-              tabs: [
-                Tab(
-                  icon: SvgPicture.asset(
-                    'lib/core/assets/icons/tabs/1.svg',
-                    colorFilter: ColorFilter.mode(
-                      tabController.index == 0
-                          ? AppColors.primary
-                          : AppColors.textPrimary,
-                      BlendMode.srcIn,
-                    ),
-                  ),
-                  text: "Главная",
+            child: Builder(
+              builder: (context) => TabBar(
+                controller: tabController,
+                indicatorColor: Colors.transparent,
+                labelColor: AppColors.primary,
+                unselectedLabelColor: AppColors.textPrimary,
+                labelStyle: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
                 ),
-                Tab(
-                  icon: SvgPicture.asset(
-                    'lib/core/assets/icons/tabs/2.svg',
-                    colorFilter: ColorFilter.mode(
-                      tabController.index == 1
-                          ? AppColors.primary
-                          : AppColors.textPrimary,
-                      BlendMode.srcIn,
+                tabs: [
+                  Tab(
+                    icon: SvgPicture.asset(
+                      'lib/core/assets/icons/tabs/1.svg',
+                      colorFilter: ColorFilter.mode(
+                        tabController.index == 0
+                            ? AppColors.primary
+                            : AppColors.textPrimary,
+                        BlendMode.srcIn,
+                      ),
                     ),
+                    text: 'common.tabs.home'.tr(),
                   ),
-                  text: "Каталог",
-                ),
-                const Tab(
-                  height: 65,
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 22),
-                    child: Text(
-                      "AR",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 10,
+                  Tab(
+                    icon: SvgPicture.asset(
+                      'lib/core/assets/icons/tabs/2.svg',
+                      colorFilter: ColorFilter.mode(
+                        tabController.index == 1
+                            ? AppColors.primary
+                            : AppColors.textPrimary,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    text: 'common.tabs.catalog'.tr(),
+                  ),
+                  Tab(
+                    height: 65,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 22),
+                      child: Text(
+                        'common.tabs.ar'.tr(),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 10,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Tab(
-                  icon: SvgPicture.asset(
-                    'lib/core/assets/icons/tabs/3.svg',
-                    colorFilter: ColorFilter.mode(
-                      tabController.index == 3
-                          ? AppColors.primary
-                          : AppColors.textPrimary,
-                      BlendMode.srcIn,
+                  Tab(
+                    icon: SvgPicture.asset(
+                      'lib/core/assets/icons/tabs/3.svg',
+                      colorFilter: ColorFilter.mode(
+                        tabController.index == 3
+                            ? AppColors.primary
+                            : AppColors.textPrimary,
+                        BlendMode.srcIn,
+                      ),
                     ),
+                    text: 'common.tabs.cart'.tr(),
                   ),
-                  text: "Корзина",
-                ),
-                Tab(
-                  icon: SvgPicture.asset(
-                    'lib/core/assets/icons/tabs/4.svg',
-                    colorFilter: ColorFilter.mode(
-                      tabController.index == 4
-                          ? AppColors.primary
-                          : AppColors.textPrimary,
-                      BlendMode.srcIn,
+                  Tab(
+                    icon: SvgPicture.asset(
+                      'lib/core/assets/icons/tabs/4.svg',
+                      colorFilter: ColorFilter.mode(
+                        tabController.index == 4
+                            ? AppColors.primary
+                            : AppColors.textPrimary,
+                        BlendMode.srcIn,
+                      ),
                     ),
+                    text: 'common.tabs.profile'.tr(),
                   ),
-                  text: "Профиль",
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

@@ -4,6 +4,7 @@ import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/features/store/domain/models/product.dart';
 import 'package:remalux_ar/features/favorites/domain/providers/favorites_providers.dart';
 import 'package:remalux_ar/features/store/presentation/providers/store_providers.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ProductVariantItem extends ConsumerWidget {
   final ProductVariant variant;
@@ -20,23 +21,25 @@ class ProductVariantItem extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final product = variant.attributes['product'] as Map<String, dynamic>?;
+    final currentLocale = context.locale.languageCode;
 
     if (product == null) {
-      return const Card(
+      return Card(
         child: Center(
-          child: Text('Нет данных о продукте'),
+          child: Text('common.no_data'.tr()),
         ),
       );
     }
 
-    final title =
-        (product['title'] as Map<String, dynamic>?)?['ru'] as String? ??
-            'Без названия';
+    final title = (product['title'] as Map<String, dynamic>?)?[currentLocale] ??
+        (product['title'] as Map<String, dynamic>?)?['ru'] ??
+        'common.no_title'.tr();
     final isColorable = product['is_colorable'] as bool? ?? false;
     final isFavourite = product['is_favourite'] as bool? ?? false;
     final productId = product['id'] as int?;
     final category = (product['category'] as Map<String, dynamic>?)?['title']
-            ?['ru'] as String? ??
+            ?[currentLocale] ??
+        (product['category'] as Map<String, dynamic>?)?['title']?['ru'] ??
         '';
 
     return Container(
@@ -145,9 +148,9 @@ class ProductVariantItem extends ConsumerWidget {
                         color: AppColors.primary.withOpacity(0.9),
                         borderRadius: BorderRadius.circular(4),
                       ),
-                      child: const Text(
-                        'В наличии',
-                        style: TextStyle(
+                      child: Text(
+                        'store.in_stock'.tr(),
+                        style: const TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w500,
                           color: Colors.white,
@@ -226,7 +229,8 @@ class ProductVariantItem extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        '${variant.value} кг',
+                        'store.weight_value'
+                            .tr(args: [variant.value.toString()]),
                         style: const TextStyle(
                           fontSize: 12,
                           color: AppColors.textPrimary,
@@ -247,7 +251,9 @@ class ProductVariantItem extends ConsumerWidget {
                       children: [
                         if (variant.discount_price != null) ...[
                           Text(
-                            '${variant.discount_price!.toInt()} ₸',
+                            'store.price_value'.tr(args: [
+                              variant.discount_price!.toInt().toString()
+                            ]),
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -255,7 +261,8 @@ class ProductVariantItem extends ConsumerWidget {
                             ),
                           ),
                           Text(
-                            '${variant.price.toInt()} ₸',
+                            'store.price_value'
+                                .tr(args: [variant.price.toInt().toString()]),
                             style: TextStyle(
                               fontSize: 12,
                               decoration: TextDecoration.lineThrough,
@@ -264,7 +271,8 @@ class ProductVariantItem extends ConsumerWidget {
                           ),
                         ] else
                           Text(
-                            '${variant.price.toInt()} ₸',
+                            'store.price_value'
+                                .tr(args: [variant.price.toInt().toString()]),
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
