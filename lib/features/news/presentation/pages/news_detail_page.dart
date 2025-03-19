@@ -6,6 +6,7 @@ import 'package:remalux_ar/core/widgets/custom_app_bar.dart';
 import 'package:remalux_ar/features/home/presentation/providers/news_provider.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class NewsDetailPage extends ConsumerWidget {
   final int newsId;
@@ -18,11 +19,12 @@ class NewsDetailPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final newsAsync = ref.watch(newsDetailProvider(newsId));
+    final currentLocale = context.locale.languageCode;
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: const CustomAppBar(
-        title: 'Новость',
+      appBar: CustomAppBar(
+        title: 'home.news.title'.tr(),
         showTitle: false,
       ),
       body: newsAsync.when(
@@ -33,7 +35,7 @@ class NewsDetailPage extends ConsumerWidget {
               Padding(
                 padding: const EdgeInsets.all(12),
                 child: Text(
-                  news.title['ru'] ?? '',
+                  news.title[currentLocale] ?? '',
                   style: GoogleFonts.ysabeau(
                     fontSize: 19,
                     fontWeight: FontWeight.w600,
@@ -55,7 +57,9 @@ class NewsDetailPage extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Html(
-                      data: news.content?['ru'] ?? news.description['ru'] ?? '',
+                      data: news.content?[currentLocale] ??
+                          news.description[currentLocale] ??
+                          '',
                       style: {
                         "body": Style(
                           fontSize: FontSize(16),
@@ -74,7 +78,7 @@ class NewsDetailPage extends ConsumerWidget {
         ),
         loading: () => const _NewsDetailSkeleton(),
         error: (error, stackTrace) => Center(
-          child: Text('Ошибка: $error'),
+          child: Text('common.error'.tr() + ': $error'),
         ),
       ),
     );

@@ -88,7 +88,7 @@ class AddressesService {
 
     try {
       await dio.delete(
-        '/users/addresses/$id/delete',
+        '/users/addresses/$id',
         options: Options(
           headers: {
             'Cache-Control': 'no-cache',

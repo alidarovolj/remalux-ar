@@ -13,6 +13,7 @@ import 'package:remalux_ar/features/orders/presentation/widgets/order_skeleton.d
 import 'package:remalux_ar/features/store/presentation/providers/store_providers.dart';
 import 'package:remalux_ar/features/store/presentation/widgets/product_variant_item.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class OrdersPage extends ConsumerStatefulWidget {
   const OrdersPage({super.key});
@@ -58,8 +59,8 @@ class _OrdersPageState extends ConsumerState<OrdersPage> {
       ),
       child: Scaffold(
         backgroundColor: const Color(0xFFF5F5F5),
-        appBar: const CustomAppBar(
-          title: 'Заказы',
+        appBar: CustomAppBar(
+          title: 'orders.my_orders'.tr(),
           showBottomBorder: true,
         ),
         body: RefreshIndicator(
@@ -86,23 +87,23 @@ class _OrdersPageState extends ConsumerState<OrdersPage> {
                             ),
                             const SizedBox(height: 24),
                             Text(
-                              'У вас пока нет заказов',
+                              'orders.empty.title'.tr(),
                               style: GoogleFonts.ysabeau(
                                 fontSize: 23,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                             const SizedBox(height: 8),
-                            const Text(
-                              'Здесь будут отображаться ваши заказы',
-                              style: TextStyle(
+                            Text(
+                              'orders.empty.description'.tr(),
+                              style: const TextStyle(
                                 fontSize: 15,
                                 color: AppColors.textSecondary,
                               ),
                             ),
                             const SizedBox(height: 24),
                             CustomButton(
-                              label: 'К каталогу',
+                              label: 'orders.empty.to_catalog'.tr(),
                               isFullWidth: false,
                               onPressed: () {
                                 context.go('/store');
@@ -150,9 +151,9 @@ class _OrdersPageState extends ConsumerState<OrdersPage> {
                           color: Colors.red,
                         ),
                         const SizedBox(height: 16),
-                        const Text(
-                          'Не удалось загрузить заказы',
-                          style: TextStyle(
+                        Text(
+                          'orders.error.title'.tr(),
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                           ),
@@ -171,7 +172,7 @@ class _OrdersPageState extends ConsumerState<OrdersPage> {
                           onPressed: () {
                             ref.read(ordersNotifierProvider.notifier).refresh();
                           },
-                          child: const Text('Попробовать снова'),
+                          child: Text('orders.error.try_again'.tr()),
                         ),
                       ],
                     ),
@@ -181,7 +182,7 @@ class _OrdersPageState extends ConsumerState<OrdersPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Text(
-                    'Рекомендуемые товары',
+                    'orders.recommended_products'.tr(),
                     style: GoogleFonts.ysabeau(
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
@@ -192,8 +193,8 @@ class _OrdersPageState extends ConsumerState<OrdersPage> {
                 productsAsync.when(
                   data: (response) {
                     if (response.data.isEmpty) {
-                      return const Center(
-                        child: Text('Нет доступных товаров'),
+                      return Center(
+                        child: Text('orders.no_products'.tr()),
                       );
                     }
                     return GridView.builder(
@@ -225,7 +226,11 @@ class _OrdersPageState extends ConsumerState<OrdersPage> {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
-                                      'Added ${variant.attributes['title']['ru']} to cart'),
+                                    'orders.added_to_cart'.tr(args: [
+                                      variant.attributes['title']
+                                          [context.locale.languageCode]
+                                    ]),
+                                  ),
                                 ),
                               );
                             },

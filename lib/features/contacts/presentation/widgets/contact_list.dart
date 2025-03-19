@@ -3,6 +3,7 @@ import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/features/contacts/data/models/contact_model.dart';
 import 'package:remalux_ar/features/contacts/presentation/widgets/yandex_map_view.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ContactList extends StatelessWidget {
   final List<Contact> contacts;
@@ -120,9 +121,9 @@ class ContactList extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      'График работы',
-                                      style: TextStyle(
+                                    Text(
+                                      'contacts.schedule.title'.tr(),
+                                      style: const TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w600,
                                         color: AppColors.textPrimary,
@@ -131,13 +132,13 @@ class ContactList extends StatelessWidget {
                                     const SizedBox(height: 8),
                                     // Work days
                                     ...[
-                                      'Пн',
-                                      'Вт',
-                                      'Ср',
-                                      'Чт',
-                                      'Пт',
-                                      'Сб',
-                                      'Вс'
+                                      'contacts.schedule.weekdays.mon'.tr(),
+                                      'contacts.schedule.weekdays.tue'.tr(),
+                                      'contacts.schedule.weekdays.wed'.tr(),
+                                      'contacts.schedule.weekdays.thu'.tr(),
+                                      'contacts.schedule.weekdays.fri'.tr(),
+                                      'contacts.schedule.weekdays.sat'.tr(),
+                                      'contacts.schedule.weekdays.sun'.tr(),
                                     ].asMap().entries.map(
                                       (entry) {
                                         final workTime =
@@ -166,7 +167,8 @@ class ContactList extends StatelessWidget {
                                               Text(
                                                 isWorkDay
                                                     ? '${workTime.startTime} - ${workTime.endTime}'
-                                                    : 'Выходной',
+                                                    : 'contacts.schedule.closed'
+                                                        .tr(),
                                                 style: TextStyle(
                                                   fontSize: 15,
                                                   color: isWorkDay
@@ -183,7 +185,10 @@ class ContactList extends StatelessWidget {
                                     if (item.breakTime.startTime != null) ...[
                                       const SizedBox(height: 8),
                                       Text(
-                                        'Перерыв: ${item.breakTime.startTime} - ${item.breakTime.endTime}',
+                                        'contacts.schedule.break'.tr(args: [
+                                          item.breakTime.startTime!,
+                                          item.breakTime.endTime!
+                                        ]),
                                         style: const TextStyle(
                                           fontSize: 15,
                                           color: AppColors.textSecondary,

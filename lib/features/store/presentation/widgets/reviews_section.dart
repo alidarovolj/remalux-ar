@@ -4,6 +4,7 @@ import 'package:remalux_ar/features/store/domain/models/review.dart';
 import 'package:remalux_ar/core/widgets/custom_button.dart';
 import 'package:intl/intl.dart';
 import 'package:remalux_ar/features/store/presentation/widgets/review_modal.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ReviewsSection extends StatelessWidget {
   final List<Review> reviews;
@@ -25,11 +26,11 @@ class ReviewsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (reviews.isEmpty)
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 0),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 0),
             child: Text(
-              'Пока нет отзывов',
-              style: TextStyle(
+              'store.product.reviews.no_reviews'.tr(),
+              style: const TextStyle(
                 fontSize: 14,
                 color: AppColors.textSecondary,
                 fontStyle: FontStyle.italic,
@@ -37,20 +38,23 @@ class ReviewsSection extends StatelessWidget {
             ),
           )
         else
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 0),
-            itemCount: reviews.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 16),
-            itemBuilder: (context, index) {
-              final review = reviews[index];
-              return _ReviewCard(review: review);
-            },
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                for (var i = 0; i < reviews.length; i++) ...[
+                  SizedBox(
+                    width: 300,
+                    child: _ReviewCard(review: reviews[i]),
+                  ),
+                  if (i < reviews.length - 1) const SizedBox(width: 16),
+                ],
+              ],
+            ),
           ),
         const SizedBox(height: 16),
         CustomButton(
-          label: 'Оставить отзыв',
+          label: 'store.product.reviews.leave_review'.tr(),
           onPressed: () {
             showModalBottomSheet(
               context: context,
@@ -89,7 +93,7 @@ class _ReviewCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.backgroundLight,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -102,6 +106,7 @@ class _ReviewCard extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

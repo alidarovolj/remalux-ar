@@ -17,6 +17,7 @@ import 'package:remalux_ar/core/widgets/detailed_color_card.dart';
 import 'package:remalux_ar/features/home/presentation/widgets/color_detail_modal.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class FavoritesPage extends ConsumerStatefulWidget {
   final int? initialTabIndex;
@@ -79,8 +80,8 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage>
       ),
       child: Scaffold(
         backgroundColor: Colors.white,
-        appBar: const CustomAppBar(
-          title: 'Избранное',
+        appBar: CustomAppBar(
+          title: 'favorites.title'.tr(),
           showBottomBorder: true,
         ),
         body: Column(
@@ -132,9 +133,9 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage>
                             ),
                           ),
                           const SizedBox(width: 8),
-                          const Text(
-                            'Товары',
-                            style: TextStyle(
+                          Text(
+                            'favorites.tabs.products'.tr(),
+                            style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
                             ),
@@ -163,9 +164,9 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage>
                             ),
                           ),
                           const SizedBox(width: 8),
-                          const Text(
-                            'Цвета',
-                            style: TextStyle(
+                          Text(
+                            'favorites.tabs.colors'.tr(),
+                            style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
                             ),
@@ -197,7 +198,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage>
                               ),
                               const SizedBox(height: 16),
                               Text(
-                                'У вас нет избранных товаров',
+                                'favorites.empty_products.title'.tr(),
                                 style: GoogleFonts.ysabeau(
                                   fontSize: 23,
                                   fontWeight: FontWeight.w600,
@@ -206,17 +207,18 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage>
                                 ),
                               ),
                               const SizedBox(height: 8),
-                              const Text(
-                                'Добавляйте товары в избранное,\nчтобы быстро находить их',
+                              Text(
+                                'favorites.empty_products.description'.tr(),
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                   color: AppColors.textSecondary,
                                 ),
                               ),
                               const SizedBox(height: 16),
                               CustomButton(
-                                label: 'К товарам',
+                                label:
+                                    'favorites.empty_products.to_catalog'.tr(),
                                 isFullWidth: false,
                                 onPressed: () {
                                   context.go('/store');
@@ -254,7 +256,8 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage>
                                         {};
 
                                 final productTitle = ((productData['title']
-                                            as Map<String, dynamic>?)?['ru']
+                                                as Map<String, dynamic>?)?[
+                                            context.locale.languageCode]
                                         as String?) ??
                                     '';
                                 final imageUrl = product.image_url;
@@ -352,9 +355,9 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage>
                             color: Colors.red,
                           ),
                           const SizedBox(height: 16),
-                          const Text(
-                            'Не удалось загрузить избранные товары',
-                            style: TextStyle(
+                          Text(
+                            'favorites.error.products.title'.tr(),
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                             ),
@@ -370,7 +373,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage>
                           ),
                           const SizedBox(height: 16),
                           CustomButton(
-                            label: 'Попробовать снова',
+                            label: 'favorites.error.products.try_again'.tr(),
                             isFullWidth: false,
                             onPressed: () {
                               ref
@@ -402,7 +405,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage>
                                     ),
                                     const SizedBox(height: 16),
                                     Text(
-                                      'У вас нет избранных цветов',
+                                      'favorites.empty_colors.title'.tr(),
                                       textAlign: TextAlign.center,
                                       style: GoogleFonts.ysabeau(
                                         fontSize: 23,
@@ -412,17 +415,18 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage>
                                       ),
                                     ),
                                     const SizedBox(height: 8),
-                                    const Text(
-                                      'Добавляйте цвета в избранное,\nчтобы быстро находить их',
+                                    Text(
+                                      'favorites.empty_colors.description'.tr(),
                                       textAlign: TextAlign.center,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 15,
                                         color: AppColors.textSecondary,
                                       ),
                                     ),
                                     const SizedBox(height: 16),
                                     CustomButton(
-                                      label: 'К цветам',
+                                      label: 'favorites.empty_colors.to_colors'
+                                          .tr(),
                                       isFullWidth: false,
                                       onPressed: () {
                                         context.go('/colors');
@@ -512,9 +516,9 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage>
                             color: Colors.red,
                           ),
                           const SizedBox(height: 16),
-                          const Text(
-                            'Не удалось загрузить избранные цвета',
-                            style: TextStyle(
+                          Text(
+                            'favorites.error.colors.title'.tr(),
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                             ),
@@ -530,7 +534,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage>
                           ),
                           const SizedBox(height: 16),
                           CustomButton(
-                            label: 'Попробовать снова',
+                            label: 'favorites.error.colors.try_again'.tr(),
                             isFullWidth: false,
                             onPressed: () {
                               ref
@@ -560,7 +564,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage>
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Text(
-            'Рекомендуемые товары',
+            'favorites.recommended.products'.tr(),
             style: GoogleFonts.ysabeau(
               fontSize: 20,
               fontWeight: FontWeight.w600,
@@ -571,8 +575,8 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage>
         productsAsync.when(
           data: (response) {
             if (response.data.isEmpty) {
-              return const Center(
-                child: Text('Нет доступных товаров'),
+              return Center(
+                child: Text('favorites.recommended.no_products'.tr()),
               );
             }
             return GridView.builder(
@@ -603,7 +607,11 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage>
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
-                              'Added ${variant.attributes['title']['ru']} to cart'),
+                            'store.added_to_cart'.tr(args: [
+                              variant.attributes['title']
+                                  [context.locale.languageCode]
+                            ]),
+                          ),
                         ),
                       );
                     },
@@ -706,7 +714,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage>
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Text(
-            'Рекомендуемые цвета',
+            'favorites.recommended.colors'.tr(),
             style: GoogleFonts.ysabeau(
               fontSize: 20,
               fontWeight: FontWeight.w600,
@@ -717,8 +725,8 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage>
         colorsAsync.when(
           data: (colors) {
             if (colors.isEmpty) {
-              return const Center(
-                child: Text('Нет доступных цветов'),
+              return Center(
+                child: Text('favorites.recommended.no_colors'.tr()),
               );
             }
             return GridView.builder(

@@ -5,6 +5,7 @@ import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/core/widgets/custom_button.dart';
 import 'package:remalux_ar/features/store/presentation/providers/store_providers.dart';
 import 'package:go_router/go_router.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class SortingModal extends ConsumerWidget {
   const SortingModal({super.key});
@@ -38,7 +39,7 @@ class SortingModal extends ConsumerWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'Сортировка',
+                'store.sorting'.tr(),
                 style: GoogleFonts.ysabeau(
                   fontSize: 22,
                   fontWeight: FontWeight.w600,
@@ -54,7 +55,7 @@ class SortingModal extends ConsumerWidget {
             child: Column(
               children: [
                 _buildRadioItem(
-                  'По возрастанию цены',
+                  'store.sorting_options.price_asc'.tr(),
                   'asc',
                   selectedSorting,
                   (value) {
@@ -63,7 +64,7 @@ class SortingModal extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
                 _buildRadioItem(
-                  'По убыванию цены',
+                  'store.sorting_options.price_desc'.tr(),
                   'desc',
                   selectedSorting,
                   (value) {
@@ -96,12 +97,10 @@ class SortingModal extends ConsumerWidget {
                     final selectedFilters = ref.read(selectedFiltersProvider);
                     final Map<String, dynamic> queryParams = {};
 
-                    // Add sorting parameter if selected
                     if (selectedSorting != null) {
                       queryParams['order_by'] = selectedSorting;
                     }
 
-                    // Add filter parameters if any are selected
                     if (selectedFilters.isNotEmpty) {
                       for (final id in selectedFilters) {
                         queryParams['filter_ids[$id]'] = id.toString();
@@ -112,7 +111,7 @@ class SortingModal extends ConsumerWidget {
                         queryParams: queryParams);
                     if (context.mounted) context.pop();
                   },
-                  label: 'Применить',
+                  label: 'common.save'.tr(),
                   type: ButtonType.normal,
                 ),
                 const SizedBox(height: 8),
@@ -121,7 +120,6 @@ class SortingModal extends ConsumerWidget {
                     sortingNotifier.state = null;
                     final selectedFilters = ref.read(selectedFiltersProvider);
 
-                    // Keep filters when resetting sort
                     if (selectedFilters.isNotEmpty) {
                       final Map<String, dynamic> queryParams = {};
                       for (final id in selectedFilters) {
@@ -135,7 +133,7 @@ class SortingModal extends ConsumerWidget {
 
                     if (context.mounted) context.pop();
                   },
-                  label: 'Сбросить',
+                  label: 'common.cancel'.tr(),
                   type: ButtonType.normal,
                   backgroundColor: const Color(0xFFF8F8F8),
                   textColor: AppColors.textPrimary,

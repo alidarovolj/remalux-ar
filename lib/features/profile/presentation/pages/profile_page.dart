@@ -438,7 +438,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 context,
                 icon: 'lib/core/assets/icons/profile/info.svg',
                 title: 'profile.about_remalux'.tr(),
-                onTap: () {},
+                onTap: () {
+                  context.push('/about');
+                },
               ),
 
               // Contacts
@@ -462,12 +464,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               ),
 
               // Become a Partner
-              // _buildSettingsItem(
-              //   context,
-              //   icon: 'lib/core/assets/icons/profile/handshake.svg',
-              //   title: 'Стать партнером',
-              //   onTap: () {},
-              // ),
+              _buildSettingsItem(
+                context,
+                icon: 'lib/core/assets/icons/profile/handshake.svg',
+                title: 'partnership.title'.tr(),
+                onTap: () {
+                  context.push('/partnership');
+                },
+              ),
 
               // FAQ
               _buildSettingsItem(
@@ -506,7 +510,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 context,
                 icon: 'lib/core/assets/icons/profile/language.svg',
                 title: 'profile.app_language'.tr(),
-                subtitle: context.locale.languageCode == 'kk'
+                subtitle: context.locale.languageCode == 'kz'
                     ? 'Қазақша'
                     : context.locale.languageCode == 'ru'
                         ? 'Русский'
@@ -660,7 +664,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           icon: 'lib/core/assets/icons/profile/info.svg',
           title: 'profile.about_remalux'.tr(),
           onTap: () {
-            // TODO: Navigate to About page
+            context.push('/about');
           },
         ),
         _buildSettingsItem(
@@ -679,14 +683,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             context.push('/projects');
           },
         ),
-        // _buildSettingsItem(
-        //   context,
-        //   icon: 'lib/core/assets/icons/profile/handshake.svg',
-        //   title: 'Стать партнером',
-        //   onTap: () {
-        //     // TODO: Navigate to Partnership page
-        //   },
-        // ),
+        _buildSettingsItem(
+          context,
+          icon: 'lib/core/assets/icons/profile/handshake.svg',
+          title: 'partnership.title'.tr(),
+          onTap: () {
+            context.push('/partnership');
+          },
+        ),
         _buildSettingsItem(
           context,
           icon: 'lib/core/assets/icons/profile/question.svg',

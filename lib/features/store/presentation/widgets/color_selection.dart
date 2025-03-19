@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:remalux_ar/core/theme/colors.dart';
 import 'package:remalux_ar/features/home/domain/providers/selected_color_provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ColorSelection extends ConsumerWidget {
   const ColorSelection({super.key});
@@ -10,6 +11,7 @@ class ColorSelection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedColor = ref.watch(selectedColorProvider);
+    final currentLocale = context.locale.languageCode;
 
     if (selectedColor != null) {
       return Column(
@@ -32,7 +34,9 @@ class ColorSelection extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        selectedColor.title['ru'] ?? '',
+                        selectedColor.title[currentLocale] ??
+                            selectedColor.title['ru'] ??
+                            '',
                         style: const TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w600,
@@ -94,9 +98,9 @@ class ColorSelection extends ConsumerWidget {
                       height: 32,
                     ),
                     const SizedBox(width: 8),
-                    const Text(
-                      'Выбрать другой цвет',
-                      style: TextStyle(
+                    Text(
+                      'color_selection.select_another_color'.tr(),
+                      style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
@@ -130,9 +134,9 @@ class ColorSelection extends ConsumerWidget {
                 height: 20,
               ),
               const SizedBox(width: 8),
-              const Text(
-                'Выберите цвет',
-                style: TextStyle(
+              Text(
+                'color_selection.select_color'.tr(),
+                style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
                   color: AppColors.links,

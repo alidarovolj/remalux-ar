@@ -18,6 +18,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:remalux_ar/core/services/storage_service.dart';
 import 'package:remalux_ar/features/auth/domain/providers/auth_provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   try {
@@ -44,10 +45,11 @@ void main() async {
         supportedLocales: const [
           Locale('en'),
           Locale('ru'),
-          Locale('kk'),
+          Locale('kz'),
         ],
         path: 'lib/core/assets/translations',
         fallbackLocale: const Locale('en'),
+        useOnlyLangCode: true,
         child: ProviderScope(
           child: Consumer(
             builder: (context, ref, child) {
@@ -126,8 +128,17 @@ class App extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      localizationsDelegates: context.localizationDelegates,
-      supportedLocales: context.supportedLocales,
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        context.localizationDelegates[0],
+      ],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('ru'),
+        Locale('kk'),
+      ],
       locale: context.locale,
       routerConfig: router,
     );

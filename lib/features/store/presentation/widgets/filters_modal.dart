@@ -5,6 +5,7 @@ import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/core/widgets/custom_button.dart';
 import 'package:remalux_ar/features/home/presentation/providers/categories_provider.dart';
 import 'package:remalux_ar/features/store/presentation/providers/store_providers.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class FiltersModal extends ConsumerWidget {
   final int? initialFilterId;
@@ -64,7 +65,7 @@ class FiltersModal extends ConsumerWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'Все фильтры',
+                'store.filters'.tr(),
                 style: GoogleFonts.ysabeau(
                   fontSize: 22,
                   fontWeight: FontWeight.w600,
@@ -83,7 +84,7 @@ class FiltersModal extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    'Категория',
+                    'store.categories.title'.tr(),
                     style: GoogleFonts.ysabeau(
                       fontSize: 19,
                       fontWeight: FontWeight.w600,
@@ -105,7 +106,8 @@ class FiltersModal extends ConsumerWidget {
                                 onTap: () => selectedFiltersNotifier
                                     .toggleFilter(category.id),
                                 child: _buildCategoryChip(
-                                  category.title['ru'] ?? '',
+                                  category.title[context.locale.languageCode] ??
+                                      '',
                                   category.imageUrl,
                                   isSelected:
                                       selectedFilters.contains(category.id),
@@ -116,7 +118,7 @@ class FiltersModal extends ConsumerWidget {
                     loading: () =>
                         const Center(child: CircularProgressIndicator()),
                     error: (error, stack) =>
-                        Center(child: Text('Error: $error')),
+                        Center(child: Text('common.error'.tr())),
                   ),
                   const SizedBox(height: 24),
                   filtersAsync.when(
@@ -127,7 +129,8 @@ class FiltersModal extends ConsumerWidget {
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
                                   Text(
-                                    filter.title['ru'] ?? '',
+                                    filter.title[context.locale.languageCode] ??
+                                        '',
                                     style: GoogleFonts.ysabeau(
                                       fontSize: 19,
                                       fontWeight: FontWeight.w600,
@@ -137,7 +140,9 @@ class FiltersModal extends ConsumerWidget {
                                   const SizedBox(height: 12),
                                   ...filter.values
                                       .map((value) => _buildCheckboxItem(
-                                            value.values['ru'] ?? '',
+                                            value.values[context
+                                                    .locale.languageCode] ??
+                                                '',
                                             isSelected: selectedFilters
                                                 .contains(value.id),
                                             onChanged: (bool? checked) {
@@ -155,10 +160,10 @@ class FiltersModal extends ConsumerWidget {
                     loading: () =>
                         const Center(child: CircularProgressIndicator()),
                     error: (error, stack) =>
-                        Center(child: Text('Error: $error')),
+                        Center(child: Text('common.error'.tr())),
                   ),
                   Text(
-                    'Цена',
+                    'store.price.title'.tr(),
                     style: GoogleFonts.ysabeau(
                       fontSize: 19,
                       fontWeight: FontWeight.w600,
@@ -180,8 +185,8 @@ class FiltersModal extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'от',
+                            Text(
+                              'store.price.from'.tr(),
                               style: TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textSecondary,
@@ -195,9 +200,9 @@ class FiltersModal extends ConsumerWidget {
                                 color: const Color(0xFFF8F8F8),
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: const Text(
-                                '3000 ₸',
-                                style: TextStyle(
+                              child: Text(
+                                '3000 ${'common.currency'.tr()}',
+                                style: const TextStyle(
                                   fontSize: 14,
                                   color: AppColors.textPrimary,
                                 ),
@@ -211,8 +216,8 @@ class FiltersModal extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'до',
+                            Text(
+                              'store.price.to'.tr(),
                               style: TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textSecondary,
@@ -226,9 +231,9 @@ class FiltersModal extends ConsumerWidget {
                                 color: const Color(0xFFF8F8F8),
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: const Text(
-                                '5000 ₸',
-                                style: TextStyle(
+                              child: Text(
+                                '5000 ${'common.currency'.tr()}',
+                                style: const TextStyle(
                                   fontSize: 14,
                                   color: AppColors.textPrimary,
                                 ),
@@ -274,7 +279,7 @@ class FiltersModal extends ConsumerWidget {
                     }
                     Navigator.pop(context);
                   },
-                  label: 'Применить',
+                  label: 'common.save'.tr(),
                   type: ButtonType.normal,
                 ),
                 const SizedBox(height: 8),
@@ -284,7 +289,7 @@ class FiltersModal extends ConsumerWidget {
                     productsNotifier.fetchProducts();
                     Navigator.pop(context);
                   },
-                  label: 'Сбросить все',
+                  label: 'common.cancel'.tr(),
                   type: ButtonType.normal,
                   backgroundColor: const Color(0xFFF8F8F8),
                   textColor: AppColors.textPrimary,

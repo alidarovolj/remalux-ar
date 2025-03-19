@@ -7,6 +7,7 @@ import 'package:remalux_ar/core/widgets/custom_button.dart';
 import 'package:remalux_ar/features/projects/presentation/providers/projects_provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:go_router/go_router.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ProjectsPage extends ConsumerStatefulWidget {
   const ProjectsPage({super.key});
@@ -38,8 +39,8 @@ class _ProjectsPageState extends ConsumerState<ProjectsPage> {
       body: projects.when(
         data: (projectsList) {
           if (projectsList.isEmpty) {
-            return const Center(
-              child: Text('Нет проектов'),
+            return Center(
+              child: Text('projects.no_projects'.tr()),
             );
           }
 
@@ -49,11 +50,11 @@ class _ProjectsPageState extends ConsumerState<ProjectsPage> {
             itemBuilder: (context, index) {
               // Header
               if (index == 0) {
-                return const Padding(
-                  padding: EdgeInsets.only(bottom: 40),
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 40),
                   child: Text(
-                    'Наши проекты',
-                    style: TextStyle(
+                    'projects.title'.tr(),
+                    style: const TextStyle(
                       fontSize: 23,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
@@ -67,7 +68,7 @@ class _ProjectsPageState extends ConsumerState<ProjectsPage> {
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 24),
                   child: CustomButton(
-                    label: 'К продукции',
+                    label: 'projects.to_products'.tr(),
                     onPressed: () => context.go('/store'),
                     type: ButtonType.normal,
                     backgroundColor: AppColors.primary,
@@ -84,7 +85,11 @@ class _ProjectsPageState extends ConsumerState<ProjectsPage> {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8),
                     child: Text(
-                      project.title.ru,
+                      context.locale.languageCode == 'ru'
+                          ? project.title.ru
+                          : context.locale.languageCode == 'kz'
+                              ? project.title.kz
+                              : project.title.en,
                       style: GoogleFonts.ysabeau(
                         fontSize: 19,
                         fontWeight: FontWeight.w600,
@@ -203,7 +208,11 @@ class _ProjectsPageState extends ConsumerState<ProjectsPage> {
                       children: [
                         // Description
                         Text(
-                          project.description.ru,
+                          context.locale.languageCode == 'ru'
+                              ? project.description.ru
+                              : context.locale.languageCode == 'kz'
+                                  ? project.description.kz
+                                  : project.description.en,
                           style: const TextStyle(
                             fontSize: 15,
                             color: AppColors.textSecondary,
@@ -226,18 +235,18 @@ class _ProjectsPageState extends ConsumerState<ProjectsPage> {
                               children: [
                                 if (project.floors != null)
                                   _buildDetailRow(
-                                    'Этажность:',
-                                    '${project.floors} этажей',
+                                    'projects.details.floors'
+                                        .tr(args: [project.floors.toString()]),
                                   ),
                                 if (project.area != null)
                                   _buildDetailRow(
-                                    'Площадь:',
-                                    project.area!,
+                                    'projects.details.area'
+                                        .tr(args: [project.area!]),
                                   ),
                                 if (project.year != null)
                                   _buildDetailRow(
-                                    'Год:',
-                                    project.year.toString(),
+                                    'projects.details.year'
+                                        .tr(args: [project.year.toString()]),
                                   ),
                               ],
                             ),
@@ -290,34 +299,21 @@ class _ProjectsPageState extends ConsumerState<ProjectsPage> {
         },
         loading: () => _buildSkeleton(),
         error: (error, stackTrace) => Center(
-          child: Text('Ошибка: $error'),
+          child: Text('projects.error'.tr(args: [error.toString()])),
         ),
       ),
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
+  Widget _buildDetailRow(String label) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 15,
-              color: AppColors.textSecondary,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w500,
-              color: AppColors.textPrimary,
-            ),
-          ),
-        ],
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontSize: 15,
+          color: AppColors.textSecondary,
+        ),
       ),
     );
   }

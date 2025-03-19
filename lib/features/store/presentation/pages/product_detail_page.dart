@@ -626,6 +626,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                               ],
                             ),
                           ),
+                        const SizedBox(height: 24),
 
                         // Reviews
                         Consumer(
@@ -639,7 +640,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'store.product.reviews'.tr(args: [
+                                      'store.product.reviews_count'.tr(args: [
                                         reviewsResponse.meta.total.toString()
                                       ]),
                                       style: GoogleFonts.ysabeau(

@@ -8,6 +8,7 @@ import 'package:remalux_ar/features/contacts/presentation/providers/contacts_pro
 import 'package:remalux_ar/features/contacts/presentation/widgets/contact_list.dart';
 import 'package:remalux_ar/features/contacts/presentation/widgets/contact_map.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ContactsPage extends ConsumerStatefulWidget {
   const ContactsPage({super.key});
@@ -21,9 +22,7 @@ class _ContactsPageState extends ConsumerState<ContactsPage>
   TabController? _tabController;
 
   String _getAddressText(int count) {
-    if (count == 1) return '1 адрес';
-    if (count >= 2 && count <= 4) return '$count адреса';
-    return '$count адресов';
+    return 'contacts.address_count'.plural(count, args: [count.toString()]);
   }
 
   @override
@@ -296,14 +295,14 @@ class _ContactsPageState extends ConsumerState<ContactsPage>
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: const CustomAppBar(
-        title: 'Наши филиалы',
+      appBar: CustomAppBar(
+        title: 'contacts.title'.tr(),
         showBottomBorder: true,
       ),
       body: contactsState.when(
         data: (contacts) {
           if (contacts.isEmpty) {
-            return const Center(child: Text('Нет доступных контактов'));
+            return Center(child: Text('contacts.no_contacts'.tr()));
           }
 
           if (!mounted) return const SizedBox.shrink();
@@ -323,7 +322,7 @@ class _ContactsPageState extends ConsumerState<ContactsPage>
               Padding(
                 padding: const EdgeInsets.all(12),
                 child: Text(
-                  'Наши филиалы',
+                  'contacts.title'.tr(),
                   style: GoogleFonts.ysabeau(
                     fontSize: 23,
                     fontWeight: FontWeight.w600,
@@ -385,12 +384,12 @@ class _ContactsPageState extends ConsumerState<ContactsPage>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(error.toString()),
+              Text('contacts.error.title'.tr()),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () =>
                     ref.read(contactsProvider.notifier).fetchContacts(),
-                child: const Text('Повторить'),
+                child: Text('contacts.error.try_again'.tr()),
               ),
             ],
           ),

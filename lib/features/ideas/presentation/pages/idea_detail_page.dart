@@ -9,6 +9,7 @@ import 'package:remalux_ar/features/ideas/presentation/widgets/idea_detail_skele
 import 'package:go_router/go_router.dart';
 import 'dart:ui';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class IdeaDetailPage extends ConsumerStatefulWidget {
   final int ideaId;
@@ -25,6 +26,7 @@ class IdeaDetailPage extends ConsumerStatefulWidget {
 class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
   late ScrollController _scrollController;
   bool _showSafeArea = false;
+  String currentLocale = 'ru';
 
   @override
   void initState() {
@@ -35,6 +37,22 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark,
     ));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        currentLocale = context.locale.languageCode;
+      });
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final newLocale = context.locale.languageCode;
+    if (currentLocale != newLocale) {
+      setState(() {
+        currentLocale = newLocale;
+      });
+    }
   }
 
   @override
@@ -55,7 +73,6 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
   @override
   Widget build(BuildContext context) {
     final ideaAsync = ref.watch(ideaDetailProvider(widget.ideaId));
-    final topPadding = MediaQuery.of(context).padding.top;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -79,7 +96,7 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          idea.title['ru'] ?? '',
+                          idea.title[currentLocale] ?? '',
                           style: GoogleFonts.ysabeau(
                             fontSize: 19,
                             fontWeight: FontWeight.w600,
@@ -88,7 +105,7 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          idea.shortDescription['ru'] ?? '',
+                          idea.shortDescription[currentLocale] ?? '',
                           style: const TextStyle(
                               fontSize: 15, color: AppColors.textPrimary),
                         ),
@@ -102,9 +119,9 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
 
                         // Colors section
                         if (idea.colors != null && idea.colors!.isNotEmpty) ...[
-                          const Text(
-                            'Использованные цвета',
-                            style: TextStyle(
+                          Text(
+                            'ideas.used_colors'.tr(),
+                            style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w600,
                               color: AppColors.textPrimary,
@@ -118,7 +135,10 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
                               itemCount: idea.colors!.length,
                               itemBuilder: (context, index) {
                                 final color = idea.colors![index];
-                                return _ColorCard(color: color);
+                                return _ColorCard(
+                                  color: color,
+                                  currentLocale: currentLocale,
+                                );
                               },
                             ),
                           ),
@@ -170,7 +190,9 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
         },
         loading: () => const IdeaDetailSkeleton(),
         error: (error, stackTrace) => Center(
-          child: Text('Ошибка: $error'),
+          child: Text(
+            'ideas.error'.tr(args: [error.toString()]),
+          ),
         ),
       ),
     );
@@ -215,7 +237,7 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
               children: [
                 if (text['heading'] != null)
                   Text(
-                    text['heading']['ru'] ?? '',
+                    text['heading'][currentLocale] ?? '',
                     style: GoogleFonts.ysabeau(
                       fontSize: 19,
                       fontWeight: FontWeight.w600,
@@ -224,7 +246,7 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
                   ),
                 const SizedBox(height: 8),
                 Text(
-                  text['text']['ru'] ?? '',
+                  text['text'][currentLocale] ?? '',
                   style: const TextStyle(
                       fontSize: 15, color: AppColors.textPrimary),
                 ),
@@ -244,9 +266,10 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (content['title'] != null && content['title']['ru'] != null) ...[
+          if (content['title'] != null &&
+              content['title'][currentLocale] != null) ...[
             Text(
-              content['title']['ru'],
+              content['title'][currentLocale],
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
@@ -401,7 +424,7 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              color['title']['ru'] ?? '',
+                              color['title'][currentLocale] ?? '',
                               style: const TextStyle(
                                 fontSize: 17,
                                 fontWeight: FontWeight.w600,
@@ -437,9 +460,8 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
                   onTap: () {
                     // TODO: Implement visualization
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                            'Визуализация будет доступна в ближайшее время'),
+                      SnackBar(
+                        content: Text('ideas.visualization_coming_soon'.tr()),
                       ),
                     );
                   },
@@ -457,9 +479,9 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
                         SvgPicture.asset('lib/core/assets/images/cube.svg',
                             width: 40, height: 40),
                         const SizedBox(width: 8),
-                        const Text(
-                          'Визуализировать',
-                          style: TextStyle(
+                        Text(
+                          'ideas.visualize'.tr(),
+                          style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
                             color: AppColors.textPrimary,
@@ -475,9 +497,8 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
                   onTap: () {
                     // TODO: Implement visualization
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                            'Визуализация будет доступна в ближайшее время'),
+                      SnackBar(
+                        content: Text('ideas.visualization_coming_soon'.tr()),
                       ),
                     );
                   },
@@ -490,12 +511,12 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
                       color: AppColors.buttonSecondary,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Выбрать краску',
-                          style: TextStyle(
+                          'ideas.select_paint'.tr(),
+                          style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
                             color: AppColors.textPrimary,
@@ -559,7 +580,7 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
                   children: [
                     // Заголовок
                     Text(
-                      'Цветовая схема:',
+                      'ideas.color_scheme'.tr() + ':',
                       style: GoogleFonts.ysabeau(
                         fontSize: 19,
                         fontWeight: FontWeight.w600,
@@ -570,9 +591,9 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
 
                     // Название цвета (title)
                     if (content['title'] != null &&
-                        content['title']['ru'] != null)
+                        content['title'][currentLocale] != null)
                       Text(
-                        '(${content['title']['ru']})',
+                        '(${content['title'][currentLocale]})',
                         style: const TextStyle(
                           fontSize: 15,
                           color: AppColors.textPrimary,
@@ -618,11 +639,11 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               for (final textItem in texts)
-                if (textItem['ru'] != null)
+                if (textItem[currentLocale] != null)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 12),
                     child: Text(
-                      textItem['ru'],
+                      textItem[currentLocale],
                       style: const TextStyle(
                         fontSize: 15,
                         color: AppColors.textPrimary,
@@ -646,8 +667,12 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
 
 class _ColorCard extends StatelessWidget {
   final Map<String, dynamic> color;
+  final String currentLocale;
 
-  const _ColorCard({required this.color});
+  const _ColorCard({
+    required this.color,
+    required this.currentLocale,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -709,7 +734,7 @@ class _ColorCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  color['title']['ru'] ?? '',
+                  color['title'][currentLocale] ?? '',
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,

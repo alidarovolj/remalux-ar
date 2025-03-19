@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:remalux_ar/core/theme/colors.dart';
 import 'package:remalux_ar/features/orders/domain/models/order.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class OrderItem extends StatelessWidget {
   final Order order;
@@ -42,7 +43,8 @@ class OrderItem extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Заказ от ${order.formattedCreatedAt}',
+                        'orders.order.from'
+                            .tr(args: [order.formattedCreatedAt]),
                         style: const TextStyle(
                           fontSize: 19,
                           fontWeight: FontWeight.w600,
@@ -50,7 +52,7 @@ class OrderItem extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '№${order.id}',
+                        'orders.order.number'.tr(args: [order.id.toString()]),
                         style: const TextStyle(
                           fontSize: 15,
                           color: AppColors.primary,
@@ -72,7 +74,7 @@ class OrderItem extends StatelessWidget {
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
-                      order.status.title,
+                      'orders.status.${order.status.code}'.tr(),
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
@@ -84,7 +86,8 @@ class OrderItem extends StatelessWidget {
 
                   // Delivery info
                   Text(
-                    'Доставка курьером, ${order.formattedDeliveryDate}',
+                    'orders.order.delivery_courier'
+                        .tr(args: [order.formattedDeliveryDate]),
                     style: const TextStyle(
                       fontSize: 15,
                       color: AppColors.textPrimary,
@@ -97,7 +100,8 @@ class OrderItem extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Товары на ${order.totalAmount} ₸',
+                        'orders.order.products_worth'
+                            .tr(args: [order.totalAmount.toString()]),
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
@@ -181,16 +185,6 @@ class OrderItem extends StatelessWidget {
   }
 
   String _getPositionText(int count) {
-    // Handle special cases for Russian pluralization
-    final mod10 = count % 10;
-    final mod100 = count % 100;
-
-    if (mod10 == 1 && mod100 != 11) {
-      return 'позиция';
-    } else if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) {
-      return 'позиции';
-    } else {
-      return 'позиций';
-    }
+    return 'orders.positions'.plural(count);
   }
 }

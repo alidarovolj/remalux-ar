@@ -7,6 +7,7 @@ import 'package:remalux_ar/features/addresses/domain/providers/addresses_provide
 import 'package:remalux_ar/features/addresses/presentation/widgets/add_address_sheet.dart';
 import 'package:remalux_ar/core/widgets/custom_snack_bar.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class AddressesPage extends ConsumerStatefulWidget {
   const AddressesPage({super.key});
@@ -31,8 +32,8 @@ class _AddressesPageState extends ConsumerState<AddressesPage> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: const CustomAppBar(
-        title: 'Адреса доставок',
+      appBar: CustomAppBar(
+        title: 'addresses.title'.tr(),
         showBottomBorder: true,
       ),
       body: addresses.when(
@@ -53,7 +54,7 @@ class _AddressesPageState extends ConsumerState<AddressesPage> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'У вас пока нет сохраненных\nадресов',
+                        'addresses.empty.title'.tr(),
                         textAlign: TextAlign.center,
                         style: GoogleFonts.ysabeau(
                           fontSize: 23,
@@ -86,9 +87,9 @@ class _AddressesPageState extends ConsumerState<AddressesPage> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text(
-                        'Добавить адрес',
-                        style: TextStyle(
+                      child: Text(
+                        'addresses.add.button'.tr(),
+                        style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w400,
                           color: Colors.white,
@@ -132,7 +133,7 @@ class _AddressesPageState extends ConsumerState<AddressesPage> {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          'Добавить новый адрес',
+                          'addresses.add.new'.tr(),
                           style: TextStyle(
                             fontSize: 15,
                             color: Colors.blue[600],
@@ -165,9 +166,26 @@ class _AddressesPageState extends ConsumerState<AddressesPage> {
                         ),
                       ),
                       onDismissed: (direction) async {
-                        ref
-                            .read(addressesProvider.notifier)
-                            .deleteAddress(address.id);
+                        try {
+                          await ref
+                              .read(addressesProvider.notifier)
+                              .deleteAddress(address.id);
+                          if (context.mounted) {
+                            CustomSnackBar.show(
+                              context,
+                              message: 'addresses.delete.success'.tr(),
+                              type: SnackBarType.success,
+                            );
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            CustomSnackBar.show(
+                              context,
+                              message: 'addresses.delete.error'.tr(),
+                              type: SnackBarType.error,
+                            );
+                          }
+                        }
                       },
                       child: Container(
                         height: 68,
@@ -197,11 +215,14 @@ class _AddressesPageState extends ConsumerState<AddressesPage> {
                               ? Text(
                                   [
                                     if (address.entrance != null)
-                                      'Подъезд ${address.entrance}',
+                                      'addresses.details.entrance'
+                                          .tr(args: [address.entrance!]),
                                     if (address.floor != null)
-                                      'Этаж ${address.floor}',
+                                      'addresses.details.floor'
+                                          .tr(args: [address.floor!]),
                                     if (address.apartment != null)
-                                      'Квартира ${address.apartment}',
+                                      'addresses.details.apartment'
+                                          .tr(args: [address.apartment!]),
                                   ].join(', '),
                                   style: const TextStyle(
                                     fontSize: 15,
@@ -210,7 +231,34 @@ class _AddressesPageState extends ConsumerState<AddressesPage> {
                                   ),
                                 )
                               : null,
-                          trailing: const Icon(Icons.more_horiz),
+                          trailing: IconButton(
+                            icon: const Icon(
+                              Icons.delete_outline,
+                              color: Colors.red,
+                            ),
+                            onPressed: () async {
+                              try {
+                                await ref
+                                    .read(addressesProvider.notifier)
+                                    .deleteAddress(address.id);
+                                if (context.mounted) {
+                                  CustomSnackBar.show(
+                                    context,
+                                    message: 'addresses.delete.success'.tr(),
+                                    type: SnackBarType.success,
+                                  );
+                                }
+                              } catch (e) {
+                                if (context.mounted) {
+                                  CustomSnackBar.show(
+                                    context,
+                                    message: 'addresses.delete.error'.tr(),
+                                    type: SnackBarType.error,
+                                  );
+                                }
+                              }
+                            },
+                          ),
                         ),
                       ),
                     );
@@ -249,7 +297,9 @@ class _AddressesPageState extends ConsumerState<AddressesPage> {
           ],
         ),
         error: (error, stackTrace) => Center(
-          child: Text('Error: $error'),
+          child: Text(
+            'addresses.error'.tr(args: [error.toString()]),
+          ),
         ),
       ),
     );

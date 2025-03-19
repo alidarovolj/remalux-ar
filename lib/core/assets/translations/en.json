@@ -66,11 +66,20 @@
     "search_products": "Search products",
     "filters": "Filters",
     "sorting": "Sorting",
+    "sorting_options": {
+      "price_asc": "Price: Low to High",
+      "price_desc": "Price: High to Low"
+    },
     "products_count": "{} products found",
     "no_products_found": "No products found",
     "try_different_filters": "Try different filters",
     "categories": {
       "title": "Categories"
+    },
+    "price": {
+      "title": "Price",
+      "from": "from",
+      "to": "to"
     },
     "in_stock": "In stock",
     "weight_value": "{} kg",
@@ -89,7 +98,11 @@
       "add_to_favorites": "Add to favorites",
       "about_product": "About product",
       "product_data": "Product data",
-      "reviews": "Reviews ({count})",
+      "reviews_count": "Reviews ({})",
+      "reviews": {
+        "no_reviews": "No reviews yet",
+        "leave_review": "Leave a review"
+      },
       "certificates": "Product certificates",
       "certificate": "Certificate",
       "open": "Open",
@@ -116,11 +129,23 @@
     }
   },
   "orders": {
-    "my_orders": "My orders",
+    "my_orders": "My Orders",
     "order_from": "Order from {date}",
     "order_number": "#{number}",
     "delivery_courier": "Courier delivery, {date}",
     "products_worth": "Products worth {amount} ₸",
+    "empty": {
+      "title": "You don't have any orders yet",
+      "description": "Your orders will be displayed here",
+      "to_catalog": "To catalog"
+    },
+    "error": {
+      "title": "Failed to load orders",
+      "try_again": "Try again"
+    },
+    "recommended_products": "Recommended products",
+    "no_products": "No products available",
+    "added_to_cart": "Added {} to cart",
     "positions": {
       "one": "item",
       "few": "items",
@@ -131,6 +156,17 @@
       "delivered": "Delivered",
       "processing": "Processing",
       "cancelled": "Cancelled"
+    },
+    "order": {
+      "from": "Order from {}",
+      "number": "#{}",
+      "delivery_courier": "Courier delivery, {}",
+      "products_worth": "Products worth {} ₸",
+      "positions": {
+        "one": "item",
+        "few": "items",
+        "many": "items"
+      }
     }
   },
   "profile": {
@@ -173,7 +209,25 @@
     },
     "colors": {
       "title": "Colors",
-      "view_all": "View all"
+      "view_all": "View all",
+      "page_title": "Palettes",
+      "search_placeholder": "Search colors",
+      "all_colors": "All colors",
+      "color_names": {
+        "grey": "Grey",
+        "blue": "Blue",
+        "pink": "Pink",
+        "orange": "Orange",
+        "purple": "Purple",
+        "brown": "Brown",
+        "white": "White",
+        "green": "Green",
+        "yellow": "Yellow"
+      },
+      "color": "Color",
+      "visualize": "Visualize",
+      "select_paint": "Select paint",
+      "color_saved": "Color saved"
     },
     "ideas": {
       "title": "Ideas",
@@ -186,6 +240,236 @@
     "news": {
       "title": "News",
       "view_all": "View all"
+    }
+  },
+  "color_selection": {
+    "select_color": "Select color",
+    "select_another_color": "Select another color"
+  },
+  "ideas": {
+    "title": "Ideas",
+    "used_colors": "Used colors",
+    "color_scheme": "Color scheme",
+    "visualize": "Visualize",
+    "select_paint": "Select paint",
+    "visualization_coming_soon": "Visualization will be available soon",
+    "error": "Error: {}"
+  },
+  "favorites": {
+    "title": "Favorites",
+    "tabs": {
+      "products": "Products",
+      "colors": "Colors"
+    },
+    "empty_products": {
+      "title": "You don't have any favorite products",
+      "description": "Add products to favorites\nto find them quickly",
+      "to_catalog": "To catalog"
+    },
+    "empty_colors": {
+      "title": "You don't have any favorite colors",
+      "description": "Add colors to favorites\nto find them quickly",
+      "to_colors": "To colors"
+    },
+    "error": {
+      "products": {
+        "title": "Failed to load favorite products",
+        "try_again": "Try again"
+      },
+      "colors": {
+        "title": "Failed to load favorite colors",
+        "try_again": "Try again"
+      }
+    },
+    "recommended": {
+      "products": "Recommended products",
+      "colors": "Recommended colors",
+      "no_products": "No products available",
+      "no_colors": "No colors available"
+    }
+  },
+  "addresses": {
+    "title": "Delivery Addresses",
+    "empty": {
+      "title": "You don't have any saved\naddresses yet"
+    },
+    "add": {
+      "button": "Add address",
+      "new": "Add new address",
+      "title": "Add new address",
+      "address_hint": "Enter address",
+      "entrance": "Entrance",
+      "floor": "Floor",
+      "apartment": "Apartment",
+      "save": "Save",
+      "error": {
+        "select_address": "Please select an address on the map",
+        "save_failed": "Failed to save address",
+        "success": "Address successfully added"
+      }
+    },
+    "details": {
+      "entrance": "Entrance {}",
+      "floor": "Floor {}",
+      "apartment": "Apartment {}"
+    },
+    "error": "Error: {}",
+    "delete": {
+      "success": "Address deleted successfully",
+      "error": "Error deleting address"
+    }
+  },
+  "contacts": {
+    "title": "Our branches",
+    "no_contacts": "No contacts available",
+    "address_count": {
+      "one": "1 address",
+      "few": "{} addresses",
+      "many": "{} addresses",
+      "other": "{} addresses"
+    },
+    "error": {
+      "title": "Failed to load contacts",
+      "try_again": "Try again"
+    },
+    "schedule": {
+      "title": "Working hours",
+      "weekdays": {
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat",
+        "sun": "Sun"
+      },
+      "closed": "Closed",
+      "break": "Break: {} - {}"
+    }
+  },
+  "projects": {
+    "title": "Our projects",
+    "no_projects": "No projects",
+    "error": "Error: {}",
+    "details": {
+      "floors": "Floors: {}",
+      "area": "Area: {}",
+      "year": "Year: {}"
+    },
+    "to_products": "To products"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "description": "Still have questions? Don't worry, we're here to help! Read our frequently asked questions.\nIf your question hasn't been addressed, simply leave it, and we'll get back to you as soon as possible.",
+    "question_input": {
+      "label": "Your question",
+      "placeholder": "Write your question",
+      "submit": "Submit question"
+    },
+    "auth_required": {
+      "title": "You need to be logged in to submit a question",
+      "login": "Login"
+    },
+    "success_message": "Your question has been successfully submitted",
+    "error_message": "There was a problem submitting your question",
+    "questions": {
+      "1": {
+        "title": "What is water-based paint?",
+        "answer": "Water-based paint is a paint where water is the main solvent. It forms an emulsion of water and binding agent, making the paint safe and convenient to use."
+      },
+      "2": {
+        "title": "Can water-based paint be used for exterior work?",
+        "answer": "Yes, there is a special water-based paint for exterior work that has increased resistance to rain, snow, and sunlight. You can use facade paint, satin, or textured paint."
+      },
+      "3": {
+        "title": "What are the main advantages of REMALUX paints?",
+        "answer": "They dry quickly, have no odor, are easy to apply, are safe for health and the environment, and do not emit toxic substances."
+      },
+      "4": {
+        "title": "What types of water-based paints are available?",
+        "answer": "Water-based paints are available in acrylic, latex, silicone, and other polymer bases. The choice depends on operating conditions and surface requirements."
+      },
+      "5": {
+        "title": "Which water-based paint should I choose for apartment walls?",
+        "answer": "For interior work, it's better to choose PRO paint, universal paint, or interior paint, as they have good vapor permeability and are easy to clean."
+      },
+      "6": {
+        "title": "Which water-based paints are better for children's rooms?",
+        "answer": "For children's rooms, choose PRO paint, universal paint, satin, or metal and wood paint that don't contain harmful substances and don't have a strong odor."
+      },
+      "7": {
+        "title": "What does 'matte' or 'glossy' surface mean?",
+        "answer": "Matte paint doesn't reflect light, creating a velvety surface that hides imperfections (PRO paint, universal, interior). While glossy gives walls shine (satin, kitchen and bathroom paint, metal and wood paint) requires a perfectly smooth surface as it will show all imperfections."
+      },
+      "8": {
+        "title": "How to properly prepare the surface before applying water-based paint?",
+        "answer": "The surface should be clean, dry, and smooth. If necessary, remove old paint, smooth out cracks and seams, then apply primer. Humidity should not be above 80%, and temperature above +10°C."
+      },
+      "9": {
+        "title": "What is the consumption of water-based paint per 1 m²?",
+        "answer": "Usually consumption is about 100-150 ml per 1 m², depending on the surface type and chosen paint. Per one layer."
+      },
+      "10": {
+        "title": "Can water-based paint be applied in multiple layers?",
+        "answer": "Yes, for even coverage it's recommended to apply two or three layers of paint, letting each layer dry."
+      },
+      "11": {
+        "title": "How long does water-based paint take to dry?",
+        "answer": "Drying time depends on temperature and humidity, but usually paint dries from 2 hours."
+      },
+      "12": {
+        "title": "Which water-based paint is most resistant to dirt?",
+        "answer": "PRO and satin paints, facade paint, and metal and wood paint have good resistance to dirt and can be cleaned from dust and grime."
+      },
+      "13": {
+        "title": "Which paint is better to choose for the bathroom?",
+        "answer": "We have specially developed water-based paint for kitchen and bathroom with antimicrobial properties and semi-gloss finish, resistant to high humidity and mold formation."
+      },
+      "14": {
+        "title": "How to properly wash walls after painting with water-based paint?",
+        "answer": "For washing, use soft sponges and neutral cleaning agents. Harsh chemicals can damage the coating."
+      },
+      "15": {
+        "title": "Which water-based paint to use for wood surfaces?",
+        "answer": "For wood, we have water-based paints for wood and metal that have increased adhesion to wooden surfaces."
+      },
+      "16": {
+        "title": "Why might water-based paint crack?",
+        "answer": "This can be related to non-compliance with paint application technology."
+      },
+      "17": {
+        "title": "Which water-based paint to choose for painting ceilings?",
+        "answer": "Our water-based paints are perfect for painting ceilings as they dry quickly and don't emit odors. We can offer you interior paint or washable paint, or premium segment paint '2x1'."
+      },
+      "18": {
+        "title": "Why is water-based paint better than oil-based paint?",
+        "answer": "Water-based paints are easier to apply, dry faster, don't have a strong odor, and are safer for health than oil-based paints."
+      },
+      "19": {
+        "title": "How to store water-based paint?",
+        "answer": "Store paint in a tightly closed container in a dry and cool place at a temperature from +5°C to +35°C, away from heat sources and direct sunlight."
+      }
+    }
+  },
+  "partnership": {
+    "title": "Become a Partner",
+    "create_projects": "Create Bright Projects with Remalux",
+    "welcome_text": "Welcome to Remalux! We are a leading manufacturer of high-quality paints known for their variety of shades and durability. Join our team of partners and create bright and lasting coatings for your bold projects with us.",
+    "submit_application": "Submit Application",
+    "company_history": "Company History",
+    "history_text": "Remalux company was founded over 30 years ago with one simple mission — to offer the highest quality paints that inspire the creation of unique and lasting projects. Since then, we have come a long way: from a small factory to an industry leader known for its innovations and responsible approach to production",
+    "branches": {
+      "title": "Branches",
+      "description": "Remalux has 6 branches in all major cities of Kazakhstan with headquarters in Almaty.",
+      "clients": "clients"
+    },
+    "history": {
+      "1990": "Remalux company opened its doors, setting a goal to create paints that would inspire and transform the world around us.",
+      "1995": "We introduced our first line of interior paints, immediately gaining customer attention thanks to high quality and variety of shades.",
+      "2000": "Started implementing new production technologies, significantly improving the durability and environmental friendliness of our products.",
+      "2010": "Remalux expanded its presence throughout the country, offering products in the best retail and specialized stores.",
+      "2015": "Launched an export program, entering international markets, starting cooperation with partners worldwide.",
+      "2023": "We opened a modern production facility, increased production capacity, expanded our product range to better meet our customers' needs."
     }
   }
 }

@@ -10,6 +10,7 @@ import 'package:remalux_ar/features/home/presentation/widgets/color_detail_modal
 import 'package:remalux_ar/core/widgets/detailed_color_card.dart';
 import 'package:remalux_ar/core/widgets/custom_app_bar.dart';
 import 'package:remalux_ar/features/favorites/domain/providers/favorites_providers.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'dart:async';
 
 class ColorsPage extends ConsumerStatefulWidget {
@@ -29,6 +30,7 @@ class _ColorsPageState extends ConsumerState<ColorsPage> {
   late TextEditingController _searchController;
   Timer? _debounceTimer;
   int? _selectedColorId;
+  String currentLocale = 'ru';
 
   @override
   void initState() {
@@ -45,6 +47,9 @@ class _ColorsPageState extends ConsumerState<ColorsPage> {
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        currentLocale = context.locale.languageCode;
+      });
       final colorsNotifier = ref.read(detailedColorsProvider.notifier);
       colorsNotifier.loadColors(
         additionalParams: _selectedColorId != null
@@ -52,6 +57,17 @@ class _ColorsPageState extends ConsumerState<ColorsPage> {
             : null,
       );
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final newLocale = context.locale.languageCode;
+    if (currentLocale != newLocale) {
+      setState(() {
+        currentLocale = newLocale;
+      });
+    }
   }
 
   @override
@@ -104,8 +120,8 @@ class _ColorsPageState extends ConsumerState<ColorsPage> {
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: const CustomAppBar(
-        title: 'Палитры',
+      appBar: CustomAppBar(
+        title: 'home.colors.page_title'.tr(),
         showBottomBorder: true,
         showFavoritesButton: true,
       ),
@@ -129,7 +145,7 @@ class _ColorsPageState extends ConsumerState<ColorsPage> {
                       controller: _searchController,
                       onChanged: _onSearchChanged,
                       decoration: InputDecoration(
-                        hintText: 'Поиск по цветам',
+                        hintText: 'home.colors.search_placeholder'.tr(),
                         hintStyle: TextStyle(
                           color: AppColors.textPrimary.withOpacity(0.5),
                           fontSize: 15,
@@ -202,9 +218,9 @@ class _ColorsPageState extends ConsumerState<ColorsPage> {
                                 ),
                               ),
                               const SizedBox(height: 8),
-                              const Text(
-                                'Все цвета',
-                                style: TextStyle(
+                              Text(
+                                'home.colors.all_colors'.tr(),
+                                style: const TextStyle(
                                   fontSize: 12,
                                   color: Color(0xFF1F1F1F),
                                 ),
@@ -238,7 +254,7 @@ class _ColorsPageState extends ConsumerState<ColorsPage> {
                                             borderRadius:
                                                 BorderRadius.circular(12),
                                             child: Image.asset(
-                                              'lib/core/assets/images/colors/${_getImageName(color.title['ru'] ?? '')}',
+                                              'lib/core/assets/images/colors/${_getImageName(color.title['en']?.toLowerCase() ?? '')}',
                                               fit: BoxFit.cover,
                                             ),
                                           ),
@@ -257,7 +273,8 @@ class _ColorsPageState extends ConsumerState<ColorsPage> {
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
-                                      color.title['ru'] ?? '',
+                                      'home.colors.color_names.${color.title['en']?.toLowerCase() ?? ''}'
+                                          .tr(),
                                       style: const TextStyle(
                                         fontSize: 12,
                                         color: Color(0xFF1F1F1F),
@@ -323,7 +340,8 @@ class _ColorsPageState extends ConsumerState<ColorsPage> {
                               .toggleFavorite(
                                 color.id,
                                 context,
-                                color.title['ru'] ?? '',
+                                'home.colors.color_names.${color.title['en']?.toLowerCase() ?? ''}'
+                                    .tr(),
                                 color.isFavourite,
                               );
                           ref
@@ -364,24 +382,25 @@ class _ColorsPageState extends ConsumerState<ColorsPage> {
   }
 
   String _getImageName(String colorName) {
-    switch (colorName.toLowerCase()) {
-      case 'серый':
+    final colorKey = colorName.toLowerCase();
+    switch (colorKey) {
+      case 'grey':
         return 'grey.png';
-      case 'синий':
+      case 'blue':
         return 'Blue.png';
-      case 'розовый':
+      case 'pink':
         return 'Pink.png';
-      case 'оранжевый':
+      case 'orange':
         return 'Coral.png';
-      case 'фиолетовый':
+      case 'purple':
         return 'Purple.png';
-      case 'коричневый':
+      case 'brown':
         return 'Brown.png';
-      case 'белый':
+      case 'white':
         return 'aqua.png';
-      case 'зеленый':
+      case 'green':
         return 'Green.png';
-      case 'желтый':
+      case 'yellow':
         return 'Yellow.png';
       default:
         return 'grey.png';

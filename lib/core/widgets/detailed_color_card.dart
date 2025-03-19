@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/features/favorites/domain/models/favorite_color.dart';
+import 'package:easy_localization/easy_localization.dart';
 
-class DetailedColorCard extends ConsumerWidget {
+class DetailedColorCard extends ConsumerStatefulWidget {
   final dynamic color;
   final VoidCallback? onTap;
   final VoidCallback? onFavoritePressed;
@@ -15,43 +16,71 @@ class DetailedColorCard extends ConsumerWidget {
     this.onFavoritePressed,
   });
 
-  String _getHexColor() {
-    if (color is FavoriteColor) {
-      return color.color.hex;
-    }
-    return color.hex;
-  }
+  @override
+  ConsumerState<DetailedColorCard> createState() => _DetailedColorCardState();
+}
 
-  bool _isFavorite() {
-    if (color is FavoriteColor) {
-      return color.color.isFavourite;
-    }
-    return color.isFavourite;
-  }
+class _DetailedColorCardState extends ConsumerState<DetailedColorCard> {
+  String currentLocale = 'ru';
 
-  int _getId() {
-    if (color is FavoriteColor) {
-      return color.color.id;
-    }
-    return color.id;
-  }
-
-  Map<String, String> _getTitle() {
-    if (color is FavoriteColor) {
-      return color.color.title;
-    }
-    return color.title;
-  }
-
-  String _getRal() {
-    if (color is FavoriteColor) {
-      return color.color.ral;
-    }
-    return color.ral;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        currentLocale = context.locale.languageCode;
+      });
+    });
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final newLocale = context.locale.languageCode;
+    if (currentLocale != newLocale) {
+      setState(() {
+        currentLocale = newLocale;
+      });
+    }
+  }
+
+  String _getHexColor() {
+    if (widget.color is FavoriteColor) {
+      return widget.color.color.hex;
+    }
+    return widget.color.hex;
+  }
+
+  bool _isFavorite() {
+    if (widget.color is FavoriteColor) {
+      return widget.color.color.isFavourite;
+    }
+    return widget.color.isFavourite;
+  }
+
+  int _getId() {
+    if (widget.color is FavoriteColor) {
+      return widget.color.color.id;
+    }
+    return widget.color.id;
+  }
+
+  Map<String, String> _getTitle() {
+    if (widget.color is FavoriteColor) {
+      return widget.color.color.title;
+    }
+    return widget.color.title;
+  }
+
+  String _getRal() {
+    if (widget.color is FavoriteColor) {
+      return widget.color.color.ral;
+    }
+    return widget.color.ral;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final hexColor = _getHexColor();
     final isFavorite = _isFavorite();
     final id = _getId();
@@ -59,7 +88,7 @@ class DetailedColorCard extends ConsumerWidget {
     final ral = _getRal();
 
     return GestureDetector(
-      onTap: onTap,
+      onTap: widget.onTap,
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -88,7 +117,7 @@ class DetailedColorCard extends ConsumerWidget {
                       ),
                     ),
                   ),
-                  if (onFavoritePressed != null)
+                  if (widget.onFavoritePressed != null)
                     Positioned(
                       top: 8,
                       right: 8,
@@ -109,7 +138,7 @@ class DetailedColorCard extends ConsumerWidget {
                                 : Colors.grey[600],
                             size: 18,
                           ),
-                          onPressed: onFavoritePressed,
+                          onPressed: widget.onFavoritePressed,
                           padding: EdgeInsets.zero,
                         ),
                       ),
@@ -123,7 +152,7 @@ class DetailedColorCard extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    title['ru'] ?? '',
+                    title[currentLocale] ?? '',
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,

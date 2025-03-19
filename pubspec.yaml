@@ -11,6 +11,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   cupertino_icons: ^1.0.8
   storybook_flutter: ^0.14.1
   flutter_riverpod: ^2.6.1
@@ -35,7 +37,7 @@ dependencies:
   flutter_datetime_picker: ^1.5.1
   shared_preferences: ^2.5.2
   flutter_secure_storage: ^9.2.4
-  yandex_mapkit: ^3.4.0
+  yandex_mapkit: ^4.1.0
   geolocator: ^13.0.2
   permission_handler: ^11.3.1
   local_auth: ^2.1.8
@@ -68,5 +70,6 @@ flutter:
     - lib/core/assets/images/logos/
     - lib/core/assets/images/onboarding/
     - lib/core/assets/pdf/
+    - lib/core/assets/translations/
     - lib/core/assets/images/colors/
     - lib/core/assets/images/store/

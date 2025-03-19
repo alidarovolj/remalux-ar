@@ -31,10 +31,10 @@ class LanguageSelectionModal extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           RadioListTile<String>(
-            value: 'kk',
+            value: 'kz',
             groupValue: currentLocale,
             onChanged: (value) {
-              context.setLocale(const Locale('kk'));
+              context.setLocale(const Locale('kz'));
               Navigator.pop(context);
             },
             title: const Text(

@@ -7,8 +7,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:remalux_ar/features/home/domain/providers/selected_color_provider.dart';
 import 'package:remalux_ar/core/widgets/custom_snack_bar.dart';
+import 'package:easy_localization/easy_localization.dart';
 
-class ColorDetailModal extends ConsumerWidget {
+class ColorDetailModal extends ConsumerStatefulWidget {
   final DetailedColorModel color;
 
   const ColorDetailModal({
@@ -17,7 +18,35 @@ class ColorDetailModal extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ColorDetailModal> createState() => _ColorDetailModalState();
+}
+
+class _ColorDetailModalState extends ConsumerState<ColorDetailModal> {
+  String currentLocale = 'ru';
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        currentLocale = context.locale.languageCode;
+      });
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final newLocale = context.locale.languageCode;
+    if (currentLocale != newLocale) {
+      setState(() {
+        currentLocale = newLocale;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -45,7 +74,7 @@ class ColorDetailModal extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Text(
-              'Цвет',
+              'home.colors.color'.tr(),
               textAlign: TextAlign.center,
               style: GoogleFonts.ysabeau(
                 fontSize: 22,
@@ -68,7 +97,8 @@ class ColorDetailModal extends ConsumerWidget {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: Color(int.parse('0xFF${color.hex.substring(1)}')),
+                    color: Color(
+                        int.parse('0xFF${widget.color.hex.substring(1)}')),
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
@@ -79,7 +109,7 @@ class ColorDetailModal extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        color.title['ru'] ?? '',
+                        widget.color.title[currentLocale] ?? '',
                         style: const TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w600,
@@ -88,7 +118,7 @@ class ColorDetailModal extends ConsumerWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        color.ral,
+                        widget.color.ral,
                         style: TextStyle(
                           fontSize: 15,
                           color: Colors.grey[600],
@@ -144,9 +174,9 @@ class ColorDetailModal extends ConsumerWidget {
                         SvgPicture.asset('lib/core/assets/icons/cube.svg',
                             width: 40, height: 40),
                         const SizedBox(width: 8),
-                        const Text(
-                          'Визуализировать',
-                          style: TextStyle(
+                        Text(
+                          'home.colors.visualize'.tr(),
+                          style: const TextStyle(
                             color: AppColors.textPrimary,
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
@@ -163,21 +193,21 @@ class ColorDetailModal extends ConsumerWidget {
                   onTap: () async {
                     await ref
                         .read(selectedColorProvider.notifier)
-                        .setColor(color);
+                        .setColor(widget.color);
 
                     if (context.mounted) {
                       CustomSnackBar.show(
                         context,
-                        message: 'Цвет сохранен',
+                        message: 'home.colors.color_saved'.tr(),
                         type: SnackBarType.success,
                         duration: const Duration(seconds: 2),
                       );
 
-                      if (color.parentColor != null) {
+                      if (widget.color.parentColor != null) {
                         context.go('/store', extra: {
                           'filter': {
                             'filters[parentColor.id]':
-                                color.parentColor!.id.toString()
+                                widget.color.parentColor!.id.toString()
                           }
                         });
                       } else {
@@ -204,9 +234,9 @@ class ColorDetailModal extends ConsumerWidget {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        const Text(
-                          'Выбрать краску',
-                          style: TextStyle(
+                        Text(
+                          'home.colors.select_paint'.tr(),
+                          style: const TextStyle(
                             color: AppColors.textPrimary,
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
