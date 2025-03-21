@@ -73,3 +73,5 @@ flutter:
     - lib/core/assets/translations/
     - lib/core/assets/images/colors/
     - lib/core/assets/images/store/
+    - lib/core/assets/images/partnership/
+    - lib/core/assets/images/part_prods/

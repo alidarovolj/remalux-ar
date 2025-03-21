@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/features/store/domain/models/review.dart';
 import 'package:remalux_ar/core/widgets/custom_button.dart';
-import 'package:intl/intl.dart';
 import 'package:remalux_ar/features/store/presentation/widgets/review_modal.dart';
 import 'package:easy_localization/easy_localization.dart';
 

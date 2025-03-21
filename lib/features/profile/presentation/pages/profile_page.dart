@@ -242,7 +242,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       const SizedBox(height: 8),
                       Text(
                         'profile.phone'.tr(),
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 15,
                           color: AppColors.textPrimary,
                         ),
@@ -289,7 +289,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       const SizedBox(height: 8),
                       Text(
                         'profile.email'.tr(),
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 15,
                           color: AppColors.textPrimary,
                         ),
@@ -564,9 +564,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             ),
             const SizedBox(height: 12),
             ElevatedButton(
-              onPressed: () {
-                // TODO: Implement registration
-              },
+              onPressed: () => context.push('/registration'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFB71C1C),
                 foregroundColor: Colors.white,

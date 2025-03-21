@@ -41,7 +41,7 @@ class _RecipientsPageState extends ConsumerState<RecipientsPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Center(
+                const Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -50,8 +50,8 @@ class _RecipientsPageState extends ConsumerState<RecipientsPage> {
                         size: 96,
                         color: AppColors.primary,
                       ),
-                      const SizedBox(height: 16),
-                      const Text(
+                      SizedBox(height: 16),
+                      Text(
                         'У вас пока нет сохраненных\nполучателей',
                         textAlign: TextAlign.center,
                         style: TextStyle(

@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:remalux_ar/core/network/dio_provider.dart';
 import 'package:remalux_ar/features/contacts/data/models/contact_model.dart';

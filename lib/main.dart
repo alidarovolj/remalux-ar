@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 // import 'core/utils/notification_utils.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'app.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:remalux_ar/core/providers/auth/auth_state.dart' as auth_state;
 // import 'package:remalux_ar/features/auth/presentation/pages/auth_check_page.dart';
@@ -15,8 +14,6 @@ import 'package:remalux_ar/core/router/app_router.dart';
 // import 'package:yandex_search/yandex_search.dart';
 // import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:remalux_ar/core/services/storage_service.dart';
-import 'package:remalux_ar/features/auth/domain/providers/auth_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 

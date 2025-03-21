@@ -79,7 +79,7 @@ class _CustomButtonState extends State<CustomButton> {
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeInOut,
       decoration: BoxDecoration(
-        gradient: widget.isBackGradient
+        gradient: widget.isBackGradient && widget.isEnabled
             ? const LinearGradient(
                 colors: [
                   Color(0xFFC41B5E),
@@ -91,12 +91,11 @@ class _CustomButtonState extends State<CustomButton> {
                 end: Alignment.centerRight,
               )
             : null,
-        color: widget.isBackGradient
-            ? null
-            : widget.backgroundColor ??
-                (widget.isEnabled
-                    ? AppColors.primary
-                    : AppColors.buttonDisabled),
+        color: !widget.isEnabled
+            ? const Color(0xFFE0E0E0) // Серый цвет для disabled состояния
+            : widget.isBackGradient
+                ? null
+                : widget.backgroundColor ?? AppColors.primary,
         borderRadius: BorderRadius.circular(AppLength.xs),
       ),
       child: MaterialButton(

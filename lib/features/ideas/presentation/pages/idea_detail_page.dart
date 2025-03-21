@@ -580,7 +580,7 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
                   children: [
                     // Заголовок
                     Text(
-                      'ideas.color_scheme'.tr() + ':',
+                      '${'ideas.color_scheme'.tr()}:',
                       style: GoogleFonts.ysabeau(
                         fontSize: 19,
                         fontWeight: FontWeight.w600,

@@ -54,12 +54,58 @@
     "password_min_length": "Minimum 8 characters",
     "password_contains_letter": "Must contain letters",
     "password_contains_number": "Must contain numbers",
+    "password_contains_uppercase": "Must contain uppercase letters",
+    "password_contains_lowercase": "Must contain lowercase letters",
     "password_contains_special": "Must contain special characters",
     "password_match": "Passwords must match",
     "password_reset": "Reset password",
     "password_reset_sent": "Password reset instructions sent to your email",
     "password_reset_error": "Error resetting password",
-    "password_reset_success": "Password successfully changed"
+    "password_reset_success": "Password successfully changed",
+    "registration": {
+      "title": "Registration",
+      "step1": "Step 1: Contact Information",
+      "step2": "Step 2: Verification",
+      "step3": "Step 3: Create Password",
+      "email": "Email",
+      "email_hint": "Enter your email",
+      "phone": "Phone number",
+      "phone_hint": "+7 (___) ___ __ __",
+      "verification_code": "Verification code",
+      "verification_code_hint": "Enter code from SMS",
+      "password": "Password",
+      "password_hint": "Create password",
+      "confirm_password": "Confirm password",
+      "confirm_password_hint": "Repeat password",
+      "terms_agreement": "I agree with the terms and conditions",
+      "next": "Next",
+      "back": "Back",
+      "register": "Register",
+      "success": "Registration successful",
+      "have_account": "Already have an account?",
+      "login": "Login",
+      "validation": {
+        "email_required": "Email is required",
+        "email_invalid": "Invalid email format",
+        "email_taken": "This email is already in use",
+        "email_available": "Email is available",
+        "phone_required": "Phone number is required",
+        "phone_invalid": "Invalid phone number format",
+        "phone_taken": "This phone number is already in use",
+        "phone_available": "Phone number is available",
+        "code_required": "Verification code is required",
+        "code_invalid": "Invalid verification code",
+        "password_required": "Password is required",
+        "password_invalid": "Password does not meet requirements",
+        "passwords_not_match": "Passwords do not match",
+        "terms_required": "You must agree to the terms and conditions",
+        "sms_sent_to": "SMS code was sent to",
+        "with_login_code": "with your login code",
+        "resend_code": "Resend code",
+        "resend_code_timer": "Resend code in 00:%s",
+        "code_sent": "Code sent successfully"
+      }
+    }
   },
   "store": {
     "catalog": "Catalog",
@@ -452,24 +498,146 @@
     }
   },
   "partnership": {
-    "title": "Become a Partner",
-    "create_projects": "Create Bright Projects with Remalux",
-    "welcome_text": "Welcome to Remalux! We are a leading manufacturer of high-quality paints known for their variety of shades and durability. Join our team of partners and create bright and lasting coatings for your bold projects with us.",
+    "title": "Partnership",
+    "create_projects": "Create Projects With Us",
+    "welcome_text": "Welcome to the Remalux partnership page. Here you will find information about cooperation opportunities with us and the benefits our partners receive.",
     "submit_application": "Submit Application",
     "company_history": "Company History",
-    "history_text": "Remalux company was founded over 30 years ago with one simple mission — to offer the highest quality paints that inspire the creation of unique and lasting projects. Since then, we have come a long way: from a small factory to an industry leader known for its innovations and responsible approach to production",
+    "history_text": "Over more than 30 years, we have grown from a small production facility to one of the leaders in the paint and coating materials market in Kazakhstan.",
+    "history": {
+      "1990": "Company foundation and start of first paint and coating materials production",
+      "1995": "Product range expansion and entry into regional markets",
+      "2000": "Production modernization and implementation of new technologies",
+      "2010": "Opening of new production lines and distribution network expansion",
+      "2015": "Launch of innovative products and entry into international market",
+      "2023": "Implementation of AR technologies and mobile app launch"
+    },
     "branches": {
-      "title": "Branches",
-      "description": "Remalux has 6 branches in all major cities of Kazakhstan with headquarters in Almaty.",
+      "title": "Branches and Representative Offices",
+      "description": "Our company has a wide network of branches and representative offices throughout Kazakhstan, allowing us to be closer to our clients and partners.",
       "clients": "clients"
     },
-    "history": {
-      "1990": "Remalux company opened its doors, setting a goal to create paints that would inspire and transform the world around us.",
-      "1995": "We introduced our first line of interior paints, immediately gaining customer attention thanks to high quality and variety of shades.",
-      "2000": "Started implementing new production technologies, significantly improving the durability and environmental friendliness of our products.",
-      "2010": "Remalux expanded its presence throughout the country, offering products in the best retail and specialized stores.",
-      "2015": "Launched an export program, entering international markets, starting cooperation with partners worldwide.",
-      "2023": "We opened a modern production facility, increased production capacity, expanded our product range to better meet our customers' needs."
+    "why_choose_us": "Why Choose Us",
+    "why_choose_us_desc": "We offer our partners unique cooperation terms and support at all stages of work.",
+    "advantages": {
+      "high_quality": "High Quality",
+      "high_quality_desc": "Products comply with international quality standards",
+      "competitive_prices": "Competitive Prices",
+      "competitive_prices_desc": "Optimal price-quality ratio",
+      "innovative_tech": "Innovative Technologies",
+      "innovative_tech_desc": "Modern solutions in production",
+      "service": "Service",
+      "service_desc": "Professional partner support",
+      "materials": "Materials",
+      "materials_desc": "Wide selection of materials for any task",
+      "wide_range": "Wide Range",
+      "wide_range_desc": "Constantly updated product catalog"
+    },
+    "statistics": {
+      "title": "Statistics",
+      "years": "years in market",
+      "branches": "branches",
+      "employees": "employees",
+      "projects": "completed projects"
+    },
+    "products": {
+      "varnish": "Varnish",
+      "varnish_types": "+9 types of paint",
+      "putty": "Putty",
+      "putty_types": "6 types of putty",
+      "coating": "Coating",
+      "coating_types": "+7 types of coatings",
+      "enamel": "Enamel",
+      "enamel_types": "+8 types of enamels",
+      "glue": "Glue",
+      "glue_types": "2 types of glue"
+    },
+    "news": {
+      "title": "Stay Up to Date with All News",
+      "description": "Want to be the first to know about new products, promotions, and inspiring projects? Follow us on Instagram! Keep track of updates, find ideas for your projects, and stay informed about all Remalux news. Join our online family and become part of the world of vibrant colors and creative solutions!",
+      "instagram": "@remalux.kz"
+    },
+    "application": {
+      "title": "Fill Out Partnership Application Form",
+      "description": "Want to become a Remalux partner and offer our customers the best paints? Fill out the application, and our manager will contact you to discuss cooperation terms and answer all your questions.",
+      "submit": "Submit Application"
+    },
+    "form": {
+      "title": "Partnership Application Form",
+      "full_name": "Full Name",
+      "bin": "BIN",
+      "phone": "Phone Number",
+      "select_city": "Select City",
+      "agree_with": "I agree with the ",
+      "terms_and_conditions": "terms and conditions",
+      "submit": "Submit Application",
+      "errors": {
+        "required_field": "Required field",
+        "invalid_email": "Invalid email format",
+        "invalid_bin": "BIN must contain 12 digits"
+      }
     }
+  },
+  "about": {
+    "title": "About Company",
+    "company_name": "K-COLOR LLP with REMALUX trademark",
+    "company_description": "K-COLOR LLP with REMALUX trademark is a leader in the production of paint and varnish materials in the Republic of Kazakhstan. We offer our customers a wide range of high-quality paints made according to British formulations, comparable to the most popular French, Belgian, German, Dutch and Turkish manufacturers.",
+    "advantages": {
+      "quality": {
+        "title": "High Quality",
+        "description": "Our paints undergo strict quality control, ensuring high coverage quality and durability"
+      },
+      "price": {
+        "title": "Competitive Prices",
+        "description": "We optimize prices so you can get professional products at affordable prices"
+      },
+      "technology": {
+        "title": "Innovative Production Technologies",
+        "description": "We use new technologies to ensure our products dry quickly and provide rich color"
+      },
+      "service": {
+        "title": "Professional Service",
+        "description": "Our specialists are always ready to help with product selection and provide technical advice"
+      },
+      "materials": {
+        "title": "Economical Material Consumption",
+        "description": "Our paints have such density that you can reduce consumption and save on painting"
+      },
+      "assortment": {
+        "title": "Wide Product Range",
+        "description": "Our range includes paints for any need - from interior paint to industrial coatings and decorative plasters"
+      }
+    },
+    "for_whom": {
+      "title": "Who are our company's products for?",
+      "description": "The products we manufacture are designed to easily meet the requirements of the most demanding highly qualified professionals for use in prestigious facilities. In addition, it is perfectly suitable for ordinary people who choose materials for home use and independent cosmetic repairs."
+    },
+    "info_section": {
+      "title": "Everything you need for a perfect result",
+      "description": "REMALUX produces high-quality paint and varnish materials with modern technologies and excellent service. All products are safe and comply with European standards.",
+      "items": {
+        "technology": {
+          "title": "Innovative Technologies and Modern Production Methods",
+          "description": "REMALUX paint and varnish materials production is based on modern technologies and world science achievements, allowing us to produce high-quality and safe products at competitive prices."
+        },
+        "service": {
+          "title": "Service Support",
+          "description": "We provide long-term and post-warranty service, training center consultations, and technical support. Our specialists are always ready to serve."
+        },
+        "assortment": {
+          "title": "Wide Product Range",
+          "description": "REMALUX produces paste-like plasters, water-emulsion paints, varnishes, acrylic adhesives, and other materials. We select paint for any task from interior paint to industrial coatings and decorative plasters."
+        },
+        "safety": {
+          "title": "Safety and Comfort of Use",
+          "description": "REMALUX company products are safe to use, odorless, allowing comfortable application of materials. Our paints dry quickly and don't require special application methods."
+        }
+      }
+    },
+    "car_fleet": {
+      "title": "Our Car Fleet: Fast and Reliable Delivery",
+      "description": "We have a modern car fleet that enables prompt and reliable delivery of our products throughout Kazakhstan. Our professional drivers and logistics specialists ensure timely delivery of orders to any point in the country, guaranteeing the safety of products during transportation."
+    },
+    "to_products": "To Products"
   }
 }

@@ -78,7 +78,7 @@ class NewsDetailPage extends ConsumerWidget {
         ),
         loading: () => const _NewsDetailSkeleton(),
         error: (error, stackTrace) => Center(
-          child: Text('common.error'.tr() + ': $error'),
+          child: Text('${'common.error'.tr()}: $error'),
         ),
       ),
     );

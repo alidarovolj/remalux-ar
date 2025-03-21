@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/core/widgets/custom_app_bar.dart';
 import 'package:remalux_ar/core/widgets/custom_button.dart';
 import 'package:remalux_ar/core/widgets/custom_text_field.dart';
-import 'package:remalux_ar/features/auth/domain/providers/auth_provider.dart';
-import 'package:remalux_ar/features/faq/domain/models/faq.dart';
 import 'package:remalux_ar/features/faq/domain/providers/faq_provider.dart';
 import 'package:remalux_ar/features/profile/presentation/pages/profile_page.dart';
 import 'package:easy_localization/easy_localization.dart';

@@ -336,7 +336,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                     ),
                                   ],
                                 ),
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                   color: AppColors.textPrimary,
                                 ),
@@ -354,7 +354,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                     ),
                                   ],
                                 ),
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
                               ),

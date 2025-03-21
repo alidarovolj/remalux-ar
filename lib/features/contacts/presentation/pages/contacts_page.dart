@@ -3,10 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/core/widgets/custom_app_bar.dart';
-import 'package:remalux_ar/features/contacts/data/models/contact_model.dart';
 import 'package:remalux_ar/features/contacts/presentation/providers/contacts_provider.dart';
 import 'package:remalux_ar/features/contacts/presentation/widgets/contact_list.dart';
-import 'package:remalux_ar/features/contacts/presentation/widgets/contact_map.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:easy_localization/easy_localization.dart';
 

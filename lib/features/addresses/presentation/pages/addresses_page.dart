@@ -47,7 +47,7 @@ class _AddressesPageState extends ConsumerState<AddressesPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.location_on_outlined,
                         size: 96,
                         color: AppColors.primary,

@@ -12,6 +12,7 @@ class CustomTextField extends StatelessWidget {
   final bool obscureText;
   final Widget? suffixIcon;
   final String? errorText;
+  final String? statusText;
   final void Function(String)? onChanged;
   final FocusNode? focusNode;
 
@@ -26,6 +27,7 @@ class CustomTextField extends StatelessWidget {
     this.obscureText = false,
     this.suffixIcon,
     this.errorText,
+    this.statusText,
     this.onChanged,
     this.focusNode,
   });
@@ -98,6 +100,17 @@ class CustomTextField extends StatelessWidget {
             ),
           ),
         ),
+        if (statusText != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 8, left: 12),
+            child: Text(
+              statusText!,
+              style: const TextStyle(
+                fontSize: 12,
+                color: Color(0xFF4CAF50),
+              ),
+            ),
+          ),
       ],
     );
   }

@@ -147,8 +147,9 @@ class _ProjectsPageState extends ConsumerState<ProjectsPage> {
                                         fit: BoxFit.cover,
                                         loadingBuilder:
                                             (context, child, loadingProgress) {
-                                          if (loadingProgress == null)
+                                          if (loadingProgress == null) {
                                             return child;
+                                          }
                                           return Shimmer.fromColors(
                                             baseColor: Colors.grey[300]!,
                                             highlightColor: Colors.grey[100]!,
@@ -178,8 +179,9 @@ class _ProjectsPageState extends ConsumerState<ProjectsPage> {
                                           fit: BoxFit.cover,
                                           loadingBuilder: (context, child,
                                               loadingProgress) {
-                                            if (loadingProgress == null)
+                                            if (loadingProgress == null) {
                                               return child;
+                                            }
                                             return Shimmer.fromColors(
                                               baseColor: Colors.grey[300]!,
                                               highlightColor: Colors.grey[100]!,

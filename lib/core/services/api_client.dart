@@ -49,6 +49,24 @@ class ApiClient {
       options: options,
     );
   }
+
+  Future<Response?> checkEmailAvailability(String email) async {
+    try {
+      return await get('/auth/check-email', queryParameters: {'email': email});
+    } catch (e) {
+      print('Error checking email availability: $e');
+      return null;
+    }
+  }
+
+  Future<Response?> checkPhoneAvailability(String phone) async {
+    try {
+      return await get('/auth/check-phone', queryParameters: {'phone': phone});
+    } catch (e) {
+      print('Error checking phone availability: $e');
+      return null;
+    }
+  }
 }
 
 final apiClientProvider = Provider<ApiClient>((ref) {

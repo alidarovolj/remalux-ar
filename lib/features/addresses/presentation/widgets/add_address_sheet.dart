@@ -98,8 +98,7 @@ class _AddAddressSheetState extends ConsumerState<AddAddressSheet> {
       ),
     );
 
-    final results =
-        await (searchResult as (SearchSession, Future<SearchSessionResult>)).$2;
+    final results = await (searchResult).$2;
     setState(() {
       _searchResults = results.items ?? [];
       _isSearching = false;
@@ -306,11 +305,7 @@ class _AddAddressSheetState extends ConsumerState<AddAddressSheet> {
                             ),
                           );
 
-                          final results = await (searchResult as (
-                            SearchSession,
-                            Future<SearchSessionResult>
-                          ))
-                              .$2;
+                          final results = await (searchResult).$2;
                           if (results.items?.isNotEmpty == true) {
                             setState(() {
                               _addressController.text =

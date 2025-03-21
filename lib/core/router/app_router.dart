@@ -11,6 +11,7 @@ import 'package:remalux_ar/features/ideas/presentation/pages/idea_detail_page.da
 import 'package:remalux_ar/features/home/presentation/pages/colors_page.dart';
 import 'package:remalux_ar/features/profile/presentation/pages/profile_page.dart';
 import 'package:remalux_ar/features/auth/presentation/pages/login_page.dart';
+import 'package:remalux_ar/features/auth/presentation/pages/registration_page.dart';
 import 'package:remalux_ar/features/orders/presentation/pages/orders_page.dart';
 import 'package:remalux_ar/features/favorites/presentation/pages/favorites_page.dart';
 import 'package:remalux_ar/features/recipients/presentation/pages/recipients_page.dart';
@@ -19,6 +20,8 @@ import 'package:remalux_ar/features/contacts/presentation/pages/contacts_page.da
 import 'package:remalux_ar/features/projects/presentation/pages/projects_page.dart';
 import 'package:remalux_ar/features/faq/presentation/pages/faq_page.dart';
 import 'package:remalux_ar/features/partnership/presentation/pages/partnership_page.dart';
+import 'package:remalux_ar/features/partnership/presentation/pages/partnership_application_page.dart';
+import 'package:remalux_ar/features/about/presentation/pages/about_page.dart';
 // import 'package:chucker_flutter/chucker_flutter.dart';
 
 class AppRouter {
@@ -166,6 +169,20 @@ class AppRouter {
         path: '/partnership',
         name: 'partnership',
         builder: (context, state) => const PartnershipPage(),
+      ),
+      GoRoute(
+        path: '/partnership/application',
+        name: 'partnership_application',
+        builder: (context, state) => const PartnershipApplicationPage(),
+      ),
+      GoRoute(
+        path: '/about',
+        builder: (context, state) => const AboutPage(),
+      ),
+      GoRoute(
+        path: '/registration',
+        name: 'registration',
+        builder: (context, state) => const RegistrationPage(),
       ),
     ],
   );

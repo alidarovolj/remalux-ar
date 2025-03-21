@@ -318,9 +318,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                               ),
                             ),
                             TextButton(
-                              onPressed: () {
-                                // TODO: Navigate to registration
-                              },
+                              onPressed: () => context.push('/registration'),
                               style: TextButton.styleFrom(
                                 foregroundColor: AppColors.primary,
                                 padding:

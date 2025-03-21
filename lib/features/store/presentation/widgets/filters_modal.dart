@@ -187,7 +187,7 @@ class FiltersModal extends ConsumerWidget {
                           children: [
                             Text(
                               'store.price.from'.tr(),
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textSecondary,
                               ),
@@ -218,7 +218,7 @@ class FiltersModal extends ConsumerWidget {
                           children: [
                             Text(
                               'store.price.to'.tr(),
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textSecondary,
                               ),
