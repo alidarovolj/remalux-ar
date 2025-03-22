@@ -16,6 +16,9 @@ import 'package:remalux_ar/features/store/presentation/widgets/product_detail_sk
 import 'package:remalux_ar/features/home/domain/providers/selected_color_provider.dart';
 import 'package:remalux_ar/features/store/presentation/widgets/color_selection.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:remalux_ar/features/cart/domain/providers/cart_provider.dart';
+import 'package:remalux_ar/core/widgets/custom_snack_bar.dart';
+import 'package:remalux_ar/features/store/presentation/widgets/add_to_cart_success_modal.dart';
 
 class ProductDetailPage extends ConsumerStatefulWidget {
   final int productId;
@@ -1092,8 +1095,51 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                     borderRadius: BorderRadius.circular(12),
                     child: InkWell(
                       onTap: selectedWeight != null
-                          ? () {
-                              // TODO: Implement add to cart
+                          ? () async {
+                              try {
+                                final selectedColor =
+                                    ref.read(selectedColorProvider);
+                                await ref.read(cartProvider.notifier).addToCart(
+                                      productVariantId: selectedVariant!.id,
+                                      quantity: quantity,
+                                      colorId: selectedColor?.id,
+                                    );
+
+                                if (mounted) {
+                                  // Показываем snackbar
+                                  CustomSnackBar.show(
+                                    context,
+                                    message: 'store.product.added_to_cart'.tr(),
+                                    type: SnackBarType.success,
+                                  );
+
+                                  // Показываем модальное окно
+                                  showModalBottomSheet(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    backgroundColor: Colors.transparent,
+                                    builder: (context) => AddToCartSuccessModal(
+                                      productTitle:
+                                          product.title[currentLocale] ??
+                                              product.title['ru'] ??
+                                              '',
+                                      productImage: product.imageUrl,
+                                      quantity: quantity,
+                                      price: (selectedVariant!.price * quantity)
+                                          .toString(),
+                                    ),
+                                  );
+                                }
+                              } catch (error) {
+                                if (mounted) {
+                                  CustomSnackBar.show(
+                                    context,
+                                    message: 'store.product.add_to_cart_error'
+                                        .tr(args: [error.toString()]),
+                                    type: SnackBarType.error,
+                                  );
+                                }
+                              }
                             }
                           : null,
                       child: SizedBox(

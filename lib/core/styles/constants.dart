@@ -31,6 +31,7 @@ class AppColors {
   // Border colors
   static const Color borderColor = Color.fromRGBO(245, 245, 245, 1);
   static const Color borderDark = Color.fromRGBO(38, 52, 79, 1);
+  static const Color borderLight = Color.fromRGBO(226, 228, 233, 1);
 
   // Background colors
   static const Color backgroundLight = Color.fromRGBO(247, 247, 248, 1);
@@ -46,6 +47,10 @@ class AppColors {
 
   static const Color buttonSendMine = Color.fromRGBO(224, 232, 255, 1);
   static const Color buttonSendBot = Color.fromRGBO(246, 247, 249, 1);
-  static const Color buttonDisabled = Color.fromRGBO(234, 237, 240, 1);
+  static const Color buttonDisabled = Color(0xFFEAEDF0);
   static const Color buttonLogout = Color.fromRGBO(178, 14, 15, 1);
+
+  // Shimmer colors
+  static const Color shimmerBase = Color(0xFFE0E0E0);
+  static const Color shimmerHighlight = Color(0xFFF5F5F5);
 }

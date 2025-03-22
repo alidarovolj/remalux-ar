@@ -9,7 +9,7 @@ import 'package:remalux_ar/core/providers/auth/auth_state.dart' as auth_state;
 // import 'package:remalux_ar/features/auth/presentation/pages/auth_check_page.dart';
 import 'package:remalux_ar/core/services/analytics_service.dart';
 import 'package:remalux_ar/core/router/app_router.dart';
-// import 'package:remalux_ar/core/database/database_initializer.dart';
+import 'package:remalux_ar/core/services/api_client.dart';
 // import 'package:yandex_mapkit/yandex_mapkit.dart';
 // import 'package:yandex_search/yandex_search.dart';
 // import 'package:chucker_flutter/chucker_flutter.dart';
@@ -52,6 +52,7 @@ void main() async {
             builder: (context, ref, child) {
               try {
                 ref.read(auth_state.authProvider.notifier).initializeAuth();
+                ref.read(tokenInitializerProvider);
               } catch (e) {
                 print('Ошибка инициализации авторизации: $e');
               }

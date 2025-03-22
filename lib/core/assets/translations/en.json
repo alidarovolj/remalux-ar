@@ -36,7 +36,8 @@
       "ar": "AR",
       "cart": "Cart",
       "profile": "Profile"
-    }
+    },
+    "confirm": "Confirm"
   },
   "auth": {
     "welcome": "Welcome!",
@@ -158,7 +159,12 @@
       "download_error": "Error downloading file: {error}",
       "similar_products": "Similar products",
       "add_to_cart": "Add to cart",
-      "reviews_error": "Error loading reviews: {error}"
+      "reviews_error": "Error loading reviews: {error}",
+      "added_to_cart": "Product added to cart",
+      "add_to_cart_error": "Error adding to cart: {0}",
+      "quantity": "Quantity: {0}",
+      "continue_shopping": "Continue shopping",
+      "go_to_cart": "Go to cart"
     },
     "paint_calculator": {
       "title": "Paint Calculator",
@@ -172,6 +178,26 @@
       "add_to_cart_format": "Add %s pcs to cart",
       "area_format": "%s m²",
       "paint_format": "%s kg"
+    },
+    "cart": {
+      "auth_required": "You need to be logged in to view your cart",
+      "empty": "Your cart is empty",
+      "error": "Error loading cart",
+      "total": "Total",
+      "continue": "Continue",
+      "promo": {
+        "placeholder": "Promo code",
+        "apply": "Apply"
+      },
+      "select_all": "Select All",
+      "delete_selected": "Delete Selected",
+      "summary": {
+        "title": "Total",
+        "products": "Products",
+        "discount": "Discount",
+        "total": "To Pay",
+        "continue": "{count} products • {amount} ₸"
+      }
     }
   },
   "orders": {
@@ -639,5 +665,61 @@
       "description": "We have a modern car fleet that enables prompt and reliable delivery of our products throughout Kazakhstan. Our professional drivers and logistics specialists ensure timely delivery of orders to any point in the country, guaranteeing the safety of products during transportation."
     },
     "to_products": "To Products"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "delivery_type": {
+      "title": "Delivery Method",
+      "courier": "Delivery",
+      "pickup": "Pickup"
+    },
+    "delivery_address": {
+      "title": "Delivery Address",
+      "add": "Add Address",
+      "empty": "Please add and select an address for delivery",
+      "entrance": "Entrance {number}",
+      "floor": "Floor {number}",
+      "change": "Change Address",
+      "hint": "Add delivery address"
+    },
+    "delivery_time": {
+      "title": "Delivery Time",
+      "hint": "Choose convenient delivery time",
+      "add": "Add",
+      "change": "Change"
+    },
+    "recipient": {
+      "title": "Recipient Details",
+      "add": "Add Recipient",
+      "empty": "Please add and select a recipient to proceed with the order",
+      "change": "Choose Another Recipient",
+      "hint": "Please add recipient"
+    },
+    "payment": {
+      "title": "Payment",
+      "online": "Online Payment",
+      "cash": "Cash on Delivery",
+      "kaspi": "Kaspi",
+      "halyk": "Halyk"
+    },
+    "comments": {
+      "title": "Order Comments",
+      "placeholder": "Enter your comment"
+    },
+    "promo": {
+      "applied": "Applied",
+      "remove": "Remove"
+    },
+    "error": {
+      "loading": "Error loading data"
+    },
+    "cart": {
+      "title": "Your Cart",
+      "products": "Products",
+      "discount": "Discount",
+      "total": "Total",
+      "button": "{} products • {} ₸"
+    },
+    "terms": "I agree with the return and reclamation terms"
   }
 }

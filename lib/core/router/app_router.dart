@@ -22,6 +22,8 @@ import 'package:remalux_ar/features/faq/presentation/pages/faq_page.dart';
 import 'package:remalux_ar/features/partnership/presentation/pages/partnership_page.dart';
 import 'package:remalux_ar/features/partnership/presentation/pages/partnership_application_page.dart';
 import 'package:remalux_ar/features/about/presentation/pages/about_page.dart';
+import 'package:remalux_ar/features/cart/presentation/pages/cart_page.dart';
+import 'package:remalux_ar/features/checkout/presentation/pages/checkout_page.dart';
 // import 'package:chucker_flutter/chucker_flutter.dart';
 
 class AppRouter {
@@ -58,6 +60,15 @@ class AppRouter {
               final initialFilterId = extra?['filter_id'] as int?;
               return StorePage(initialFilterId: initialFilterId);
             },
+          ),
+          GoRoute(
+            path: '/cart',
+            name: 'cart',
+            builder: (context, state) => const CartPage(),
+          ),
+          GoRoute(
+            path: '/checkout',
+            builder: (context, state) => const CheckoutPage(),
           ),
           GoRoute(
             path: '/news',

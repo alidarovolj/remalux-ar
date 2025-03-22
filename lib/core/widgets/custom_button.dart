@@ -3,9 +3,14 @@ import 'package:remalux_ar/core/styles/constants.dart';
 
 enum ButtonType { small, normal, big } // Типы кнопок
 
+enum ButtonVariant {
+  primary,
+  secondary,
+}
+
 class CustomButton extends StatefulWidget {
   final String label; // Текст на кнопке
-  final VoidCallback onPressed; // Действие при нажатии
+  final VoidCallback? onPressed; // Действие при нажатии
   final ButtonType type; // Тип кнопки
   final bool isEnabled; // Определяет, включена ли кнопка
   final bool isFullWidth; // Растягивать ли кнопку на всю ширину
@@ -13,11 +18,12 @@ class CustomButton extends StatefulWidget {
   final bool isBackGradient;
   final Color? backgroundColor; // Add this line
   final Color? textColor; // Add this line
+  final ButtonVariant variant;
 
   const CustomButton({
     super.key,
     required this.label,
-    required this.onPressed,
+    this.onPressed,
     this.type = ButtonType.normal, // Тип по умолчанию
     this.isEnabled = true, // Кнопка включена по умолчанию
     this.isFullWidth = true, // По умолчанию на всю ширину
@@ -25,6 +31,7 @@ class CustomButton extends StatefulWidget {
     this.isBackGradient = false,
     this.backgroundColor, // Add this line
     this.textColor, // Add this line
+    this.variant = ButtonVariant.primary,
   });
 
   @override
@@ -75,6 +82,18 @@ class _CustomButtonState extends State<CustomButton> {
 
   @override
   Widget build(BuildContext context) {
+    final backgroundColor = switch (widget.variant) {
+      ButtonVariant.primary =>
+        widget.isEnabled ? AppColors.primary : AppColors.buttonDisabled,
+      ButtonVariant.secondary =>
+        widget.isEnabled ? AppColors.buttonSecondary : AppColors.buttonDisabled,
+    };
+
+    final textColor = switch (widget.variant) {
+      ButtonVariant.primary => Colors.white,
+      ButtonVariant.secondary => AppColors.primary,
+    };
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeInOut,
@@ -95,7 +114,7 @@ class _CustomButtonState extends State<CustomButton> {
             ? const Color(0xFFE0E0E0) // Серый цвет для disabled состояния
             : widget.isBackGradient
                 ? null
-                : widget.backgroundColor ?? AppColors.primary,
+                : backgroundColor,
         borderRadius: BorderRadius.circular(AppLength.xs),
       ),
       child: MaterialButton(
@@ -128,10 +147,7 @@ class _CustomButtonState extends State<CustomButton> {
             : AnimatedDefaultTextStyle(
                 duration: const Duration(milliseconds: 200),
                 style: _textStyle.copyWith(
-                  color: widget.textColor ??
-                      (widget.isEnabled
-                          ? AppColors.white
-                          : AppColors.textSecondary),
+                  color: textColor,
                 ),
                 child: Text(widget.label),
               ),
