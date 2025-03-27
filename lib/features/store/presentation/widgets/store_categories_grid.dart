@@ -14,6 +14,7 @@ class StoreCategoriesGrid extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final categoriesAsync = ref.watch(categoriesProvider);
     final selectedFilters = ref.watch(selectedFiltersProvider);
+    final selectedFiltersNotifier = ref.read(selectedFiltersProvider.notifier);
     final currentLocale = context.locale.languageCode;
 
     return Column(
@@ -46,7 +47,8 @@ class StoreCategoriesGrid extends ConsumerWidget {
             itemCount: categories.length,
             itemBuilder: (context, index) {
               final category = categories[index];
-              final isSelected = selectedFilters.contains(category.id);
+              final isSelected =
+                  selectedFiltersNotifier.selectedCategory == category.id;
               return _CategoryItem(
                 category: category,
                 isSelected: isSelected,
@@ -90,18 +92,30 @@ class _CategoryItem extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedFiltersNotifier = ref.read(selectedFiltersProvider.notifier);
+    final selectedFilters = ref.watch(selectedFiltersProvider);
     final productsNotifier = ref.read(productsProvider.notifier);
 
     return GestureDetector(
       onTap: () {
-        selectedFiltersNotifier.toggleFilter(category.id);
+        selectedFiltersNotifier.toggleFilter(category.id, isCategory: true);
+
+        final Map<String, dynamic> queryParams = {};
+
+        // Add category if selected
+        if (selectedFiltersNotifier.selectedCategory != null) {
+          queryParams['filters[product.category_id]'] =
+              selectedFiltersNotifier.selectedCategory.toString();
+        }
+
+        // Add other filters
+        for (final id in selectedFilters) {
+          if (id != selectedFiltersNotifier.selectedCategory) {
+            queryParams['filter_ids[$id]'] = id.toString();
+          }
+        }
+
         productsNotifier.fetchProducts(
-          queryParams: selectedFiltersNotifier.state.isNotEmpty
-              ? {
-                  for (var id in selectedFiltersNotifier.state)
-                    'filter_ids[$id]': id.toString()
-                }
-              : null,
+          queryParams: queryParams.isNotEmpty ? queryParams : null,
         );
       },
       child: Container(

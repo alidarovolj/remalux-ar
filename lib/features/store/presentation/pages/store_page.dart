@@ -14,15 +14,18 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:remalux_ar/features/home/domain/providers/selected_color_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'dart:async';
+import 'package:remalux_ar/features/auth/domain/providers/auth_provider.dart';
+import 'package:remalux_ar/core/providers/auth/auth_state.dart' as auth_state;
+import 'package:remalux_ar/features/profile/presentation/pages/profile_page.dart';
 
 class StorePage extends ConsumerStatefulWidget {
-  final int? initialFilterId;
-  final Map<String, String>? filter;
+  final int? initialCategoryId;
+  final bool autoFocus;
 
   const StorePage({
     super.key,
-    this.initialFilterId,
-    this.filter,
+    this.initialCategoryId,
+    this.autoFocus = false,
   });
 
   @override
@@ -32,6 +35,7 @@ class StorePage extends ConsumerStatefulWidget {
 class _StorePageState extends ConsumerState<StorePage> {
   late ScrollController _scrollController;
   late TextEditingController _searchController;
+  final FocusNode _searchFocusNode = FocusNode();
   Timer? _debounceTimer;
   bool _isHeaderExpanded = true;
 
@@ -43,27 +47,17 @@ class _StorePageState extends ConsumerState<StorePage> {
     _scrollController.addListener(_onScroll);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Create query parameters map
-      final Map<String, dynamic> queryParams = {};
-
-      // Add initial filter if provided
-      if (widget.initialFilterId != null) {
-        queryParams['filter_ids[${widget.initialFilterId}]'] =
-            widget.initialFilterId.toString();
-        ref.read(selectedFiltersProvider.notifier).state = {
-          widget.initialFilterId!
-        };
+      if (widget.initialCategoryId != null) {
+        ref
+            .read(selectedFiltersProvider.notifier)
+            .toggleFilter(widget.initialCategoryId!, isCategory: true);
+        _fetchProducts();
       }
-
-      // Add parent color filter if provided
-      if (widget.filter != null) {
-        queryParams.addAll(widget.filter!);
-      }
-
-      // Fetch products with the filters
-      if (queryParams.isNotEmpty) {
-        final productsNotifier = ref.read(productsProvider.notifier);
-        productsNotifier.fetchProducts(queryParams: queryParams);
+      if (widget.autoFocus) {
+        _searchFocusNode.requestFocus();
+        _searchController.selection = TextSelection.fromPosition(
+          TextPosition(offset: _searchController.text.length),
+        );
       }
     });
   }
@@ -72,6 +66,7 @@ class _StorePageState extends ConsumerState<StorePage> {
   void dispose() {
     _scrollController.dispose();
     _searchController.dispose();
+    _searchFocusNode.dispose();
     _debounceTimer?.cancel();
     super.dispose();
   }
@@ -94,6 +89,8 @@ class _StorePageState extends ConsumerState<StorePage> {
       final productsNotifier = ref.read(productsProvider.notifier);
       final selectedFilters = ref.read(selectedFiltersProvider);
       final selectedSorting = ref.read(sortingProvider);
+      final selectedCategory =
+          ref.read(selectedFiltersProvider.notifier).selectedCategory;
 
       // Create query parameters map
       final Map<String, dynamic> queryParams = {};
@@ -106,6 +103,12 @@ class _StorePageState extends ConsumerState<StorePage> {
         return;
       }
       // If empty, continue without search parameter
+
+      // Add category filter if selected
+      if (selectedCategory != null) {
+        queryParams['filters[product.category_id]'] =
+            selectedCategory.toString();
+      }
 
       // Add existing filter parameters
       if (selectedFilters.isNotEmpty) {
@@ -126,6 +129,41 @@ class _StorePageState extends ConsumerState<StorePage> {
         queryParams: queryParams.isEmpty ? null : queryParams,
       );
     });
+  }
+
+  void _fetchProducts() {
+    final productsNotifier = ref.read(productsProvider.notifier);
+    final selectedFilters = ref.read(selectedFiltersProvider);
+    final selectedSorting = ref.read(sortingProvider);
+    final selectedCategory =
+        ref.read(selectedFiltersProvider.notifier).selectedCategory;
+
+    // Create query parameters map
+    final Map<String, dynamic> queryParams = {};
+
+    // Add category filter if selected
+    if (selectedCategory != null) {
+      queryParams['filters[product.category_id]'] = selectedCategory.toString();
+    }
+
+    // Add existing filter parameters
+    if (selectedFilters.isNotEmpty) {
+      for (final id in selectedFilters) {
+        queryParams['filter_ids[$id]'] = id.toString();
+      }
+    }
+
+    // Add sorting parameter if selected
+    if (selectedSorting != null) {
+      queryParams['order_by'] = selectedSorting;
+    }
+
+    print('Search query params: $queryParams'); // Debug print
+
+    // Fetch products with updated parameters
+    productsNotifier.fetchProducts(
+      queryParams: queryParams.isEmpty ? null : queryParams,
+    );
   }
 
   @override
@@ -176,8 +214,7 @@ class _StorePageState extends ConsumerState<StorePage> {
                             productsAsync.when(
                               data: (response) => 'store.products_count'
                                   .tr(args: [response.meta.total.toString()]),
-                              loading: () =>
-                                  'store.products_count'.tr(args: ['0']),
+                              loading: () => '',
                               error: (_, __) =>
                                   'store.products_count'.tr(args: ['0']),
                             ),
@@ -185,6 +222,21 @@ class _StorePageState extends ConsumerState<StorePage> {
                               fontSize: 14,
                               color: AppColors.textPrimary.withOpacity(0.5),
                             ),
+                          ),
+                          productsAsync.maybeWhen(
+                            loading: () => Shimmer.fromColors(
+                              baseColor: Colors.grey[300]!,
+                              highlightColor: Colors.grey[100]!,
+                              child: Container(
+                                width: 80,
+                                height: 14,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                            ),
+                            orElse: () => const SizedBox(),
                           ),
                           const Spacer(),
                           GestureDetector(
@@ -358,10 +410,10 @@ class _StorePageState extends ConsumerState<StorePage> {
                     height: _isHeaderExpanded
                         ? (395 +
                             MediaQuery.of(context).padding.top +
-                            (selectedColor != null ? 64 : 0))
+                            (selectedColor != null ? 64 : 12.5))
                         : (165 +
                             MediaQuery.of(context).padding.top +
-                            (selectedColor != null ? 64 : 0)),
+                            (selectedColor != null ? 64 : 12.5)),
                     padding: EdgeInsets.only(
                         top: MediaQuery.of(context).padding.top),
                     decoration: BoxDecoration(
@@ -414,7 +466,9 @@ class _StorePageState extends ConsumerState<StorePage> {
                                   child: Row(
                                     children: [
                                       IconButton(
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          context.push('/compare-products');
+                                        },
                                         icon: SvgPicture.asset(
                                           'lib/core/assets/icons/scale.svg',
                                           width: 24,
@@ -422,14 +476,62 @@ class _StorePageState extends ConsumerState<StorePage> {
                                         ),
                                         padding: EdgeInsets.zero,
                                       ),
-                                      IconButton(
-                                        onPressed: () {},
-                                        icon: SvgPicture.asset(
-                                          'lib/core/assets/icons/heart.svg',
-                                          width: 24,
-                                          height: 24,
-                                        ),
-                                        padding: EdgeInsets.zero,
+                                      Consumer(
+                                        builder: (context, ref, child) {
+                                          final userAsync =
+                                              ref.watch(userProvider);
+                                          return userAsync.when(
+                                            data: (user) => IconButton(
+                                              onPressed: () {
+                                                if (user != null) {
+                                                  context.push('/favorites');
+                                                } else {
+                                                  context.push('/login');
+                                                }
+                                              },
+                                              icon: SvgPicture.asset(
+                                                'lib/core/assets/icons/heart.svg',
+                                                width: 24,
+                                                height: 24,
+                                                colorFilter:
+                                                    const ColorFilter.mode(
+                                                  AppColors.textPrimary,
+                                                  BlendMode.srcIn,
+                                                ),
+                                              ),
+                                              padding: EdgeInsets.zero,
+                                            ),
+                                            loading: () => IconButton(
+                                              onPressed: () {},
+                                              icon: SvgPicture.asset(
+                                                'lib/core/assets/icons/heart.svg',
+                                                width: 24,
+                                                height: 24,
+                                                colorFilter:
+                                                    const ColorFilter.mode(
+                                                  AppColors.textPrimary,
+                                                  BlendMode.srcIn,
+                                                ),
+                                              ),
+                                              padding: EdgeInsets.zero,
+                                            ),
+                                            error: (_, __) => IconButton(
+                                              onPressed: () =>
+                                                  context.push('/login'),
+                                              icon: SvgPicture.asset(
+                                                'lib/core/assets/icons/heart.svg',
+                                                width: 24,
+                                                height: 24,
+                                                colorFilter:
+                                                    const ColorFilter.mode(
+                                                  AppColors.textPrimary,
+                                                  BlendMode.srcIn,
+                                                ),
+                                              ),
+                                              padding: EdgeInsets.zero,
+                                            ),
+                                          );
+                                        },
                                       ),
                                     ],
                                   ),
@@ -450,6 +552,7 @@ class _StorePageState extends ConsumerState<StorePage> {
                             ),
                             child: TextField(
                               controller: _searchController,
+                              autofocus: widget.autoFocus,
                               onChanged: _onSearchChanged,
                               decoration: InputDecoration(
                                 hintText: 'store.search_products'.tr(),
@@ -746,7 +849,7 @@ class _StorePageState extends ConsumerState<StorePage> {
                                       ),
                                       child: IconButton(
                                         onPressed: () {
-                                          // TODO: Implement refresh
+                                          context.push('/colors');
                                         },
                                         icon: SvgPicture.asset(
                                           'lib/core/assets/icons/refresh.svg',

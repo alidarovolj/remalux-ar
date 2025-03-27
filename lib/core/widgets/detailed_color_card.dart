@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/features/favorites/domain/models/favorite_color.dart';
+import 'package:remalux_ar/core/providers/auth/auth_state.dart';
+import 'package:remalux_ar/core/widgets/auth_required_modal.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class DetailedColorCard extends ConsumerStatefulWidget {
@@ -138,7 +140,21 @@ class _DetailedColorCardState extends ConsumerState<DetailedColorCard> {
                                 : Colors.grey[600],
                             size: 18,
                           ),
-                          onPressed: widget.onFavoritePressed,
+                          onPressed: () {
+                            final authState = ref.read(authProvider);
+
+                            if (!authState.isAuthenticated) {
+                              showModalBottomSheet(
+                                context: context,
+                                backgroundColor: Colors.transparent,
+                                isScrollControlled: true,
+                                builder: (context) => const AuthRequiredModal(),
+                              );
+                              return;
+                            }
+
+                            widget.onFavoritePressed?.call();
+                          },
                           padding: EdgeInsets.zero,
                         ),
                       ),

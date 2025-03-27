@@ -18,11 +18,15 @@ final cartSummaryProvider = Provider<CartSummary>((ref) {
   final promoCode = ref.watch(promoCodeProvider);
 
   // Подсчет общей суммы
-  final totalAmount = items.fold<int>(
-    0,
-    (sum, item) =>
-        sum + (int.parse(item.productVariant.price.toString()) * item.quantity),
-  );
+  final totalAmount = items
+      .fold<double>(
+        0,
+        (sum, item) =>
+            sum +
+            (double.parse(item.productVariant.price.toString()) *
+                item.quantity),
+      )
+      .round();
 
   // Подсчет общего количества товаров
   final totalProducts = items.fold<int>(

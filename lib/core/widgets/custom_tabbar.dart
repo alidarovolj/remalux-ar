@@ -10,10 +10,13 @@ class CustomTabBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+
     return Stack(
       clipBehavior: Clip.none,
       children: [
         Container(
+          padding: EdgeInsets.only(bottom: 0),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: const BorderRadius.only(

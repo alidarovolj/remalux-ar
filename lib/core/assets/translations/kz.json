@@ -40,6 +40,8 @@
     "confirm": "Растау"
   },
   "auth": {
+    "required_title": "Авторизация қажет",
+    "required_description": "Тауарды таңдаулыларға қосу үшін аккаунтқа кіру қажет",
     "login": "Кіру",
     "register": "Тіркелу",
     "email": "Эл. пошта",
@@ -139,12 +141,12 @@
     "added_to_cart": "Себетке қосылды {}",
     "product": {
       "visualize": "Визуализациялау",
-      "article": "Артикул: {article}",
+      "article": "Артикул: {}",
       "color": "Түс",
       "weight": "Салмақ",
       "weight_unit": "кг",
-      "usage_rate": "Тұтыну нормасы: {rate} г/м2",
-      "coverage_calculation": "Бояу жабынының есебі: {area} м2",
+      "usage_rate": "Тұтыну нормасы: {} м²/л",
+      "coverage_calculation": "Бояуды жабу ауданын есептеу: {} м²",
       "paint_calculator": "Бояу калькуляторы",
       "compare": "Салыстыру",
       "add_to_favorites": "Таңдаулыларға қосу",
@@ -169,7 +171,8 @@
       "add_to_cart_error": "Себетке қосу кезінде қате: {0}",
       "quantity": "Саны: {0}",
       "continue_shopping": "Сатып алуды жалғастыру",
-      "go_to_cart": "Себетке өту"
+      "go_to_cart": "Себетке өту",
+      "added_to_compare": "Тауар салыстыруға қосылды"
     },
     "paint_calculator": {
       "title": "Бояу калькуляторы",
@@ -179,10 +182,10 @@
       "total_area": "Жалпы аумақ:",
       "required_paint": "Қажетті бояу:",
       "packages_count": "Қаптама саны:",
-      "packages_format": "%1$s дана %2$s кг",
-      "add_to_cart_format": "Себетке %s дана қосу",
-      "area_format": "%s м²",
-      "paint_format": "%s кг"
+      "packages_format": "{} дана {} кг",
+      "add_to_cart_format": "Себетке {} дана қосу",
+      "area_format": "{} м²",
+      "paint_format": "{} кг"
     },
     "cart": {
       "select_all": "Барлығын таңдау",
@@ -198,7 +201,16 @@
         "total": "Төлемге",
         "continue": "{count} өнім • {amount} ₸"
       }
-    }
+    },
+    "compare_products": "Өнімдерді салыстыру",
+    "select_product": "Өнімді таңдау",
+    "article": "Артикул",
+    "category": "Санат",
+    "consumption_rate": "Шығын нормасы",
+    "is_colorable": "Боялатын бояу",
+    "yes": "Иә",
+    "no": "Жоқ",
+    "description": "Сипаттама"
   },
   "orders": {
     "my_orders": "Менің тапсырыстарым",
@@ -227,7 +239,7 @@
     "status": {
       "delivered": "Жеткізілді",
       "processing": "Өңделуде",
-      "cancelled": "Бас тартылды"
+      "cancel": "Бас тартылды"
     },
     "order": {
       "from": "{} тапсырысы",

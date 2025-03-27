@@ -4,6 +4,8 @@ import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/features/store/domain/models/product.dart';
 import 'package:remalux_ar/features/favorites/domain/providers/favorites_providers.dart';
 import 'package:remalux_ar/features/store/presentation/providers/store_providers.dart';
+import 'package:remalux_ar/core/providers/auth/auth_state.dart';
+import 'package:remalux_ar/core/widgets/auth_required_modal.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class ProductVariantItem extends ConsumerWidget {
@@ -117,6 +119,18 @@ class ProductVariantItem extends ConsumerWidget {
                           size: 18,
                         ),
                         onPressed: () async {
+                          final authState = ref.read(authProvider);
+
+                          if (!authState.isAuthenticated) {
+                            showModalBottomSheet(
+                              context: context,
+                              backgroundColor: Colors.transparent,
+                              isScrollControlled: true,
+                              builder: (context) => const AuthRequiredModal(),
+                            );
+                            return;
+                          }
+
                           try {
                             final service = ref.read(favoritesServiceProvider);
                             await ref

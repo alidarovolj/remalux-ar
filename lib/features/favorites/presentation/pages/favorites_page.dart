@@ -18,6 +18,8 @@ import 'package:remalux_ar/features/home/presentation/widgets/color_detail_modal
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:remalux_ar/features/auth/domain/providers/auth_provider.dart';
+import 'package:remalux_ar/core/services/storage_service.dart';
 
 class FavoritesPage extends ConsumerStatefulWidget {
   final int? initialTabIndex;
@@ -35,6 +37,33 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
+  Future<void> _refreshFavorites() async {
+    print('🔄 Force refreshing favorites');
+    final token = await StorageService.getToken();
+    if (token != null) {
+      try {
+        print('📱 Starting favorites refresh');
+        await Future.wait([
+          ref.read(favoriteProductsProvider.notifier).loadFavoriteProducts(),
+          ref.read(favoriteColorsProvider.notifier).loadFavoriteColors(),
+        ]);
+        print('✅ Favorites refresh completed successfully');
+      } catch (error) {
+        print('❌ Favorites refresh failed: $error');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('favorites.error.refresh'.tr()),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } else {
+      print('⚠️ No token found, skipping favorites refresh');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -46,19 +75,16 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage>
     _tabController.addListener(() {
       setState(() {}); // Rebuild to update icon colors
     });
-    Future.microtask(() {
-      ref.read(favoriteProductsProvider.notifier).loadFavoriteProducts();
-      ref.read(favoriteColorsProvider.notifier).loadFavoriteColors();
+    print('📱 FavoritesPage initState');
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _refreshFavorites();
     });
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    Future.microtask(() {
-      ref.read(favoriteProductsProvider.notifier).loadFavoriteProducts();
-      ref.read(favoriteColorsProvider.notifier).loadFavoriteColors();
-    });
+    _refreshFavorites();
   }
 
   @override

@@ -104,13 +104,15 @@ class FiltersModal extends ConsumerWidget {
                       children: categories
                           .map((category) => GestureDetector(
                                 onTap: () => selectedFiltersNotifier
-                                    .toggleFilter(category.id),
+                                    .toggleFilter(category.id,
+                                        isCategory: true),
                                 child: _buildCategoryChip(
                                   category.title[context.locale.languageCode] ??
                                       '',
                                   category.imageUrl,
-                                  isSelected:
-                                      selectedFilters.contains(category.id),
+                                  isSelected: selectedFiltersNotifier
+                                          .selectedCategory ==
+                                      category.id,
                                 ),
                               ))
                           .toList(),
@@ -268,14 +270,23 @@ class FiltersModal extends ConsumerWidget {
               children: [
                 CustomButton(
                   onPressed: () {
-                    if (selectedFilters.isNotEmpty) {
-                      final Map<String, dynamic> queryParams = {};
-                      for (final id in selectedFilters) {
+                    final Map<String, dynamic> queryParams = {};
+
+                    // Handle category selection
+                    if (selectedFiltersNotifier.selectedCategory != null) {
+                      queryParams['filters[product.category_id]'] =
+                          selectedFiltersNotifier.selectedCategory.toString();
+                    }
+
+                    // Handle other filters
+                    for (final id in selectedFilters) {
+                      if (id != selectedFiltersNotifier.selectedCategory) {
                         queryParams['filter_ids[$id]'] = id.toString();
                       }
+                    }
+
+                    if (queryParams.isNotEmpty) {
                       productsNotifier.fetchProducts(queryParams: queryParams);
-                    } else {
-                      productsNotifier.fetchProducts();
                     }
                     Navigator.pop(context);
                   },

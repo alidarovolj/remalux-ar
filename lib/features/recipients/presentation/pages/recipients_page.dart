@@ -6,6 +6,7 @@ import 'package:remalux_ar/features/recipients/presentation/widgets/add_recipien
 import 'package:remalux_ar/core/widgets/custom_snack_bar.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class RecipientsPage extends ConsumerStatefulWidget {
   const RecipientsPage({super.key});
@@ -18,10 +19,37 @@ class _RecipientsPageState extends ConsumerState<RecipientsPage> {
   @override
   void initState() {
     super.initState();
+    print('📱 RecipientsPage initState');
     // Force refresh recipients on page visit
-    Future.microtask(() {
-      ref.read(recipientsProvider.notifier).refreshRecipients();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _refreshRecipients();
+      }
     });
+  }
+
+  Future<void> _refreshRecipients() async {
+    print('🔄 Force refreshing recipients');
+    try {
+      print('📱 Starting recipients refresh');
+      await ref.read(recipientsProvider.notifier).refreshRecipients();
+      print('✅ Recipients refresh completed successfully');
+    } catch (error) {
+      print('❌ Recipients refresh failed: $error');
+      if (mounted) {
+        CustomSnackBar.show(
+          context,
+          message: 'recipients.error.refresh'.tr(),
+          type: SnackBarType.error,
+        );
+      }
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Remove refresh call from here to avoid setState during build
   }
 
   @override

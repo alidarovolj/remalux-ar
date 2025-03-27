@@ -3,13 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
-import 'package:remalux_ar/core/theme/colors.dart';
+import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/core/widgets/custom_snack_bar.dart';
 import 'package:remalux_ar/features/auth/domain/models/register_request.dart';
 import 'package:remalux_ar/features/auth/domain/providers/auth_provider.dart';
 import 'package:remalux_ar/core/widgets/custom_text_field.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'dart:async';
+import 'dart:ui';
 
 class RegistrationPage extends ConsumerStatefulWidget {
   const RegistrationPage({super.key});
@@ -600,9 +601,26 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => context.pop(),
+        leading: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.7),
+            borderRadius: BorderRadius.circular(100),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.black),
+              onPressed: () {
+                if (Navigator.of(context).canPop()) {
+                  context.pop();
+                } else {
+                  context.go('/');
+                }
+              },
+            ),
+          ),
         ),
         title: Image.asset(
           'lib/core/assets/images/logos/main.png',
@@ -610,90 +628,94 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         ),
         centerTitle: true,
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('lib/core/assets/images/registration.jpg'),
-            fit: BoxFit.cover,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'lib/core/assets/images/registration.jpg',
+              fit: BoxFit.contain,
+              alignment: Alignment.topCenter,
+            ),
           ),
-        ),
-        child: SafeArea(
-          bottom: false,
-          child: Column(
-            children: [
-              Expanded(
-                child: Container(
-                  margin: const EdgeInsets.only(top: 16),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(12),
-                      topRight: Radius.circular(12),
+          SafeArea(
+            bottom: false,
+            child: Column(
+              children: [
+                const SizedBox(height: 16),
+                Expanded(
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(12),
+                        topRight: Radius.circular(12),
+                      ),
                     ),
-                  ),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: _buildStepIndicator(),
-                        ),
-                        Expanded(
-                          child: SingleChildScrollView(
-                            child: Padding(
-                              padding: const EdgeInsets.all(12),
-                              child: _currentStep == 1
-                                  ? _buildStep1()
-                                  : _buildStep2(),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: _buildStepIndicator(),
+                          ),
+                          Expanded(
+                            child: SingleChildScrollView(
+                              child: Padding(
+                                padding: const EdgeInsets.all(12),
+                                child: _currentStep == 1
+                                    ? _buildStep1()
+                                    : _buildStep2(),
+                              ),
                             ),
                           ),
-                        ),
-                        // Login Link
-                        Padding(
-                          padding: EdgeInsets.only(
-                            left: 16,
-                            right: 16,
-                            bottom: MediaQuery.of(context).padding.bottom + 16,
-                          ),
-                          child: Column(
-                            children: [
-                              Text(
-                                'auth.registration.have_account'.tr(),
-                                style: const TextStyle(
-                                  fontSize: 15,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                              TextButton(
-                                onPressed: () => context.go('/login'),
-                                style: TextButton.styleFrom(
-                                  foregroundColor: AppColors.primary,
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 8),
-                                  minimumSize: Size.zero,
-                                  tapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
-                                ),
-                                child: Text(
-                                  'auth.registration.login'.tr(),
+                          // Login Link
+                          Padding(
+                            padding: EdgeInsets.only(
+                              left: 16,
+                              right: 16,
+                              bottom:
+                                  MediaQuery.of(context).padding.bottom + 16,
+                            ),
+                            child: Column(
+                              children: [
+                                Text(
+                                  'auth.registration.have_account'.tr(),
                                   style: const TextStyle(
                                     fontSize: 15,
-                                    fontWeight: FontWeight.w400,
+                                    color: AppColors.textPrimary,
                                   ),
                                 ),
-                              ),
-                            ],
+                                TextButton(
+                                  onPressed: () => context.go('/login'),
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: AppColors.primary,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8),
+                                    minimumSize: Size.zero,
+                                    tapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                  child: Text(
+                                    'auth.registration.login'.tr(),
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

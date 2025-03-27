@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'dart:ui';
 import 'package:remalux_ar/core/styles/constants.dart';
-import 'package:remalux_ar/features/store/domain/models/product_detail.dart';
-import 'package:remalux_ar/features/store/domain/models/product.dart';
+import 'package:remalux_ar/features/store/domain/models/product_detail.dart'
+    hide ProductVariant;
+import 'package:remalux_ar/features/store/domain/models/product_detail.dart'
+    as models show ProductVariant;
+import 'package:remalux_ar/features/store/domain/entities/product.dart';
 import 'package:remalux_ar/features/store/presentation/providers/product_detail_provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -19,6 +23,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:remalux_ar/features/cart/domain/providers/cart_provider.dart';
 import 'package:remalux_ar/core/widgets/custom_snack_bar.dart';
 import 'package:remalux_ar/features/store/presentation/widgets/add_to_cart_success_modal.dart';
+import 'package:flutter/rendering.dart';
+import 'package:remalux_ar/features/store/presentation/providers/compare_products_provider.dart';
 
 class ProductDetailPage extends ConsumerStatefulWidget {
   final int productId;
@@ -36,7 +42,7 @@ class ProductDetailPage extends ConsumerStatefulWidget {
 
 class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
   String? selectedWeight;
-  ProductVariant? selectedVariant;
+  models.ProductVariant? selectedVariant;
   int quantity = 1;
 
   @override
@@ -68,7 +74,9 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
               width: 24,
               height: 24,
             ),
-            onPressed: () {},
+            onPressed: () {
+              context.push('/compare-products');
+            },
           ),
           IconButton(
             icon: SvgPicture.asset(
@@ -76,7 +84,9 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
               width: 24,
               height: 24,
             ),
-            onPressed: () {},
+            onPressed: () {
+              context.push('/favorites');
+            },
           ),
         ],
       ),
@@ -96,7 +106,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
     // Set initial variant if weight is selected but variant is not
     if (selectedWeight != null && selectedVariant == null) {
       selectedVariant = product.productVariants.firstWhere(
-          (v) => v.value == selectedWeight,
+          (v) => v.weight.toString() == selectedWeight,
           orElse: () => product.productVariants.first);
     }
 
@@ -106,69 +116,81 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
           padding: const EdgeInsets.only(bottom: 100),
           children: [
             // Product Image
-            AspectRatio(
-              aspectRatio: product.isColorable ? 1.5 : 1,
-              child: product.isColorable
-                  ? Consumer(
-                      builder: (context, ref, child) {
-                        final selectedColor = ref.watch(selectedColorProvider);
-                        return Container(
-                          color: selectedColor != null
-                              ? Color(int.parse(
-                                  '0xFF${selectedColor.hex.substring(1)}'))
-                              : Colors.white,
-                          child: PageView.builder(
-                            itemCount: 5,
-                            itemBuilder: (context, index) {
-                              return Image.asset(
-                                'lib/core/assets/images/store/${index + 1}.png',
-                                fit: BoxFit.contain,
-                              );
-                            },
-                          ),
-                        );
-                      },
-                    )
-                  : Image.network(product.imageUrl,
-                      width: double.infinity, fit: BoxFit.cover),
-            ),
-
-            // AR View Button
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Material(
-                  color: const Color(0xFFF8F8F8),
-                  borderRadius: BorderRadius.circular(12),
-                  child: InkWell(
-                    onTap: () {},
+            Stack(
+              children: [
+                AspectRatio(
+                  aspectRatio: product.isColorable ? 1.5 : 1,
+                  child: product.isColorable
+                      ? Consumer(
+                          builder: (context, ref, child) {
+                            final selectedColor =
+                                ref.watch(selectedColorProvider);
+                            return Container(
+                              color: selectedColor != null
+                                  ? Color(int.parse(
+                                      '0xFF${selectedColor.hex.substring(1)}'))
+                                  : Colors.white,
+                              child: PageView.builder(
+                                itemCount: 5,
+                                itemBuilder: (context, index) {
+                                  return Image.asset(
+                                    'lib/core/assets/images/store/${index + 1}.png',
+                                    fit: BoxFit.contain,
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                        )
+                      : Image.network(product.imageUrl,
+                          width: double.infinity, fit: BoxFit.cover),
+                ),
+                Positioned(
+                  left: 12,
+                  bottom: 12,
+                  child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 12),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SvgPicture.asset(
-                            'lib/core/assets/icons/cube.svg',
-                            width: 32,
-                            height: 32,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'store.product.visualize'.tr(),
-                            style: const TextStyle(
-                              fontSize: 15,
-                              color: AppColors.textPrimary,
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.7),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {},
+                            borderRadius: BorderRadius.circular(12),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 12),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SvgPicture.asset(
+                                    'lib/core/assets/icons/cube.svg',
+                                    width: 32,
+                                    height: 32,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'store.product.visualize'.tr(),
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
 
             // Product Info Container with all content
@@ -281,13 +303,14 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                           child: Row(
                             children: product.productVariants.map((variant) {
                               final isSelected =
-                                  selectedWeight == variant.value;
+                                  selectedWeight == variant.weight.toString();
                               return Padding(
                                 padding: const EdgeInsets.only(right: 8),
                                 child: GestureDetector(
                                   onTap: () {
                                     setState(() {
-                                      selectedWeight = variant.value;
+                                      selectedWeight =
+                                          variant.weight.toString();
                                       selectedVariant = variant;
                                     });
                                   },
@@ -306,8 +329,8 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
-                                      'store.weight_value'
-                                          .tr(args: [variant.value]),
+                                      'store.weight_value'.tr(
+                                          args: [variant.weight.toString()]),
                                       style: const TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.normal,
@@ -331,8 +354,8 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                 TextSpan(
                                   children: [
                                     TextSpan(
-                                      text: 'store.product.usage_rate'
-                                          .tr(args: ['150.00']),
+                                      text: 'store.product.usage_rate'.tr(
+                                          args: [product.expense.toString()]),
                                       style: const TextStyle(
                                         color: AppColors.textSecondary,
                                       ),
@@ -350,7 +373,18 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                   children: [
                                     TextSpan(
                                       text: 'store.product.coverage_calculation'
-                                          .tr(args: ['6.67']),
+                                          .tr(args: [
+                                        (selectedWeight != null
+                                                ? ((double.parse(
+                                                            selectedWeight!) *
+                                                        1000) /
+                                                    product.expense)
+                                                : (product.productVariants.first
+                                                        .weight *
+                                                    1000 /
+                                                    product.expense))
+                                            .toStringAsFixed(2)
+                                      ]),
                                       style: const TextStyle(
                                         color: AppColors.textSecondary,
                                       ),
@@ -381,7 +415,8 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                           expense: product.expense,
                                           selectedWeight: selectedWeight ??
                                               product
-                                                  .productVariants.first.value,
+                                                  .productVariants.first.weight
+                                                  .toString(),
                                         ),
                                       ),
                                     ).then((result) {
@@ -389,7 +424,8 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                         setState(() {
                                           if (selectedWeight == null) {
                                             selectedWeight = product
-                                                .productVariants.first.value;
+                                                .productVariants.first.weight
+                                                .toString();
                                             selectedVariant =
                                                 product.productVariants.first;
                                           }
@@ -432,7 +468,18 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                       color: Colors.transparent,
                                       child: InkWell(
                                         onTap: () {
-                                          // TODO: Implement compare functionality
+                                          ref
+                                              .read(compareProductsProvider
+                                                  .notifier)
+                                              .addProduct(product);
+                                          CustomSnackBar.show(
+                                            context,
+                                            message:
+                                                'store.product.added_to_compare'
+                                                    .tr(),
+                                            type: SnackBarType.success,
+                                          );
+                                          context.push('/compare-products');
                                         },
                                         child: Container(
                                           padding: const EdgeInsets.symmetric(

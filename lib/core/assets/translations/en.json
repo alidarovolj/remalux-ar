@@ -106,7 +106,11 @@
         "resend_code_timer": "Resend code in 00:%s",
         "code_sent": "Code sent successfully"
       }
-    }
+    },
+    "required_title": "Authentication Required",
+    "required_description": "Please sign in to add items to your favorites",
+    "login": "Sign In",
+    "register": "Register"
   },
   "store": {
     "catalog": "Catalog",
@@ -134,12 +138,12 @@
     "added_to_cart": "Added {} to cart",
     "product": {
       "visualize": "Visualize",
-      "article": "Article: {article}",
+      "article": "Article: {}",
       "color": "Color",
       "weight": "Weight",
       "weight_unit": "kg",
-      "usage_rate": "Usage rate: {rate} g/m2",
-      "coverage_calculation": "Paint coverage calculation: {area} m2",
+      "usage_rate": "Usage rate: {} m²/l",
+      "coverage_calculation": "Paint coverage calculation: {} m²",
       "paint_calculator": "Paint calculator",
       "compare": "Compare",
       "add_to_favorites": "Add to favorites",
@@ -164,7 +168,8 @@
       "add_to_cart_error": "Error adding to cart: {0}",
       "quantity": "Quantity: {0}",
       "continue_shopping": "Continue shopping",
-      "go_to_cart": "Go to cart"
+      "go_to_cart": "Go to cart",
+      "added_to_compare": "Product added to comparison"
     },
     "paint_calculator": {
       "title": "Paint Calculator",
@@ -174,10 +179,10 @@
       "total_area": "Total area:",
       "required_paint": "Paint required:",
       "packages_count": "Number of packages:",
-      "packages_format": "%1$s pcs of %2$s kg",
-      "add_to_cart_format": "Add %s pcs to cart",
-      "area_format": "%s m²",
-      "paint_format": "%s kg"
+      "packages_format": "{} pcs of {} kg",
+      "add_to_cart_format": "Add {} pcs to cart",
+      "area_format": "{} m²",
+      "paint_format": "{} kg"
     },
     "cart": {
       "auth_required": "You need to be logged in to view your cart",
@@ -198,7 +203,23 @@
         "total": "To Pay",
         "continue": "{count} products • {amount} ₸"
       }
-    }
+    },
+    "compare_products": "Compare Products",
+    "select_product": "Select Product",
+    "article": "Article",
+    "category": "Category",
+    "consumption_rate": "Consumption Rate",
+    "is_colorable": "Colorable Paint",
+    "yes": "Yes",
+    "no": "No",
+    "description": "Description",
+    "rating": "Rating",
+    "coverage": "Coverage",
+    "coating": "Coating",
+    "drying_time": "Drying time",
+    "working_temperature": "Working temperature",
+    "surface_type": "Surface type",
+    "application_area": "Application area"
   },
   "orders": {
     "my_orders": "My Orders",
@@ -227,7 +248,7 @@
     "status": {
       "delivered": "Delivered",
       "processing": "Processing",
-      "cancelled": "Cancelled"
+      "cancel": "Cancelled"
     },
     "order": {
       "from": "Order from {}",

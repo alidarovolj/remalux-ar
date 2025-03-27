@@ -7,6 +7,7 @@ import 'package:remalux_ar/core/theme/colors.dart';
 import 'package:remalux_ar/features/auth/domain/models/user.dart';
 import 'package:remalux_ar/features/auth/domain/providers/auth_provider.dart';
 import 'package:remalux_ar/core/services/storage_service.dart';
+import 'package:remalux_ar/core/api/api_client.dart';
 import 'package:remalux_ar/features/profile/presentation/widgets/profile_skeleton.dart';
 import 'package:remalux_ar/features/profile/presentation/widgets/logout_confirmation_modal.dart';
 import 'package:flutter/services.dart';
@@ -88,6 +89,7 @@ class UserNotifier extends StateNotifier<AsyncValue<User?>> {
   Future<void> logout() async {
     print('👋 Logging out...');
     await StorageService.removeToken();
+    ApiClient().removeAccessToken();
     state = const AsyncValue.data(null);
     print('✅ Logout completed');
   }
@@ -191,21 +193,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         color: AppColors.textPrimary,
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'profile.edit_profile'.tr(),
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: AppColors.primary.withOpacity(0.8),
-                      ),
-                    ),
                   ],
                 ),
-              ),
-              const Icon(
-                Icons.chevron_right,
-                color: AppColors.textSecondary,
-              ),
+              )
             ],
           ),
         ),

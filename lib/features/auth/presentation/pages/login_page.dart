@@ -3,11 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'dart:ui';
 import 'package:remalux_ar/core/theme/colors.dart';
 import 'package:remalux_ar/core/widgets/custom_snack_bar.dart';
 import 'package:remalux_ar/features/auth/domain/models/login_request.dart';
 import 'package:remalux_ar/features/auth/domain/providers/auth_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/rendering.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -107,9 +109,26 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => context.pop(),
+        leading: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.7),
+            borderRadius: BorderRadius.circular(100),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.black),
+              onPressed: () {
+                if (Navigator.of(context).canPop()) {
+                  context.pop();
+                } else {
+                  context.go('/');
+                }
+              },
+            ),
+          ),
         ),
         title: Image.asset(
           'lib/core/assets/images/logos/main.png',
@@ -121,7 +140,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage('lib/core/assets/images/login.jpg'),
-            fit: BoxFit.cover,
+            fit: BoxFit.contain,
+            alignment: Alignment.topCenter,
           ),
         ),
         child: SafeArea(

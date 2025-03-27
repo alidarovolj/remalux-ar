@@ -19,7 +19,7 @@ class IdeasGrid extends ConsumerWidget {
       buttonTitle: 'home.ideas.view_all'.tr(),
       onButtonPressed: () => context.push('/ideas'),
       child: SizedBox(
-        height: 270,
+        height: 290,
         child: ideasAsync.when(
           data: (ideas) {
             if (ideas.isEmpty) {
@@ -30,7 +30,7 @@ class IdeasGrid extends ConsumerWidget {
 
             return ListView.builder(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
               itemCount: ideas.length,
               itemBuilder: (context, index) {
                 final idea = ideas[index];
@@ -46,7 +46,7 @@ class IdeasGrid extends ConsumerWidget {
           },
           loading: () => ListView.builder(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             itemCount: 3,
             itemBuilder: (context, index) => const SizedBox(
               width: 300,

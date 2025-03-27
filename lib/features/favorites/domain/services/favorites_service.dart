@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:remalux_ar/core/services/api_client.dart';
 import 'package:remalux_ar/features/favorites/domain/models/favorite_product.dart';
 import 'package:remalux_ar/features/favorites/domain/models/favorite_color.dart';
-import 'package:remalux_ar/core/providers/auth/auth_state.dart';
+import 'package:remalux_ar/core/services/storage_service.dart';
 
 class FavoritesService {
   final ApiClient _apiClient;
@@ -10,87 +10,130 @@ class FavoritesService {
 
   FavoritesService(this._apiClient, this._ref);
 
-  void _ensureToken() {
-    final authState = _ref.watch(authProvider);
-    if (!authState.isAuthenticated || authState.token == null) {
-      throw Exception('User is not authenticated');
-    }
-    _apiClient.setAccessToken(authState.token!);
-  }
-
   Future<List<FavoriteProduct>> getFavoriteProducts() async {
-    _ensureToken();
-    final response = await _apiClient.get(
-      '/favourite-products',
-      queryParameters: {
-        'include': 'product,product.attributes',
-      },
-    );
+    print('🔄 Fetching favorite products');
+    final token = await StorageService.getToken();
+    if (token == null) {
+      print('⚠️ No token found, returning empty list');
+      return [];
+    }
+    _apiClient.setAccessToken(token);
+    try {
+      final response = await _apiClient.get(
+        '/favourite-products',
+        queryParameters: {
+          'include': 'product,product.attributes',
+        },
+      );
 
-    print('API Response for favorite products:');
-    print('Full response data: ${response.data}');
+      print('✅ Successfully fetched favorite products');
+      print('📊 Response data: ${response.data}');
 
-    return (response.data['data'] as List)
-        .map((json) => FavoriteProduct.fromJson(json))
-        .toList();
+      return (response.data['data'] as List)
+          .map((json) => FavoriteProduct.fromJson(json))
+          .toList();
+    } catch (error) {
+      print('❌ Error fetching favorite products: $error');
+      rethrow;
+    }
   }
 
   Future<List<FavoriteColor>> getFavoriteColors() async {
-    _ensureToken();
-    final response = await _apiClient.get('/favourite-colors');
-    return (response.data['data'] as List)
-        .map((json) => FavoriteColor.fromJson(json))
-        .toList();
+    print('🔄 Fetching favorite colors');
+    final token = await StorageService.getToken();
+    if (token == null) {
+      print('⚠️ No token found, returning empty list');
+      return [];
+    }
+    _apiClient.setAccessToken(token);
+    try {
+      final response = await _apiClient.get('/favourite-colors');
+      print('✅ Successfully fetched favorite colors');
+      return (response.data['data'] as List)
+          .map((json) => FavoriteColor.fromJson(json))
+          .toList();
+    } catch (error) {
+      print('❌ Error fetching favorite colors: $error');
+      rethrow;
+    }
   }
 
   Future<void> addFavoriteProduct(int productId) async {
-    _ensureToken();
+    print('🔄 Adding product to favorites: $productId');
+    final token = await StorageService.getToken();
+    if (token == null) {
+      print('❌ No token found, cannot add to favorites');
+      throw Exception('Необходимо войти в аккаунт');
+    }
+    _apiClient.setAccessToken(token);
     try {
       await _apiClient.post(
         '/favourite-products',
         data: {'product_id': productId},
       );
+      print('✅ Successfully added product to favorites');
     } catch (error) {
-      print('Error adding favorite product: $error');
+      print('❌ Error adding favorite product: $error');
       rethrow;
     }
   }
 
   Future<void> removeFavoriteProduct(int productId) async {
-    _ensureToken();
+    print('🔄 Removing product from favorites: $productId');
+    final token = await StorageService.getToken();
+    if (token == null) {
+      print('❌ No token found, cannot remove from favorites');
+      throw Exception('Необходимо войти в аккаунт');
+    }
+    _apiClient.setAccessToken(token);
     try {
       await _apiClient.delete(
         '/favourite-products',
         queryParameters: {'product_id': productId},
       );
+      print('✅ Successfully removed product from favorites');
     } catch (error) {
-      print('Error removing favorite product: $error');
+      print('❌ Error removing favorite product: $error');
       rethrow;
     }
   }
 
   Future<void> addFavoriteColor(int colorId) async {
-    _ensureToken();
+    print('🔄 Adding color to favorites: $colorId');
+    final token = await StorageService.getToken();
+    if (token == null) {
+      print('❌ No token found, cannot add to favorites');
+      throw Exception('Необходимо войти в аккаунт');
+    }
+    _apiClient.setAccessToken(token);
     try {
       await _apiClient.post(
         '/favourite-colors',
         data: {'color_id': colorId},
       );
+      print('✅ Successfully added color to favorites');
     } catch (error) {
-      print('Error adding favorite color: $error');
+      print('❌ Error adding favorite color: $error');
       rethrow;
     }
   }
 
   Future<void> removeFavoriteColor(int colorId) async {
-    _ensureToken();
+    print('🔄 Removing color from favorites: $colorId');
+    final token = await StorageService.getToken();
+    if (token == null) {
+      print('❌ No token found, cannot remove from favorites');
+      throw Exception('Необходимо войти в аккаунт');
+    }
+    _apiClient.setAccessToken(token);
     try {
       await _apiClient.delete(
         '/favourite-colors',
         queryParameters: {'favourite_color_id': colorId},
       );
+      print('✅ Successfully removed color from favorites');
     } catch (error) {
-      print('Error removing favorite color: $error');
+      print('❌ Error removing favorite color: $error');
       rethrow;
     }
   }

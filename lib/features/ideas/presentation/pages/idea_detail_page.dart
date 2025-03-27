@@ -10,6 +10,9 @@ import 'package:go_router/go_router.dart';
 import 'dart:ui';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:remalux_ar/core/widgets/detailed_color_card.dart';
+import 'package:remalux_ar/features/home/presentation/widgets/color_detail_modal.dart';
+import 'package:remalux_ar/features/home/data/models/detailed_color_model.dart';
 
 class IdeaDetailPage extends ConsumerStatefulWidget {
   final int ideaId;
@@ -134,10 +137,40 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
                               scrollDirection: Axis.horizontal,
                               itemCount: idea.colors!.length,
                               itemBuilder: (context, index) {
-                                final color = idea.colors![index];
-                                return _ColorCard(
-                                  color: color,
-                                  currentLocale: currentLocale,
+                                final colorMap = idea.colors![index];
+                                final color = DetailedColorModel(
+                                  id: colorMap['id'] as int,
+                                  hex: colorMap['hex'] as String,
+                                  title: Map<String, String>.from(
+                                      colorMap['title'] as Map),
+                                  ral: colorMap['ral'] as String,
+                                  catalog: Catalog(
+                                    id: 1, // НОВА 2024
+                                    title: 'NOVA 2024',
+                                    code: 'NOVA_2024',
+                                  ),
+                                  isFavourite:
+                                      colorMap['is_favourite'] as bool? ??
+                                          false,
+                                );
+                                return Container(
+                                  width: 180,
+                                  margin: const EdgeInsets.only(right: 12),
+                                  child: DetailedColorCard(
+                                    color: color,
+                                    onTap: () {
+                                      showModalBottomSheet(
+                                        context: context,
+                                        isScrollControlled: true,
+                                        backgroundColor: Colors.transparent,
+                                        builder: (context) =>
+                                            ColorDetailModal(color: color),
+                                      );
+                                    },
+                                    onFavoritePressed: () {
+                                      // TODO: Implement favorite functionality
+                                    },
+                                  ),
                                 );
                               },
                             ),
@@ -495,11 +528,25 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
 
                 GestureDetector(
                   onTap: () {
-                    // TODO: Implement visualization
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('ideas.visualization_coming_soon'.tr()),
+                    final detailedColor = DetailedColorModel(
+                      id: color['id'] as int,
+                      hex: color['hex'] as String,
+                      title: Map<String, String>.from(color['title'] as Map),
+                      ral: color['ral'] as String,
+                      catalog: Catalog(
+                        id: 1,
+                        title: 'NOVA 2024',
+                        code: 'NOVA_2024',
                       ),
+                      isFavourite: color['is_favourite'] as bool? ?? false,
+                    );
+
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) =>
+                          ColorDetailModal(color: detailedColor),
                     );
                   },
                   child: Container(
@@ -653,108 +700,6 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
             ],
           ),
       ],
-    );
-  }
-
-  Color _parseHexColor(String hexColor) {
-    hexColor = hexColor.toUpperCase().replaceAll('#', '');
-    if (hexColor.length == 6) {
-      hexColor = 'FF$hexColor';
-    }
-    return Color(int.parse(hexColor, radix: 16));
-  }
-}
-
-class _ColorCard extends StatelessWidget {
-  final Map<String, dynamic> color;
-  final String currentLocale;
-
-  const _ColorCard({
-    required this.color,
-    required this.currentLocale,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 180,
-      margin: const EdgeInsets.only(right: 12, bottom: 4),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: const [
-          BoxShadow(
-            color: Color.fromRGBO(59, 77, 139, 0.1),
-            blurRadius: 5,
-            offset: Offset(0, 1),
-            spreadRadius: 1,
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Stack(
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: _parseHexColor(color['hex']),
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(12),
-                      topRight: Radius.circular(12),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: Container(
-                    width: 32,
-                    height: 32,
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Icon(
-                        Icons.favorite_border,
-                        size: 18,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  color['title'][currentLocale] ?? '',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'NOVA 2024 ${color['ral']}',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 

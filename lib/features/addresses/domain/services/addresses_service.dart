@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:remalux_ar/core/api/api_client.dart';
-import 'package:remalux_ar/core/providers/auth/auth_state.dart';
+import 'package:remalux_ar/core/services/storage_service.dart';
 import 'package:remalux_ar/features/addresses/domain/models/address.dart';
 
 final addressesServiceProvider = Provider<AddressesService>((ref) {
@@ -15,16 +15,14 @@ class AddressesService {
 
   AddressesService({required this.dio, required this.ref});
 
-  Future<void> _ensureToken() async {
-    final authState = ref.watch(authProvider);
-    if (!authState.isAuthenticated || authState.token == null) {
-      throw Exception('Unauthorized');
-    }
-    dio.options.headers['Authorization'] = 'Bearer ${authState.token}';
-  }
-
   Future<List<Address>> getAddresses({bool forceRefresh = false}) async {
-    await _ensureToken();
+    print('🔄 Fetching addresses${forceRefresh ? ' (force refresh)' : ''}');
+    final token = await StorageService.getToken();
+    if (token == null) {
+      print('⚠️ No token found, returning empty list');
+      return [];
+    }
+    dio.options.headers['Authorization'] = 'Bearer $token';
 
     try {
       final response = await dio.get(
@@ -39,12 +37,14 @@ class AddressesService {
       );
 
       if (response.statusCode == 200) {
+        print('✅ Successfully fetched addresses');
         final List<dynamic> data = response.data['data'];
         return data.map((json) => Address.fromJson(json)).toList();
       }
+      print('❌ Failed to load addresses: ${response.statusCode}');
       throw Exception('Failed to load addresses');
     } catch (e) {
-      print('Error getting addresses: $e');
+      print('❌ Error getting addresses: $e');
       rethrow;
     }
   }
@@ -57,7 +57,13 @@ class AddressesService {
     String? floor,
     String? apartment,
   }) async {
-    await _ensureToken();
+    print('🔄 Adding new address: $address');
+    final token = await StorageService.getToken();
+    if (token == null) {
+      print('❌ No token found, cannot add address');
+      throw Exception('Необходимо войти в аккаунт');
+    }
+    dio.options.headers['Authorization'] = 'Bearer $token';
 
     try {
       final response = await dio.post(
@@ -76,15 +82,22 @@ class AddressesService {
           },
         ),
       );
+      print('✅ Successfully added new address');
       return Address.fromJson(response.data['data']);
     } catch (e) {
-      print('Error adding address: $e');
+      print('❌ Error adding address: $e');
       rethrow;
     }
   }
 
   Future<void> deleteAddress(int id) async {
-    await _ensureToken();
+    print('🔄 Deleting address with ID: $id');
+    final token = await StorageService.getToken();
+    if (token == null) {
+      print('❌ No token found, cannot delete address');
+      throw Exception('Необходимо войти в аккаунт');
+    }
+    dio.options.headers['Authorization'] = 'Bearer $token';
 
     try {
       await dio.delete(
@@ -95,8 +108,9 @@ class AddressesService {
           },
         ),
       );
+      print('✅ Successfully deleted address');
     } catch (e) {
-      print('Error deleting address: $e');
+      print('❌ Error deleting address: $e');
       rethrow;
     }
   }

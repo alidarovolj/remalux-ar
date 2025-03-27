@@ -82,7 +82,9 @@ class _CategoryItem extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        context.push('/store', extra: {'filter_id': category.id});
+        context.push('/store', extra: {
+          'filters[product.category_id]': category.id.toString(),
+        });
       },
       child: Container(
         decoration: BoxDecoration(

@@ -17,7 +17,7 @@ class ContactsPage extends ConsumerStatefulWidget {
 
 class _ContactsPageState extends ConsumerState<ContactsPage>
     with SingleTickerProviderStateMixin {
-  TabController? _tabController;
+  int _selectedIndex = 0;
 
   String _getAddressText(int count) {
     return 'contacts.address_count'.plural(count, args: [count.toString()]);
@@ -31,23 +31,26 @@ class _ContactsPageState extends ConsumerState<ContactsPage>
     });
   }
 
-  @override
-  void dispose() {
-    _tabController?.dispose();
-    super.dispose();
-  }
-
-  void _initializeTabController(int length) {
-    if (_tabController?.length != length) {
-      _tabController?.dispose();
-      _tabController = TabController(
-        length: length,
-        vsync: this,
-      );
-      _tabController?.addListener(() {
-        if (mounted) setState(() {});
-      });
-    }
+  Widget _buildCityButton(String title, bool isSelected, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          border: isSelected ? Border.all(color: Colors.black, width: 1) : null,
+          color: isSelected ? Colors.white : AppColors.backgroundLight,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(
+          title,
+          style: TextStyle(
+            fontSize: 15,
+            color: Colors.black,
+            fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildSkeleton() {
@@ -308,9 +311,7 @@ class _ContactsPageState extends ConsumerState<ContactsPage>
           final cities = contacts.map((c) => c.city).toSet().toList()
             ..sort((a, b) => a.title.ru.compareTo(b.title.ru));
 
-          _initializeTabController(cities.length);
-
-          final currentCity = cities[_tabController?.index ?? 0];
+          final currentCity = cities[_selectedIndex];
           final currentCityContacts =
               contacts.where((c) => c.city.id == currentCity.id).toList();
 
@@ -328,14 +329,26 @@ class _ContactsPageState extends ConsumerState<ContactsPage>
                   ),
                 ),
               ),
-              TabBar(
-                controller: _tabController!,
-                labelColor: AppColors.primary,
-                unselectedLabelColor: AppColors.textSecondary,
-                indicatorColor: AppColors.primary,
-                isScrollable: true,
-                padding: const EdgeInsets.only(left: 12),
-                tabs: cities.map((city) => Tab(text: city.title.ru)).toList(),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Row(
+                  children: List.generate(
+                    cities.length,
+                    (index) => Padding(
+                      padding: const EdgeInsets.only(right: 12),
+                      child: _buildCityButton(
+                        cities[index].title.ru,
+                        index == _selectedIndex,
+                        () {
+                          setState(() {
+                            _selectedIndex = index;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.only(right: 12, top: 24, left: 12),
@@ -365,14 +378,7 @@ class _ContactsPageState extends ConsumerState<ContactsPage>
                 child: Divider(height: 1),
               ),
               Expanded(
-                child: TabBarView(
-                  controller: _tabController!,
-                  children: cities.map((city) {
-                    final cityContacts =
-                        contacts.where((c) => c.city.id == city.id).toList();
-                    return ContactList(contacts: cityContacts);
-                  }).toList(),
-                ),
+                child: ContactList(contacts: currentCityContacts),
               ),
             ],
           );

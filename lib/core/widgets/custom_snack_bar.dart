@@ -27,13 +27,13 @@ class CustomSnackBar {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
-        action: SnackBarAction(
-          label: 'common.done'.tr(),
-          textColor: Colors.white,
-          onPressed: () {
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-          },
-        ),
+        // action: SnackBarAction(
+        //   label: 'common.done'.tr(),
+        //   textColor: Colors.white,
+        //   onPressed: () {
+        //     ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        //   },
+        // ),
       ),
     );
   }

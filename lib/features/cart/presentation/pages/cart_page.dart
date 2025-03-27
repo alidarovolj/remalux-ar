@@ -210,22 +210,34 @@ class _CartPageState extends ConsumerState<CartPage> {
         error: (error, stackTrace) {
           print('❌ Cart error: $error');
           if (error is DioException && error.response?.statusCode == 401) {
-            return Center(
+            return SafeArea(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    'store.cart.auth_required'.tr(),
-                    style: const TextStyle(
-                      fontSize: 15,
-                      color: AppColors.textPrimary,
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        'store.cart.auth_required'.tr(),
+                        style: const TextStyle(
+                          fontSize: 15,
+                          color: AppColors.textPrimary,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                    textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 16),
-                  CustomButton(
-                    label: 'auth.login'.tr(),
-                    onPressed: () => context.push('/login'),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: 12,
+                      right: 12,
+                      bottom: 16,
+                    ),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: CustomButton(
+                        label: 'auth.login_button'.tr(),
+                        onPressed: () => context.push('/login'),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -529,6 +541,7 @@ class _CartPageState extends ConsumerState<CartPage> {
 
     return Container(
       margin: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         color: Colors.white,
       ),
@@ -660,15 +673,18 @@ class _CartPageState extends ConsumerState<CartPage> {
           ),
           const SizedBox(height: 16),
           // Continue button
-          CustomButton(
-            label: 'store.cart.summary.continue'.tr(namedArgs: {
-              'count': selectedItems.length.toString(),
-              'amount': totalAmount.toStringAsFixed(0),
-            }),
-            isEnabled: selectedItems.isNotEmpty,
-            onPressed: () {
-              context.push('/checkout');
-            },
+          SizedBox(
+            width: double.infinity,
+            child: CustomButton(
+              label: 'store.cart.summary.continue'.tr(namedArgs: {
+                'count': selectedItems.length.toString(),
+                'amount': totalAmount.toStringAsFixed(0),
+              }),
+              isEnabled: selectedItems.isNotEmpty,
+              onPressed: () {
+                context.push('/checkout');
+              },
+            ),
           ),
         ],
       ),

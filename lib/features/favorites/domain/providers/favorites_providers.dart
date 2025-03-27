@@ -25,19 +25,33 @@ class FavoriteProductsNotifier
     extends StateNotifier<AsyncValue<List<FavoriteProduct>>> {
   final FavoritesService _service;
   final Ref _ref;
+  bool _mounted = true;
 
   FavoriteProductsNotifier(this._service, this._ref)
       : super(const AsyncValue.loading()) {
     loadFavoriteProducts();
   }
 
+  @override
+  void dispose() {
+    _mounted = false;
+    super.dispose();
+  }
+
+  void _setState(AsyncValue<List<FavoriteProduct>> newState) {
+    if (_mounted) {
+      state = newState;
+    }
+  }
+
   Future<void> loadFavoriteProducts() async {
     try {
-      state = const AsyncValue.loading();
+      _setState(const AsyncValue.loading());
       final products = await _service.getFavoriteProducts();
-      state = AsyncValue.data(products);
+      _setState(AsyncValue.data(products));
     } catch (error, stackTrace) {
-      state = AsyncValue.error(error, stackTrace);
+      print('❌ Error loading favorite products: $error');
+      _setState(AsyncValue.error(error, stackTrace));
     }
   }
 
@@ -45,15 +59,12 @@ class FavoriteProductsNotifier
       String productName, bool isFavourite) async {
     try {
       await _service.toggleFavoriteProduct(productId, isFavourite);
-      // Показываем снэкбар после успешного переключения
       if (context.mounted) {
         showFavoriteSnackBar(context, !isFavourite, productName);
       }
-      // Принудительно обновляем список после успешного переключения
       await loadFavoriteProducts();
     } catch (error) {
-      print('Error toggling favorite: $error');
-      // В случае ошибки показываем сообщение об ошибке
+      print('❌ Error toggling favorite: $error');
       if (context.mounted) {
         CustomSnackBar.show(
           context,
@@ -61,7 +72,6 @@ class FavoriteProductsNotifier
           type: SnackBarType.error,
         );
       }
-      // Обновляем список в случае ошибки
       await loadFavoriteProducts();
       rethrow;
     }
@@ -71,18 +81,32 @@ class FavoriteProductsNotifier
 class FavoriteColorsNotifier
     extends StateNotifier<AsyncValue<List<FavoriteColor>>> {
   final FavoritesService _service;
+  bool _mounted = true;
 
   FavoriteColorsNotifier(this._service) : super(const AsyncValue.loading()) {
     loadFavoriteColors();
   }
 
+  @override
+  void dispose() {
+    _mounted = false;
+    super.dispose();
+  }
+
+  void _setState(AsyncValue<List<FavoriteColor>> newState) {
+    if (_mounted) {
+      state = newState;
+    }
+  }
+
   Future<void> loadFavoriteColors() async {
     try {
-      state = const AsyncValue.loading();
+      _setState(const AsyncValue.loading());
       final colors = await _service.getFavoriteColors();
-      state = AsyncValue.data(colors);
+      _setState(AsyncValue.data(colors));
     } catch (error, stackTrace) {
-      state = AsyncValue.error(error, stackTrace);
+      print('❌ Error loading favorite colors: $error');
+      _setState(AsyncValue.error(error, stackTrace));
     }
   }
 
@@ -90,14 +114,12 @@ class FavoriteColorsNotifier
       String colorName, bool isFavourite) async {
     try {
       await _service.toggleFavoriteColor(colorId, isFavourite);
-      // Показываем снэкбар после успешного переключения
       if (context.mounted) {
         showFavoriteSnackBar(context, !isFavourite, colorName);
       }
       await loadFavoriteColors();
     } catch (error) {
-      print('Error toggling favorite color: $error');
-      // В случае ошибки показываем сообщение об ошибке
+      print('❌ Error toggling favorite color: $error');
       if (context.mounted) {
         CustomSnackBar.show(
           context,

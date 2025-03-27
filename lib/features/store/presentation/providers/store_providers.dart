@@ -18,19 +18,33 @@ final selectedFiltersProvider =
 });
 
 class SelectedFiltersNotifier extends StateNotifier<Set<int>> {
+  int? _selectedCategory;
+
   SelectedFiltersNotifier() : super({});
 
-  void toggleFilter(int id) {
-    final newState = Set<int>.from(state);
-    if (state.contains(id)) {
-      newState.remove(id);
+  void toggleFilter(int id, {bool isCategory = false}) {
+    if (isCategory) {
+      if (_selectedCategory == id) {
+        _selectedCategory = null;
+      } else {
+        _selectedCategory = id;
+      }
+      state = {...state}; // Trigger update
     } else {
-      newState.add(id);
+      final newState = Set<int>.from(state);
+      if (state.contains(id)) {
+        newState.remove(id);
+      } else {
+        newState.add(id);
+      }
+      state = newState;
     }
-    state = newState;
   }
 
+  int? get selectedCategory => _selectedCategory;
+
   void reset() {
+    _selectedCategory = null;
     state = {};
   }
 }

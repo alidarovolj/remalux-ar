@@ -27,7 +27,20 @@ class _MainTabBarScreenState extends ConsumerState<MainTabBarScreen>
     '/store': 1,
     '/ar': 2,
     '/cart': 3,
+    '/checkout': 3,
     '/profile': 4,
+    '/addresses': 4,
+    '/recipients': 4,
+    '/orders': 4,
+    '/favorites': 4,
+    '/about': 4,
+    '/contacts': 4,
+    '/projects': 4,
+    '/partnership': 4,
+    '/faq': 4,
+    '/colors': 0,
+    '/ideas': 0,
+    '/ideas/': 0,
   };
 
   final Map<int, String> _tabIndexToRoutes = {
@@ -72,11 +85,11 @@ class _MainTabBarScreenState extends ConsumerState<MainTabBarScreen>
       if (index == 4) {
         final authState = ref.read(authProvider);
         if (!authState.isAuthenticated) {
-          context.go('/profile');
+          context.push('/profile');
           return;
         }
       }
-      context.go(route);
+      context.push(route);
     }
   }
 

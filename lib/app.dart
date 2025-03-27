@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
         statusBarBrightness: Brightness.light,
       ),
       child: MaterialApp.router(
-        title: 'Smart Medica',
+        title: 'Remalux',
         theme: appTheme.copyWith(
           scaffoldBackgroundColor: AppColors.white,
           textTheme: GoogleFonts.openSansTextTheme(),

@@ -1,7 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:remalux_ar/features/home/presentation/pages/home_page.dart';
 import 'package:remalux_ar/features/store/presentation/pages/store_page.dart';
 import 'package:remalux_ar/features/store/presentation/pages/product_detail_page.dart';
+import 'package:remalux_ar/features/store/presentation/pages/compare_products_page.dart';
 import 'package:remalux_ar/features/storybook/presentation/pages/storybook.dart';
 import 'package:remalux_ar/core/widgets/main_tabbar_screen.dart';
 import 'package:remalux_ar/features/news/presentation/pages/news_page.dart';
@@ -24,12 +26,16 @@ import 'package:remalux_ar/features/partnership/presentation/pages/partnership_a
 import 'package:remalux_ar/features/about/presentation/pages/about_page.dart';
 import 'package:remalux_ar/features/cart/presentation/pages/cart_page.dart';
 import 'package:remalux_ar/features/checkout/presentation/pages/checkout_page.dart';
-// import 'package:chucker_flutter/chucker_flutter.dart';
+import 'package:chucker_flutter/chucker_flutter.dart';
+
+final _rootNavigatorKey = GlobalKey<NavigatorState>();
+final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
 class AppRouter {
   static final GoRouter router = GoRouter(
+    navigatorKey: _rootNavigatorKey,
     initialLocation: '/',
-    // observers: [ChuckerFlutter.navigatorObserver],
+    observers: [ChuckerFlutter.navigatorObserver],
     // redirect: (context, state) async {
     //   final hasSeenOnboarding = await StorageService.getHasSeenOnboarding();
     //   if (!hasSeenOnboarding && state.uri.path != '/onboarding') {
@@ -38,8 +44,8 @@ class AppRouter {
     //   return null;
     // },
     routes: [
-      // Main app routes (with a tab bar layout)
       ShellRoute(
+        navigatorKey: _shellNavigatorKey,
         builder: (context, state, child) {
           return MainTabBarScreen(
             currentRoute: state.uri.toString(),
@@ -57,8 +63,14 @@ class AppRouter {
             name: 'store',
             builder: (context, state) {
               final extra = state.extra as Map<String, dynamic>?;
-              final initialFilterId = extra?['filter_id'] as int?;
-              return StorePage(initialFilterId: initialFilterId);
+              final categoryId =
+                  extra?['filters[product.category_id]'] as String?;
+              final autoFocus = extra?['autoFocus'] as bool? ?? false;
+              return StorePage(
+                initialCategoryId:
+                    categoryId != null ? int.parse(categoryId) : null,
+                autoFocus: autoFocus,
+              );
             },
           ),
           GoRoute(
@@ -85,29 +97,76 @@ class AppRouter {
             name: 'profile',
             builder: (context, state) => const ProfilePage(),
           ),
+          GoRoute(
+            path: '/addresses',
+            name: 'addresses',
+            builder: (context, state) => const AddressesPage(),
+          ),
+          GoRoute(
+            path: '/recipients',
+            name: 'recipients',
+            builder: (context, state) => const RecipientsPage(),
+          ),
+          GoRoute(
+            path: '/orders',
+            name: 'orders',
+            builder: (context, state) => const OrdersPage(),
+          ),
+          GoRoute(
+            path: '/favorites',
+            name: 'favorites',
+            builder: (context, state) {
+              final extra = state.extra as Map<String, dynamic>?;
+              return FavoritesPage(
+                initialTabIndex: extra?['initialTabIndex'] as int?,
+              );
+            },
+          ),
+          GoRoute(
+            path: '/about',
+            builder: (context, state) => const AboutPage(),
+          ),
+          GoRoute(
+            path: '/contacts',
+            builder: (context, state) => const ContactsPage(),
+          ),
+          GoRoute(
+            path: '/projects',
+            name: 'projects',
+            builder: (context, state) => const ProjectsPage(),
+          ),
+          GoRoute(
+            path: '/partnership',
+            name: 'partnership',
+            builder: (context, state) => const PartnershipPage(),
+          ),
+          GoRoute(
+            path: '/partnership/application',
+            name: 'partnership_application',
+            builder: (context, state) => const PartnershipApplicationPage(),
+          ),
+          GoRoute(
+            path: '/faq',
+            name: 'faq',
+            builder: (context, state) => const FaqPage(),
+          ),
+          GoRoute(
+            path: '/colors',
+            name: 'colors',
+            builder: (context, state) {
+              final extra = state.extra as Map<String, dynamic>?;
+              final mainColorId = extra?['mainColorId'] as int?;
+              return ColorsPage(mainColorId: mainColorId);
+            },
+          ),
+          GoRoute(
+            path: '/ideas/:id',
+            builder: (context, state) {
+              final ideaId = int.parse(state.pathParameters['id']!);
+              return IdeaDetailPage(ideaId: ideaId);
+            },
+          ),
         ],
-      ),
-      // Colors page route
-      GoRoute(
-        path: '/colors',
-        name: 'colors',
-        builder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>?;
-          final mainColorId = extra?['mainColorId'] as int?;
-          return ColorsPage(mainColorId: mainColorId);
-        },
-      ),
-      // Recipients page route
-      GoRoute(
-        path: '/recipients',
-        name: 'recipients',
-        builder: (context, state) => const RecipientsPage(),
-      ),
-      // Addresses page route
-      GoRoute(
-        path: '/addresses',
-        name: 'addresses',
-        builder: (context, state) => const AddressesPage(),
       ),
       // Product detail route
       GoRoute(
@@ -121,6 +180,12 @@ class AppRouter {
             initialWeight: initialWeight,
           );
         },
+      ),
+      // Compare products route
+      GoRoute(
+        path: '/compare-products',
+        name: 'compare_products',
+        builder: (context, state) => const CompareProductsPage(),
       ),
       // News detail route
       GoRoute(
@@ -136,59 +201,9 @@ class AppRouter {
         builder: (context, state) => const StorybookScreen(),
       ),
       GoRoute(
-        path: '/ideas/:id',
-        builder: (context, state) {
-          final ideaId = int.parse(state.pathParameters['id']!);
-          return IdeaDetailPage(ideaId: ideaId);
-        },
-      ),
-      GoRoute(
         path: '/login',
         name: 'login',
         builder: (context, state) => const LoginPage(),
-      ),
-      GoRoute(
-        path: '/orders',
-        name: 'orders',
-        builder: (context, state) => const OrdersPage(),
-      ),
-      GoRoute(
-        path: '/favorites',
-        name: 'favorites',
-        builder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>?;
-          return FavoritesPage(
-            initialTabIndex: extra?['initialTabIndex'] as int?,
-          );
-        },
-      ),
-      GoRoute(
-        path: '/contacts',
-        builder: (context, state) => const ContactsPage(),
-      ),
-      GoRoute(
-        path: '/projects',
-        name: 'projects',
-        builder: (context, state) => const ProjectsPage(),
-      ),
-      GoRoute(
-        path: '/faq',
-        name: 'faq',
-        builder: (context, state) => const FaqPage(),
-      ),
-      GoRoute(
-        path: '/partnership',
-        name: 'partnership',
-        builder: (context, state) => const PartnershipPage(),
-      ),
-      GoRoute(
-        path: '/partnership/application',
-        name: 'partnership_application',
-        builder: (context, state) => const PartnershipApplicationPage(),
-      ),
-      GoRoute(
-        path: '/about',
-        builder: (context, state) => const AboutPage(),
       ),
       GoRoute(
         path: '/registration',

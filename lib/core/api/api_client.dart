@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-// import 'package:chucker_flutter/chucker_flutter.dart';
+import 'package:chucker_flutter/chucker_flutter.dart';
+import 'package:remalux_ar/core/services/storage_service.dart';
 
 class ApiClient {
   // Singleton pattern to ensure a single instance of Dio
@@ -8,6 +9,7 @@ class ApiClient {
   factory ApiClient() => _instance;
 
   late final Dio dio;
+  String? _accessToken;
 
   ApiClient._internal() {
     // Get the base URL from the environment file or use a default value
@@ -30,9 +32,36 @@ class ApiClient {
 
     // Add interceptors
     _addInterceptors();
+
+    // Initialize token from storage
+    _initializeToken();
   }
 
+  Future<void> _initializeToken() async {
+    final token = await StorageService.getToken();
+    if (token != null) {
+      setAccessToken(token);
+    }
+  }
+
+  void setAccessToken(String token) {
+    _accessToken = token;
+    dio.options.headers['Authorization'] = 'Bearer $token';
+    print('🔑 Token set in ApiClient: ${token.substring(0, 10)}...');
+  }
+
+  void removeAccessToken() {
+    _accessToken = null;
+    dio.options.headers.remove('Authorization');
+    print('🔑 Token removed from ApiClient');
+  }
+
+  String? get accessToken => _accessToken;
+
   void _addInterceptors() {
+    // Add Chucker interceptor for network inspection
+    dio.interceptors.add(ChuckerDioInterceptor());
+
     // Interceptor for logging requests, responses, and errors with dividers
     dio.interceptors.add(
       InterceptorsWrapper(
@@ -113,16 +142,23 @@ class ApiClient {
   Future<Map<String, dynamic>?> get(
     String endpoint, {
     Map<String, dynamic>? queryParameters,
+    bool requiresAuth = true,
   }) async {
     try {
+      if (requiresAuth && _accessToken == null) {
+        print('❌ No token available for authenticated request: $endpoint');
+        return null;
+      }
+
       final response = await dio.get(
         endpoint,
         queryParameters: queryParameters,
       );
 
-      // Проверяем статус ответа
+      // Handle unauthorized response
       if (response.statusCode == 401) {
         print('❌ Unauthorized request: $endpoint');
+        removeAccessToken();
         return null;
       }
 
@@ -130,6 +166,12 @@ class ApiClient {
     } on DioException catch (e) {
       print('API Error: ${e.message}');
       print('Response: ${e.response?.data}');
+
+      // Handle unauthorized error
+      if (e.response?.statusCode == 401) {
+        removeAccessToken();
+      }
+
       return null;
     }
   }
@@ -138,17 +180,24 @@ class ApiClient {
     String endpoint, {
     dynamic data,
     Map<String, dynamic>? queryParameters,
+    bool requiresAuth = true,
   }) async {
     try {
+      if (requiresAuth && _accessToken == null) {
+        print('❌ No token available for authenticated request: $endpoint');
+        return null;
+      }
+
       final response = await dio.post(
         endpoint,
         data: data,
         queryParameters: queryParameters,
       );
 
-      // Проверяем статус ответа
+      // Handle unauthorized response
       if (response.statusCode == 401) {
         print('❌ Unauthorized request: $endpoint');
+        removeAccessToken();
         return null;
       }
 
@@ -156,6 +205,12 @@ class ApiClient {
     } on DioException catch (e) {
       print('API Error: ${e.message}');
       print('Response: ${e.response?.data}');
+
+      // Handle unauthorized error
+      if (e.response?.statusCode == 401) {
+        removeAccessToken();
+      }
+
       return null;
     }
   }

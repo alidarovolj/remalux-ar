@@ -100,7 +100,11 @@
         "code_sent": "Код успешно отправлен",
         "code_invalid": "Неверный код подтверждения"
       }
-    }
+    },
+    "required_title": "Требуется авторизация",
+    "required_description": "Для добавления товара в избранное необходимо войти в аккаунт",
+    "login": "Войти",
+    "register": "Зарегистрироваться"
   },
   "store": {
     "catalog": "Каталог",
@@ -132,12 +136,12 @@
     "go_to_cart": "Перейти в корзину",
     "product": {
       "visualize": "Визуализировать",
-      "article": "Артикул: {article}",
+      "article": "Артикул: {}",
       "color": "Цвет",
       "weight": "Вес",
       "weight_unit": "кг",
-      "usage_rate": "Норма расхода: {rate} г/м2",
-      "coverage_calculation": "Расчет площади покрытия краской: {area} м2",
+      "usage_rate": "Норма расхода: {} м²/л",
+      "coverage_calculation": "Расчет площади покрытия краской: {} м²",
       "paint_calculator": "Калькулятор краски",
       "compare": "Сравнить",
       "add_to_favorites": "В избранное",
@@ -158,7 +162,8 @@
       "similar_products": "Похожие товары",
       "add_to_cart": "В корзину",
       "reviews_error": "Ошибка при загрузке отзывов: {error}",
-      "quantity": "Количество: {0}"
+      "quantity": "Количество: {0}",
+      "added_to_compare": "Товар добавлен к сравнению"
     },
     "paint_calculator": {
       "title": "Калькулятор краски",
@@ -168,10 +173,10 @@
       "total_area": "Общая площадь:",
       "required_paint": "Требуется краски:",
       "packages_count": "Количество упаковок:",
-      "packages_format": "%1$s шт по %2$s кг",
-      "add_to_cart_format": "Добавить %s шт в корзину",
-      "area_format": "%s м²",
-      "paint_format": "%s кг"
+      "packages_format": "{} шт по {} кг",
+      "add_to_cart_format": "Добавить {} шт в корзину",
+      "area_format": "{} м²",
+      "paint_format": "{} кг"
     },
     "cart": {
       "auth_required": "Для просмотра корзины необходимо авторизоваться",
@@ -192,7 +197,23 @@
         "total": "К оплате",
         "continue": "{count} товара • {amount} ₸"
       }
-    }
+    },
+    "compare_products": "Сравнение продуктов",
+    "select_product": "Выбрать продукт",
+    "article": "Артикул",
+    "category": "Категория",
+    "consumption_rate": "Норма расхода",
+    "is_colorable": "Красящаяся краска",
+    "yes": "Да",
+    "no": "Нет",
+    "description": "Описание",
+    "rating": "Рейтинг",
+    "coverage": "Кроющаяся",
+    "coating": "Покрытие",
+    "drying_time": "Время высыхания",
+    "working_temperature": "Рабочая температура",
+    "surface_type": "Тип поверхности",
+    "application_area": "Область применения"
   },
   "orders": {
     "my_orders": "Мои заказы",
@@ -215,7 +236,7 @@
     "status": {
       "delivered": "Доставлен",
       "processing": "В обработке",
-      "cancelled": "Отменен"
+      "cancel": "Отменен"
     },
     "positions": {
       "one": "позиция",

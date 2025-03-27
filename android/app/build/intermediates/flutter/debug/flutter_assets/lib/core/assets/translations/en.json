@@ -1,0 +1,725 @@
+{
+  "common": {
+    "search": "Search",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "no_data": "No product data",
+    "no_title": "No title",
+    "error": "Error",
+    "kg": "kg",
+    "currency": "₸",
+    "update_language": "Update language",
+    "empty_states": {
+      "no_products": "No products",
+      "no_ideas": "No ideas",
+      "no_news": "No news",
+      "no_colors": "No colors",
+      "no_categories": "No categories"
+    },
+    "snackbar": {
+      "error": "Error occurred",
+      "success": "Success",
+      "added_to_cart": "Added to cart",
+      "removed_from_cart": "Removed from cart",
+      "added_to_favorites": "Added to favorites",
+      "removed_from_favorites": "Removed from favorites",
+      "try_again": "Please try again"
+    },
+    "tabs": {
+      "home": "Home",
+      "catalog": "Catalog",
+      "ar": "AR",
+      "cart": "Cart",
+      "profile": "Profile"
+    },
+    "confirm": "Confirm"
+  },
+  "auth": {
+    "welcome": "Welcome!",
+    "phone_number": "Phone Number",
+    "phone_hint": "+7 (___) ___ __ __",
+    "password": "Password",
+    "password_hint": "Password",
+    "forgot_password": "Forgot password?",
+    "login_button": "Login",
+    "no_account": "Don't have an account?",
+    "register_link": "Please register",
+    "fill_all_fields": "Please fill in all fields",
+    "login_success": "You have successfully logged in",
+    "password_requirements": "Password requirements",
+    "password_min_length": "Minimum 8 characters",
+    "password_contains_letter": "Must contain letters",
+    "password_contains_number": "Must contain numbers",
+    "password_contains_uppercase": "Must contain uppercase letters",
+    "password_contains_lowercase": "Must contain lowercase letters",
+    "password_contains_special": "Must contain special characters",
+    "password_match": "Passwords must match",
+    "password_reset": "Reset password",
+    "password_reset_sent": "Password reset instructions sent to your email",
+    "password_reset_error": "Error resetting password",
+    "password_reset_success": "Password successfully changed",
+    "registration": {
+      "title": "Registration",
+      "step1": "Step 1: Contact Information",
+      "step2": "Step 2: Verification",
+      "step3": "Step 3: Create Password",
+      "email": "Email",
+      "email_hint": "Enter your email",
+      "phone": "Phone number",
+      "phone_hint": "+7 (___) ___ __ __",
+      "verification_code": "Verification code",
+      "verification_code_hint": "Enter code from SMS",
+      "password": "Password",
+      "password_hint": "Create password",
+      "confirm_password": "Confirm password",
+      "confirm_password_hint": "Repeat password",
+      "terms_agreement": "I agree with the terms and conditions",
+      "next": "Next",
+      "back": "Back",
+      "register": "Register",
+      "success": "Registration successful",
+      "have_account": "Already have an account?",
+      "login": "Login",
+      "validation": {
+        "email_required": "Email is required",
+        "email_invalid": "Invalid email format",
+        "email_taken": "This email is already in use",
+        "email_available": "Email is available",
+        "phone_required": "Phone number is required",
+        "phone_invalid": "Invalid phone number format",
+        "phone_taken": "This phone number is already in use",
+        "phone_available": "Phone number is available",
+        "code_required": "Verification code is required",
+        "code_invalid": "Invalid verification code",
+        "password_required": "Password is required",
+        "password_invalid": "Password does not meet requirements",
+        "passwords_not_match": "Passwords do not match",
+        "terms_required": "You must agree to the terms and conditions",
+        "sms_sent_to": "SMS code was sent to",
+        "with_login_code": "with your login code",
+        "resend_code": "Resend code",
+        "resend_code_timer": "Resend code in 00:%s",
+        "code_sent": "Code sent successfully"
+      }
+    }
+  },
+  "store": {
+    "catalog": "Catalog",
+    "search_products": "Search products",
+    "filters": "Filters",
+    "sorting": "Sorting",
+    "sorting_options": {
+      "price_asc": "Price: Low to High",
+      "price_desc": "Price: High to Low"
+    },
+    "products_count": "{} products found",
+    "no_products_found": "No products found",
+    "try_different_filters": "Try different filters",
+    "categories": {
+      "title": "Categories"
+    },
+    "price": {
+      "title": "Price",
+      "from": "from",
+      "to": "to"
+    },
+    "in_stock": "In stock",
+    "weight_value": "{} kg",
+    "price_value": "{} ₸",
+    "added_to_cart": "Added {} to cart",
+    "product": {
+      "visualize": "Visualize",
+      "article": "Article: {article}",
+      "color": "Color",
+      "weight": "Weight",
+      "weight_unit": "kg",
+      "usage_rate": "Usage rate: {rate} g/m2",
+      "coverage_calculation": "Paint coverage calculation: {area} m2",
+      "paint_calculator": "Paint calculator",
+      "compare": "Compare",
+      "add_to_favorites": "Add to favorites",
+      "about_product": "About product",
+      "product_data": "Product data",
+      "reviews_count": "Reviews ({})",
+      "reviews": {
+        "no_reviews": "No reviews yet",
+        "leave_review": "Leave a review"
+      },
+      "certificates": "Product certificates",
+      "certificate": "Certificate",
+      "open": "Open",
+      "download": "Download",
+      "file_saved": "File saved to: {path}",
+      "file_error": "Error opening file: {error}",
+      "download_error": "Error downloading file: {error}",
+      "similar_products": "Similar products",
+      "add_to_cart": "Add to cart",
+      "reviews_error": "Error loading reviews: {error}",
+      "added_to_cart": "Product added to cart",
+      "add_to_cart_error": "Error adding to cart: {0}",
+      "quantity": "Quantity: {0}",
+      "continue_shopping": "Continue shopping",
+      "go_to_cart": "Go to cart"
+    },
+    "paint_calculator": {
+      "title": "Paint Calculator",
+      "width": "Width, m",
+      "height": "Height, m",
+      "layers": "Layers",
+      "total_area": "Total area:",
+      "required_paint": "Paint required:",
+      "packages_count": "Number of packages:",
+      "packages_format": "%1$s pcs of %2$s kg",
+      "add_to_cart_format": "Add %s pcs to cart",
+      "area_format": "%s m²",
+      "paint_format": "%s kg"
+    },
+    "cart": {
+      "auth_required": "You need to be logged in to view your cart",
+      "empty": "Your cart is empty",
+      "error": "Error loading cart",
+      "total": "Total",
+      "continue": "Continue",
+      "promo": {
+        "placeholder": "Promo code",
+        "apply": "Apply"
+      },
+      "select_all": "Select All",
+      "delete_selected": "Delete Selected",
+      "summary": {
+        "title": "Total",
+        "products": "Products",
+        "discount": "Discount",
+        "total": "To Pay",
+        "continue": "{count} products • {amount} ₸"
+      }
+    }
+  },
+  "orders": {
+    "my_orders": "My Orders",
+    "order_from": "Order from {date}",
+    "order_number": "#{number}",
+    "delivery_courier": "Courier delivery, {date}",
+    "products_worth": "Products worth {amount} ₸",
+    "empty": {
+      "title": "You don't have any orders yet",
+      "description": "Your orders will be displayed here",
+      "to_catalog": "To catalog"
+    },
+    "error": {
+      "title": "Failed to load orders",
+      "try_again": "Try again"
+    },
+    "recommended_products": "Recommended products",
+    "no_products": "No products available",
+    "added_to_cart": "Added {} to cart",
+    "positions": {
+      "one": "item",
+      "few": "items",
+      "many": "items",
+      "other": "items"
+    },
+    "status": {
+      "delivered": "Delivered",
+      "processing": "Processing",
+      "cancelled": "Cancelled"
+    },
+    "order": {
+      "from": "Order from {}",
+      "number": "#{}",
+      "delivery_courier": "Courier delivery, {}",
+      "products_worth": "Products worth {} ₸",
+      "positions": {
+        "one": "item",
+        "few": "items",
+        "many": "items"
+      }
+    }
+  },
+  "profile": {
+    "my_profile": "My profile",
+    "personal_info": "Personal information",
+    "addresses": "Addresses",
+    "orders": "Orders",
+    "favorites": "Favorites",
+    "settings": "Settings",
+    "logout": "Log out",
+    "title": "Profile",
+    "edit_profile": "Edit profile",
+    "phone": "Phone",
+    "email": "Email",
+    "not_specified": "Not specified",
+    "favorite_products": "Favorite products",
+    "favorite_colors": "Favorite colors",
+    "saved_data": "Saved data",
+    "delivery_addresses": "Delivery addresses",
+    "recipients": "Recipients",
+    "about_section": "About us",
+    "about_remalux": "About Remalux",
+    "contacts": "Contacts",
+    "projects": "Projects",
+    "faq": "Frequently asked questions",
+    "app_settings": "App settings",
+    "app_language": "App language",
+    "no_account": "Don't have an account?",
+    "register": "Register",
+    "have_account": "Already have an account?",
+    "login": "Login"
+  },
+  "home": {
+    "try_colors": "Try colors",
+    "try_colors_description": "Choose a shade and visualize\nyour future interior",
+    "visualize": "Visualize",
+    "categories": {
+      "title": "Categories",
+      "view_all": "View all"
+    },
+    "colors": {
+      "title": "Colors",
+      "view_all": "View all",
+      "page_title": "Palettes",
+      "search_placeholder": "Search colors",
+      "all_colors": "All colors",
+      "color_names": {
+        "grey": "Grey",
+        "blue": "Blue",
+        "pink": "Pink",
+        "orange": "Orange",
+        "purple": "Purple",
+        "brown": "Brown",
+        "white": "White",
+        "green": "Green",
+        "yellow": "Yellow"
+      },
+      "color": "Color",
+      "visualize": "Visualize",
+      "select_paint": "Select paint",
+      "color_saved": "Color saved"
+    },
+    "ideas": {
+      "title": "Ideas",
+      "view_all": "View all"
+    },
+    "products": {
+      "title": "Products",
+      "view_all": "View all"
+    },
+    "news": {
+      "title": "News",
+      "view_all": "View all"
+    }
+  },
+  "color_selection": {
+    "select_color": "Select color",
+    "select_another_color": "Select another color"
+  },
+  "ideas": {
+    "title": "Ideas",
+    "used_colors": "Used colors",
+    "color_scheme": "Color scheme",
+    "visualize": "Visualize",
+    "select_paint": "Select paint",
+    "visualization_coming_soon": "Visualization will be available soon",
+    "error": "Error: {}"
+  },
+  "favorites": {
+    "title": "Favorites",
+    "tabs": {
+      "products": "Products",
+      "colors": "Colors"
+    },
+    "empty_products": {
+      "title": "You don't have any favorite products",
+      "description": "Add products to favorites\nto find them quickly",
+      "to_catalog": "To catalog"
+    },
+    "empty_colors": {
+      "title": "You don't have any favorite colors",
+      "description": "Add colors to favorites\nto find them quickly",
+      "to_colors": "To colors"
+    },
+    "error": {
+      "products": {
+        "title": "Failed to load favorite products",
+        "try_again": "Try again"
+      },
+      "colors": {
+        "title": "Failed to load favorite colors",
+        "try_again": "Try again"
+      }
+    },
+    "recommended": {
+      "products": "Recommended products",
+      "colors": "Recommended colors",
+      "no_products": "No products available",
+      "no_colors": "No colors available"
+    }
+  },
+  "addresses": {
+    "title": "Delivery Addresses",
+    "empty": {
+      "title": "You don't have any saved\naddresses yet"
+    },
+    "add": {
+      "button": "Add address",
+      "new": "Add new address",
+      "title": "Add new address",
+      "address_hint": "Enter address",
+      "entrance": "Entrance",
+      "floor": "Floor",
+      "apartment": "Apartment",
+      "save": "Save",
+      "error": {
+        "select_address": "Please select an address on the map",
+        "save_failed": "Failed to save address",
+        "success": "Address successfully added"
+      }
+    },
+    "details": {
+      "entrance": "Entrance {}",
+      "floor": "Floor {}",
+      "apartment": "Apartment {}"
+    },
+    "error": "Error: {}",
+    "delete": {
+      "success": "Address deleted successfully",
+      "error": "Error deleting address"
+    }
+  },
+  "contacts": {
+    "title": "Our branches",
+    "no_contacts": "No contacts available",
+    "address_count": {
+      "one": "1 address",
+      "few": "{} addresses",
+      "many": "{} addresses",
+      "other": "{} addresses"
+    },
+    "error": {
+      "title": "Failed to load contacts",
+      "try_again": "Try again"
+    },
+    "schedule": {
+      "title": "Working hours",
+      "weekdays": {
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat",
+        "sun": "Sun"
+      },
+      "closed": "Closed",
+      "break": "Break: {} - {}"
+    }
+  },
+  "projects": {
+    "title": "Our projects",
+    "no_projects": "No projects",
+    "error": "Error: {}",
+    "details": {
+      "floors": "Floors: {}",
+      "area": "Area: {}",
+      "year": "Year: {}"
+    },
+    "to_products": "To products"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "description": "Still have questions? Don't worry, we're here to help! Read our frequently asked questions.\nIf your question hasn't been addressed, simply leave it, and we'll get back to you as soon as possible.",
+    "question_input": {
+      "label": "Your question",
+      "placeholder": "Write your question",
+      "submit": "Submit question"
+    },
+    "auth_required": {
+      "title": "You need to be logged in to submit a question",
+      "login": "Login"
+    },
+    "success_message": "Your question has been successfully submitted",
+    "error_message": "There was a problem submitting your question",
+    "questions": {
+      "1": {
+        "title": "What is water-based paint?",
+        "answer": "Water-based paint is a paint where water is the main solvent. It forms an emulsion of water and binding agent, making the paint safe and convenient to use."
+      },
+      "2": {
+        "title": "Can water-based paint be used for exterior work?",
+        "answer": "Yes, there is a special water-based paint for exterior work that has increased resistance to rain, snow, and sunlight. You can use facade paint, satin, or textured paint."
+      },
+      "3": {
+        "title": "What are the main advantages of REMALUX paints?",
+        "answer": "They dry quickly, have no odor, are easy to apply, are safe for health and the environment, and do not emit toxic substances."
+      },
+      "4": {
+        "title": "What types of water-based paints are available?",
+        "answer": "Water-based paints are available in acrylic, latex, silicone, and other polymer bases. The choice depends on operating conditions and surface requirements."
+      },
+      "5": {
+        "title": "Which water-based paint should I choose for apartment walls?",
+        "answer": "For interior work, it's better to choose PRO paint, universal paint, or interior paint, as they have good vapor permeability and are easy to clean."
+      },
+      "6": {
+        "title": "Which water-based paints are better for children's rooms?",
+        "answer": "For children's rooms, choose PRO paint, universal paint, satin, or metal and wood paint that don't contain harmful substances and don't have a strong odor."
+      },
+      "7": {
+        "title": "What does 'matte' or 'glossy' surface mean?",
+        "answer": "Matte paint doesn't reflect light, creating a velvety surface that hides imperfections (PRO paint, universal, interior). While glossy gives walls shine (satin, kitchen and bathroom paint, metal and wood paint) requires a perfectly smooth surface as it will show all imperfections."
+      },
+      "8": {
+        "title": "How to properly prepare the surface before applying water-based paint?",
+        "answer": "The surface should be clean, dry, and smooth. If necessary, remove old paint, smooth out cracks and seams, then apply primer. Humidity should not be above 80%, and temperature above +10°C."
+      },
+      "9": {
+        "title": "What is the consumption of water-based paint per 1 m²?",
+        "answer": "Usually consumption is about 100-150 ml per 1 m², depending on the surface type and chosen paint. Per one layer."
+      },
+      "10": {
+        "title": "Can water-based paint be applied in multiple layers?",
+        "answer": "Yes, for even coverage it's recommended to apply two or three layers of paint, letting each layer dry."
+      },
+      "11": {
+        "title": "How long does water-based paint take to dry?",
+        "answer": "Drying time depends on temperature and humidity, but usually paint dries from 2 hours."
+      },
+      "12": {
+        "title": "Which water-based paint is most resistant to dirt?",
+        "answer": "PRO and satin paints, facade paint, and metal and wood paint have good resistance to dirt and can be cleaned from dust and grime."
+      },
+      "13": {
+        "title": "Which paint is better to choose for the bathroom?",
+        "answer": "We have specially developed water-based paint for kitchen and bathroom with antimicrobial properties and semi-gloss finish, resistant to high humidity and mold formation."
+      },
+      "14": {
+        "title": "How to properly wash walls after painting with water-based paint?",
+        "answer": "For washing, use soft sponges and neutral cleaning agents. Harsh chemicals can damage the coating."
+      },
+      "15": {
+        "title": "Which water-based paint to use for wood surfaces?",
+        "answer": "For wood, we have water-based paints for wood and metal that have increased adhesion to wooden surfaces."
+      },
+      "16": {
+        "title": "Why might water-based paint crack?",
+        "answer": "This can be related to non-compliance with paint application technology."
+      },
+      "17": {
+        "title": "Which water-based paint to choose for painting ceilings?",
+        "answer": "Our water-based paints are perfect for painting ceilings as they dry quickly and don't emit odors. We can offer you interior paint or washable paint, or premium segment paint '2x1'."
+      },
+      "18": {
+        "title": "Why is water-based paint better than oil-based paint?",
+        "answer": "Water-based paints are easier to apply, dry faster, don't have a strong odor, and are safer for health than oil-based paints."
+      },
+      "19": {
+        "title": "How to store water-based paint?",
+        "answer": "Store paint in a tightly closed container in a dry and cool place at a temperature from +5°C to +35°C, away from heat sources and direct sunlight."
+      }
+    }
+  },
+  "partnership": {
+    "title": "Partnership",
+    "create_projects": "Create Projects With Us",
+    "welcome_text": "Welcome to the Remalux partnership page. Here you will find information about cooperation opportunities with us and the benefits our partners receive.",
+    "submit_application": "Submit Application",
+    "company_history": "Company History",
+    "history_text": "Over more than 30 years, we have grown from a small production facility to one of the leaders in the paint and coating materials market in Kazakhstan.",
+    "history": {
+      "1990": "Company foundation and start of first paint and coating materials production",
+      "1995": "Product range expansion and entry into regional markets",
+      "2000": "Production modernization and implementation of new technologies",
+      "2010": "Opening of new production lines and distribution network expansion",
+      "2015": "Launch of innovative products and entry into international market",
+      "2023": "Implementation of AR technologies and mobile app launch"
+    },
+    "branches": {
+      "title": "Branches and Representative Offices",
+      "description": "Our company has a wide network of branches and representative offices throughout Kazakhstan, allowing us to be closer to our clients and partners.",
+      "clients": "clients"
+    },
+    "why_choose_us": "Why Choose Us",
+    "why_choose_us_desc": "We offer our partners unique cooperation terms and support at all stages of work.",
+    "advantages": {
+      "high_quality": "High Quality",
+      "high_quality_desc": "Products comply with international quality standards",
+      "competitive_prices": "Competitive Prices",
+      "competitive_prices_desc": "Optimal price-quality ratio",
+      "innovative_tech": "Innovative Technologies",
+      "innovative_tech_desc": "Modern solutions in production",
+      "service": "Service",
+      "service_desc": "Professional partner support",
+      "materials": "Materials",
+      "materials_desc": "Wide selection of materials for any task",
+      "wide_range": "Wide Range",
+      "wide_range_desc": "Constantly updated product catalog"
+    },
+    "statistics": {
+      "title": "Statistics",
+      "years": "years in market",
+      "branches": "branches",
+      "employees": "employees",
+      "projects": "completed projects"
+    },
+    "products": {
+      "varnish": "Varnish",
+      "varnish_types": "+9 types of paint",
+      "putty": "Putty",
+      "putty_types": "6 types of putty",
+      "coating": "Coating",
+      "coating_types": "+7 types of coatings",
+      "enamel": "Enamel",
+      "enamel_types": "+8 types of enamels",
+      "glue": "Glue",
+      "glue_types": "2 types of glue"
+    },
+    "news": {
+      "title": "Stay Up to Date with All News",
+      "description": "Want to be the first to know about new products, promotions, and inspiring projects? Follow us on Instagram! Keep track of updates, find ideas for your projects, and stay informed about all Remalux news. Join our online family and become part of the world of vibrant colors and creative solutions!",
+      "instagram": "@remalux.kz"
+    },
+    "application": {
+      "title": "Fill Out Partnership Application Form",
+      "description": "Want to become a Remalux partner and offer our customers the best paints? Fill out the application, and our manager will contact you to discuss cooperation terms and answer all your questions.",
+      "submit": "Submit Application"
+    },
+    "form": {
+      "title": "Partnership Application Form",
+      "full_name": "Full Name",
+      "bin": "BIN",
+      "phone": "Phone Number",
+      "select_city": "Select City",
+      "agree_with": "I agree with the ",
+      "terms_and_conditions": "terms and conditions",
+      "submit": "Submit Application",
+      "errors": {
+        "required_field": "Required field",
+        "invalid_email": "Invalid email format",
+        "invalid_bin": "BIN must contain 12 digits"
+      }
+    }
+  },
+  "about": {
+    "title": "About Company",
+    "company_name": "K-COLOR LLP with REMALUX trademark",
+    "company_description": "K-COLOR LLP with REMALUX trademark is a leader in the production of paint and varnish materials in the Republic of Kazakhstan. We offer our customers a wide range of high-quality paints made according to British formulations, comparable to the most popular French, Belgian, German, Dutch and Turkish manufacturers.",
+    "advantages": {
+      "quality": {
+        "title": "High Quality",
+        "description": "Our paints undergo strict quality control, ensuring high coverage quality and durability"
+      },
+      "price": {
+        "title": "Competitive Prices",
+        "description": "We optimize prices so you can get professional products at affordable prices"
+      },
+      "technology": {
+        "title": "Innovative Production Technologies",
+        "description": "We use new technologies to ensure our products dry quickly and provide rich color"
+      },
+      "service": {
+        "title": "Professional Service",
+        "description": "Our specialists are always ready to help with product selection and provide technical advice"
+      },
+      "materials": {
+        "title": "Economical Material Consumption",
+        "description": "Our paints have such density that you can reduce consumption and save on painting"
+      },
+      "assortment": {
+        "title": "Wide Product Range",
+        "description": "Our range includes paints for any need - from interior paint to industrial coatings and decorative plasters"
+      }
+    },
+    "for_whom": {
+      "title": "Who are our company's products for?",
+      "description": "The products we manufacture are designed to easily meet the requirements of the most demanding highly qualified professionals for use in prestigious facilities. In addition, it is perfectly suitable for ordinary people who choose materials for home use and independent cosmetic repairs."
+    },
+    "info_section": {
+      "title": "Everything you need for a perfect result",
+      "description": "REMALUX produces high-quality paint and varnish materials with modern technologies and excellent service. All products are safe and comply with European standards.",
+      "items": {
+        "technology": {
+          "title": "Innovative Technologies and Modern Production Methods",
+          "description": "REMALUX paint and varnish materials production is based on modern technologies and world science achievements, allowing us to produce high-quality and safe products at competitive prices."
+        },
+        "service": {
+          "title": "Service Support",
+          "description": "We provide long-term and post-warranty service, training center consultations, and technical support. Our specialists are always ready to serve."
+        },
+        "assortment": {
+          "title": "Wide Product Range",
+          "description": "REMALUX produces paste-like plasters, water-emulsion paints, varnishes, acrylic adhesives, and other materials. We select paint for any task from interior paint to industrial coatings and decorative plasters."
+        },
+        "safety": {
+          "title": "Safety and Comfort of Use",
+          "description": "REMALUX company products are safe to use, odorless, allowing comfortable application of materials. Our paints dry quickly and don't require special application methods."
+        }
+      }
+    },
+    "car_fleet": {
+      "title": "Our Car Fleet: Fast and Reliable Delivery",
+      "description": "We have a modern car fleet that enables prompt and reliable delivery of our products throughout Kazakhstan. Our professional drivers and logistics specialists ensure timely delivery of orders to any point in the country, guaranteeing the safety of products during transportation."
+    },
+    "to_products": "To Products"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "delivery_type": {
+      "title": "Delivery Method",
+      "courier": "Delivery",
+      "pickup": "Pickup"
+    },
+    "delivery_address": {
+      "title": "Delivery Address",
+      "add": "Add Address",
+      "empty": "Please add and select an address for delivery",
+      "entrance": "Entrance {number}",
+      "floor": "Floor {number}",
+      "change": "Change Address",
+      "hint": "Add delivery address"
+    },
+    "delivery_time": {
+      "title": "Delivery Time",
+      "hint": "Choose convenient delivery time",
+      "add": "Add",
+      "change": "Change"
+    },
+    "recipient": {
+      "title": "Recipient Details",
+      "add": "Add Recipient",
+      "empty": "Please add and select a recipient to proceed with the order",
+      "change": "Choose Another Recipient",
+      "hint": "Please add recipient"
+    },
+    "payment": {
+      "title": "Payment",
+      "online": "Online Payment",
+      "cash": "Cash on Delivery",
+      "kaspi": "Kaspi",
+      "halyk": "Halyk"
+    },
+    "comments": {
+      "title": "Order Comments",
+      "placeholder": "Enter your comment"
+    },
+    "promo": {
+      "applied": "Applied",
+      "remove": "Remove"
+    },
+    "error": {
+      "loading": "Error loading data"
+    },
+    "cart": {
+      "title": "Your Cart",
+      "products": "Products",
+      "discount": "Discount",
+      "total": "Total",
+      "button": "{} products • {} ₸"
+    },
+    "terms": "I agree with the return and reclamation terms"
+  }
+}
