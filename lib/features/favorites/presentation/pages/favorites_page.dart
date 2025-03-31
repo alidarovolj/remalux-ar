@@ -18,7 +18,6 @@ import 'package:remalux_ar/features/home/presentation/widgets/color_detail_modal
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:remalux_ar/features/auth/domain/providers/auth_provider.dart';
 import 'package:remalux_ar/core/services/storage_service.dart';
 
 class FavoritesPage extends ConsumerStatefulWidget {
@@ -311,10 +310,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage>
                                   reviewsCount: reviewsCount,
                                   weight: productValue,
                                   onTap: () {
-                                    context.push(
-                                      '/products/${product.id}',
-                                      extra: {'initialWeight': product.value},
-                                    );
+                                    context.push('/products/${product.id}');
                                   },
                                   onFavoritePressed: () async {
                                     try {
@@ -622,10 +618,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage>
                   onTap: () {
                     final productId = (variant.attributes['product']
                         as Map<String, dynamic>)['id'] as int;
-                    context.push(
-                      '/products/$productId',
-                      extra: {'initialWeight': variant.value},
-                    );
+                    context.push('/products/$productId');
                   },
                   child: ProductVariantItem(
                     variant: variant,

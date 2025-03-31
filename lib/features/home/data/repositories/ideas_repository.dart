@@ -8,10 +8,6 @@ class IdeasRepository {
     try {
       final response = await _apiClient.get('/ideas');
 
-      if (response == null) {
-        throw Exception('API response is null');
-      }
-
       final data = response['data'] as List<dynamic>;
 
       final ideas = data.map((json) {

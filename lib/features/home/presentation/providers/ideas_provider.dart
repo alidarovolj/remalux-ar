@@ -13,8 +13,5 @@ final ideasProvider = FutureProvider<List<Idea>>((ref) async {
 final ideaDetailProvider = FutureProvider.family<Idea, int>((ref, id) async {
   final apiClient = ApiClient();
   final response = await apiClient.get('/ideas/$id');
-  if (response == null) {
-    throw Exception('Failed to load idea details');
-  }
   return Idea.fromJson(response);
 });

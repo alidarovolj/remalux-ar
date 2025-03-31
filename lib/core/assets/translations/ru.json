@@ -21,14 +21,33 @@
       "cart": "Корзина",
       "profile": "Профиль"
     },
-    "confirm": "Подтвердить"
+    "confirm": "Подтвердить",
+    "empty_states": {
+      "no_products": "Нет товаров",
+      "no_ideas": "Нет идей",
+      "no_news": "Нет новостей",
+      "no_colors": "Нет цветов",
+      "no_categories": "Нет категорий"
+    },
+    "snackbar": {
+      "error": "Произошла ошибка",
+      "success": "Успешно",
+      "added_to_cart": "Добавлено в корзину",
+      "removed_from_cart": "Удалено из корзины",
+      "added_to_favorites": "Добавлено в избранное",
+      "removed_from_favorites": "Удалено из избранного",
+      "try_again": "Пожалуйста, попробуйте снова"
+    }
   },
   "auth": {
     "login": "Войти",
     "register": "Регистрация",
     "email": "Эл. почта",
     "password": "Пароль",
-    "forgot_password": "Забыли пароль?",
+    "forgot_password": {
+      "title": "Забыли пароль?",
+      "description": "Введите свой номер телефона,\nмы отправим код верификации."
+    },
     "welcome": "Добро пожаловать!",
     "phone_number": "Номер телефона",
     "phone_hint": "+7 (___) ___ __ __",
@@ -104,7 +123,22 @@
     "required_title": "Требуется авторизация",
     "required_description": "Для добавления товара в избранное необходимо войти в аккаунт",
     "login": "Войти",
-    "register": "Зарегистрироваться"
+    "register": "Зарегистрироваться",
+    "verification": {
+      "phone": "Номер телефона",
+      "phone_placeholder": "Номер телефона",
+      "send_code": "Отправить код",
+      "enter_code": "Придумайте новый пароль",
+      "code": "Введите код из SMS",
+      "resend_timer": "Отправить код повторно через {} сек",
+      "resend_code": "Отправить код повторно",
+      "continue": "Продолжить",
+      "back": "Назад",
+      "title": "Код верификации",
+      "code_sent": "Мы отправили код на номер {}",
+      "resend_code_timer": "Отправить новый код {}",
+      "resend_code": "Отправить новый код"
+    }
   },
   "store": {
     "catalog": "Каталог",
@@ -130,8 +164,8 @@
     "weight_value": "{} кг",
     "price_value": "{} ₸",
     "added_to_cart": "Товар добавлен в корзину",
-    "add_to_cart_error": "Ошибка при добавлении в корзину: {0}",
-    "quantity": "Количество: {0}",
+    "add_to_cart_error": "Ошибка при добавлении в корзину: {}",
+    "quantity": "Количество: {}",
     "continue_shopping": "Продолжить покупки",
     "go_to_cart": "Перейти в корзину",
     "product": {
@@ -162,7 +196,7 @@
       "similar_products": "Похожие товары",
       "add_to_cart": "В корзину",
       "reviews_error": "Ошибка при загрузке отзывов: {error}",
-      "quantity": "Количество: {0}",
+      "quantity": "Количество: {}",
       "added_to_compare": "Товар добавлен к сравнению"
     },
     "paint_calculator": {
@@ -180,7 +214,11 @@
     },
     "cart": {
       "auth_required": "Для просмотра корзины необходимо авторизоваться",
-      "empty": "Ваша корзина пуста",
+      "empty": {
+        "title": "Ваша корзина пуста",
+        "description": "Добавьте товары в корзину, чтобы оформить заказ",
+        "to_catalog": "Перейти в каталог"
+      },
       "error": "Ошибка при загрузке корзины",
       "total": "Итого",
       "continue": "Продолжить",
@@ -190,13 +228,18 @@
       },
       "select_all": "Выбрать все",
       "delete_selected": "Удалить выбранные",
+      "delete_selected_message": "Вы уверены, что хотите удалить выбранные товары ({count}) из корзины?",
       "summary": {
         "title": "Итого",
         "products": "Товары",
         "discount": "Скидка",
         "total": "К оплате",
         "continue": "{count} товара • {amount} ₸"
-      }
+      },
+      "delete_item_title": "Удалить товар",
+      "delete_item_message": "Вы уверены, что хотите удалить этот товар из корзины?",
+      "delete_item_cancel": "Отмена",
+      "delete_item_confirm": "Удалить"
     },
     "compare_products": "Сравнение продуктов",
     "select_product": "Выбрать продукт",
@@ -235,8 +278,9 @@
     "added_to_cart": "Добавлено {} в корзину",
     "status": {
       "delivered": "Доставлен",
-      "processing": "В обработке",
-      "cancel": "Отменен"
+      "processing": "Обрабатывается",
+      "cancel": "Отменен",
+      "pending": "В ожидании"
     },
     "positions": {
       "one": "позиция",
@@ -248,7 +292,14 @@
       "from": "Заказ от {}",
       "number": "№{}",
       "delivery_courier": "Доставка курьером, {}",
-      "products_worth": "Товары на {} ₸"
+      "products_worth": "Товары на {} ₸",
+      "no_delivery_date": "Дата доставки не указана",
+      "positions": {
+        "one": "позиция",
+        "few": "позиции",
+        "many": "позиций",
+        "other": "позиций"
+      }
     }
   },
   "profile": {
@@ -697,7 +748,8 @@
       "empty": "Для доставки необходимо добавить и выбрать адрес",
       "entrance": "Подъезд {number}",
       "floor": "Этаж {number}",
-      "hint": "Добавьте адрес доставки"
+      "hint": "Добавьте адрес доставки",
+      "change": "Изменить"
     },
     "delivery_time": {
       "title": "Время доставки",
@@ -737,6 +789,18 @@
       "discount": "Скидка",
       "total": "Итог",
       "button": "{} продукта • {} ₸"
+    },
+    "terms": "Согласен с условиями возврата и рекламации",
+    "validation": {
+      "address_required": "Выберите адрес доставки",
+      "delivery_time_required": "Выберите время доставки",
+      "recipient_required": "Выберите получателя"
+    },
+    "success": {
+      "title": "Заказ оформлен",
+      "message": "Ваш заказ успешно оформлен",
+      "order_number": "Номер заказа: {number}",
+      "continue_shopping": "Продолжить покупки"
     }
   }
 }

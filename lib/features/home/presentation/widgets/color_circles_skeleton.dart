@@ -5,7 +5,7 @@ class ColorCirclesSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: 176,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

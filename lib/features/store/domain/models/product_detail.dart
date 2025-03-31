@@ -272,14 +272,14 @@ class ProductVariant {
       print('✓ value: $value');
 
       print('Parsing discount_price...');
-      final discount_price = json['discount_price'] as num?;
-      print('✓ discount_price: $discount_price');
+      final discountPrice = json['discount_price'] as num?;
+      print('✓ discount_price: $discountPrice');
 
       final variant = ProductVariant(
         id: id,
         price: price.toDouble(),
         value: value,
-        discount_price: discount_price?.toDouble(),
+        discount_price: discountPrice?.toDouble(),
       );
 
       print('✅ Successfully created ProductVariant object');

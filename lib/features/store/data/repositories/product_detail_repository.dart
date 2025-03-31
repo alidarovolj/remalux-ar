@@ -10,11 +10,6 @@ class ProductDetailRepository {
       print('🚀 Fetching product details for ID: $productId');
       final response = await _apiClient.get('/products/$productId');
 
-      if (response == null) {
-        print('❌ API Response is null');
-        throw Exception('Failed to load product details');
-      }
-
       print('📦 Raw API Response: $response');
       final productDetail = ProductDetail.fromJson(response);
       print('✅ Successfully parsed ProductDetail: $productDetail');
@@ -37,10 +32,6 @@ class ProductDetailRepository {
         },
       );
 
-      if (response == null) {
-        throw Exception('Failed to load similar products');
-      }
-
       final List<dynamic> data = response['data'];
       return data.map((item) => ProductDetail.fromJson(item)).toList();
     } catch (e) {
@@ -59,10 +50,6 @@ class ProductDetailRepository {
         },
       );
 
-      if (response == null) {
-        throw Exception('Failed to load related products');
-      }
-
       final List<dynamic> data = response['data'];
       return data.map((item) => ProductDetail.fromJson(item)).toList();
     } catch (e) {
@@ -80,10 +67,6 @@ class ProductDetailRepository {
           'perPage': perPage.toString(),
         },
       );
-
-      if (response == null) {
-        throw Exception('Failed to load product reviews');
-      }
 
       return ReviewsResponse.fromJson(response);
     } catch (e) {

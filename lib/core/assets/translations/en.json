@@ -110,7 +110,19 @@
     "required_title": "Authentication Required",
     "required_description": "Please sign in to add items to your favorites",
     "login": "Sign In",
-    "register": "Register"
+    "register": "Register",
+    "verification": {
+      "add_phone": "Let's add a password!",
+      "phone": "Phone number",
+      "phone_placeholder": "Phone number",
+      "send_code": "Send code",
+      "enter_code": "Create a new password",
+      "code": "Enter SMS code",
+      "resend_timer": "Resend code in {} sec",
+      "resend_code": "Resend code",
+      "continue": "Continue",
+      "back": "Back"
+    }
   },
   "store": {
     "catalog": "Catalog",
@@ -165,8 +177,8 @@
       "add_to_cart": "Add to cart",
       "reviews_error": "Error loading reviews: {error}",
       "added_to_cart": "Product added to cart",
-      "add_to_cart_error": "Error adding to cart: {0}",
-      "quantity": "Quantity: {0}",
+      "add_to_cart_error": "Error adding to cart: {}",
+      "quantity": "Quantity: {}",
       "continue_shopping": "Continue shopping",
       "go_to_cart": "Go to cart",
       "added_to_compare": "Product added to comparison"
@@ -186,7 +198,11 @@
     },
     "cart": {
       "auth_required": "You need to be logged in to view your cart",
-      "empty": "Your cart is empty",
+      "empty": {
+        "title": "Your cart is empty",
+        "description": "Add items to cart to place an order",
+        "to_catalog": "Go to catalog"
+      },
       "error": "Error loading cart",
       "total": "Total",
       "continue": "Continue",
@@ -196,13 +212,18 @@
       },
       "select_all": "Select All",
       "delete_selected": "Delete Selected",
+      "delete_selected_message": "Are you sure you want to remove {count} selected items from your cart?",
       "summary": {
         "title": "Total",
         "products": "Products",
         "discount": "Discount",
         "total": "To Pay",
         "continue": "{count} products • {amount} ₸"
-      }
+      },
+      "delete_item_title": "Delete Item",
+      "delete_item_message": "Are you sure you want to remove this item from your cart?",
+      "delete_item_cancel": "Cancel",
+      "delete_item_confirm": "Delete"
     },
     "compare_products": "Compare Products",
     "select_product": "Select Product",
@@ -248,13 +269,15 @@
     "status": {
       "delivered": "Delivered",
       "processing": "Processing",
-      "cancel": "Cancelled"
+      "cancel": "Cancelled",
+      "pending": "Pending"
     },
     "order": {
       "from": "Order from {}",
       "number": "#{}",
       "delivery_courier": "Courier delivery, {}",
       "products_worth": "Products worth {} ₸",
+      "no_delivery_date": "Delivery date not specified",
       "positions": {
         "one": "item",
         "few": "items",
@@ -700,7 +723,7 @@
       "empty": "Please add and select an address for delivery",
       "entrance": "Entrance {number}",
       "floor": "Floor {number}",
-      "change": "Change Address",
+      "change": "Change",
       "hint": "Add delivery address"
     },
     "delivery_time": {
@@ -741,6 +764,17 @@
       "total": "Total",
       "button": "{} products • {} ₸"
     },
-    "terms": "I agree with the return and reclamation terms"
+    "terms": "I agree to the return and claim terms",
+    "validation": {
+      "address_required": "Please select a delivery address",
+      "delivery_time_required": "Please select a delivery time",
+      "recipient_required": "Please select a recipient"
+    },
+    "success": {
+      "title": "Order Placed",
+      "message": "Your order has been successfully placed",
+      "order_number": "Order number: {number}",
+      "continue_shopping": "Continue shopping"
+    }
   }
 }

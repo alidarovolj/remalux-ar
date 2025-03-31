@@ -49,7 +49,7 @@ class AddressSelectionModal extends ConsumerWidget {
               child: Text(
                 'checkout.delivery_address.empty'.tr(),
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   color: AppColors.textSecondary,
                 ),
@@ -108,7 +108,7 @@ class AddressSelectionModal extends ConsumerWidget {
                                   'checkout.delivery_address.entrance'.tr(
                                     namedArgs: {'number': address.entrance!},
                                   ),
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 12,
                                     color: AppColors.textSecondary,
                                   ),
@@ -118,7 +118,7 @@ class AddressSelectionModal extends ConsumerWidget {
                                   'checkout.delivery_address.floor'.tr(
                                     namedArgs: {'number': address.floor!},
                                   ),
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 12,
                                     color: AppColors.textSecondary,
                                   ),
@@ -127,7 +127,7 @@ class AddressSelectionModal extends ConsumerWidget {
                           ),
                         ),
                         if (isSelected)
-                          Icon(
+                          const Icon(
                             Icons.check_circle,
                             color: AppColors.primary,
                             size: 24,
@@ -155,7 +155,7 @@ class AddressSelectionModal extends ConsumerWidget {
               ),
               child: Text(
                 'checkout.delivery_address.add'.tr(),
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   color: AppColors.textPrimary,
                 ),

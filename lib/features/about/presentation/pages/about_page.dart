@@ -12,7 +12,7 @@ class AboutPage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Container(
         width: double.infinity,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Colors.white,
         ),
         child: Column(

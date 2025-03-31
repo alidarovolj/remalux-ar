@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:remalux_ar/core/services/api_service.dart';
 
 class PartnershipRepository {

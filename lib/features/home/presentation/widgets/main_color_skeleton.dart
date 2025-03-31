@@ -13,40 +13,35 @@ class MainColorSkeleton extends StatelessWidget {
         children: [
           const SizedBox(width: 16),
           ...List.generate(
-            5,
-            (index) => Padding(
-              padding: const EdgeInsets.only(right: 12),
-              child: Column(
-                children: [
-                  Shimmer.fromColors(
-                    baseColor: Colors.grey[300]!,
-                    highlightColor: Colors.grey[100]!,
-                    child: Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
+              6,
+              (index) => Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Column(
+                        children: [
+                          Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            width: 60,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Shimmer.fromColors(
-                    baseColor: Colors.grey[300]!,
-                    highlightColor: Colors.grey[100]!,
-                    child: Container(
-                      width: 60,
-                      height: 12,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+                  )),
         ],
       ),
     );

@@ -7,11 +7,25 @@ import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:easy_localization/easy_localization.dart';
 
-class ProductsGrid extends ConsumerWidget {
+class ProductsGrid extends ConsumerStatefulWidget {
   const ProductsGrid({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ProductsGrid> createState() => _ProductsGridState();
+}
+
+class _ProductsGridState extends ConsumerState<ProductsGrid> {
+  @override
+  void initState() {
+    super.initState();
+    // Force refresh products data after the first frame is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(productsProvider.notifier).loadProducts(forceRefresh: true);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final productsAsync = ref.watch(productsProvider);
 
     return SectionWidget(

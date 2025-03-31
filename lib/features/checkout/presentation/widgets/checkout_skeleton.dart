@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:remalux_ar/core/styles/constants.dart';
 
 class CheckoutSkeleton extends StatelessWidget {
   const CheckoutSkeleton({super.key});

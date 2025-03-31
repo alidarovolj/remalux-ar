@@ -30,9 +30,10 @@ class CartNotifier extends StateNotifier<AsyncValue<List<CartItem>>> {
 
       if (!_mounted) return;
 
-      final List<CartItem> items = (response.data['data'] as List)
-          .map((item) => CartItem.fromJson(item))
-          .toList();
+      final data = response.data['data'];
+      final List<CartItem> items = data != null
+          ? (data as List).map((item) => CartItem.fromJson(item)).toList()
+          : [];
       _setState(AsyncValue.data(items));
     } catch (error, stackTrace) {
       if (!_mounted) return;
@@ -52,7 +53,7 @@ class CartNotifier extends StateNotifier<AsyncValue<List<CartItem>>> {
     try {
       // Оптимистично обновляем UI
       state.whenData((items) {
-        final updatedItems = items?.map((item) {
+        final updatedItems = items.map((item) {
           if (item.id == itemId) {
             return CartItem(
               id: item.id,

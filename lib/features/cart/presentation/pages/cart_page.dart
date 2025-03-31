@@ -9,7 +9,9 @@ import 'package:remalux_ar/core/widgets/custom_button.dart';
 import 'package:remalux_ar/features/cart/domain/providers/cart_provider.dart';
 import 'package:remalux_ar/features/cart/domain/models/cart_item.dart';
 import 'package:remalux_ar/features/cart/presentation/widgets/delete_confirmation_dialog.dart';
+import 'package:remalux_ar/features/cart/presentation/widgets/delete_confirmation_modal.dart';
 import 'package:remalux_ar/features/cart/presentation/widgets/cart_skeleton.dart';
+import 'package:remalux_ar/core/providers/auth/auth_state.dart';
 
 class CartPage extends ConsumerStatefulWidget {
   const CartPage({super.key});
@@ -30,11 +32,17 @@ class _CartPageState extends ConsumerState<CartPage> {
       setState(() {
         currentLocale = context.locale.languageCode;
       });
-      ref.read(cartProvider.notifier).getCart().then((_) {
-        print('✅ Initial cart refresh completed');
-      }).catchError((error) {
-        print('❌ Initial cart refresh failed: $error');
-      });
+
+      // Всегда делаем запрос при инициализации
+      _refreshCart();
+    });
+  }
+
+  void _refreshCart() {
+    ref.read(cartProvider.notifier).getCart().then((_) {
+      print('✅ Cart refresh completed');
+    }).catchError((error) {
+      print('❌ Cart refresh failed: $error');
     });
   }
 
@@ -59,12 +67,15 @@ class _CartPageState extends ConsumerState<CartPage> {
   }
 
   void deleteSelectedItems() {
-    showDialog(
+    showModalBottomSheet(
       context: context,
-      builder: (context) => DeleteConfirmationDialog(
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => DeleteConfirmationModal(
         title: 'store.cart.delete_selected_title'.tr(),
-        message: 'store.cart.delete_selected_message'
-            .tr(args: [selectedItems.length.toString()]),
+        message: 'store.cart.delete_selected_message'.tr(namedArgs: {
+          'count': selectedItems.length.toString(),
+        }),
         onConfirm: () {
           for (final itemId in selectedItems) {
             ref.read(cartProvider.notifier).removeItem(itemId);
@@ -119,7 +130,7 @@ class _CartPageState extends ConsumerState<CartPage> {
                 const SizedBox(width: 8),
                 Text(
                   'store.cart.select_all'.tr(),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 14,
                     color: AppColors.textPrimary,
                     fontWeight: FontWeight.w500,
@@ -139,7 +150,7 @@ class _CartPageState extends ConsumerState<CartPage> {
               ),
               child: Text(
                 'store.cart.delete_selected'.tr(),
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
                   color: AppColors.links,
@@ -174,13 +185,43 @@ class _CartPageState extends ConsumerState<CartPage> {
       ),
       body: cartAsync.when(
         data: (items) {
-          if (items == null || items.isEmpty) {
-            return Center(
-              child: Text(
-                'store.cart.empty'.tr(),
-                style: const TextStyle(
-                  fontSize: 15,
-                  color: AppColors.textPrimary,
+          if (items.isEmpty) {
+            return SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Column(
+                  children: [
+                    const Spacer(),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'store.cart.empty.title'.tr(),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'store.cart.empty.description'.tr(),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: AppColors.textSecondary,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                    CustomButton(
+                      label: 'store.cart.empty.to_catalog'.tr(),
+                      onPressed: () => context.push('/store'),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
                 ),
               ),
             );
@@ -215,13 +256,18 @@ class _CartPageState extends ConsumerState<CartPage> {
                 children: [
                   Expanded(
                     child: Center(
-                      child: Text(
-                        'store.cart.auth_required'.tr(),
-                        style: const TextStyle(
-                          fontSize: 15,
-                          color: AppColors.textPrimary,
-                        ),
-                        textAlign: TextAlign.center,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'store.cart.auth_required'.tr(),
+                            style: const TextStyle(
+                              fontSize: 15,
+                              color: AppColors.textPrimary,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -447,9 +493,11 @@ class _CartPageState extends ConsumerState<CartPage> {
                       child: IconButton(
                         icon: const Icon(Icons.delete_outline),
                         onPressed: () {
-                          showDialog(
+                          showModalBottomSheet(
                             context: context,
-                            builder: (context) => DeleteConfirmationDialog(
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) => DeleteConfirmationModal(
                               title: 'store.cart.delete_item_title'.tr(),
                               message: 'store.cart.delete_item_message'.tr(),
                               onConfirm: () {
@@ -528,7 +576,7 @@ class _CartPageState extends ConsumerState<CartPage> {
     final cartAsync = ref.watch(cartProvider);
     final totalAmount = cartAsync.whenOrNull(
           data: (items) => items
-              ?.where((item) => selectedItems.contains(item.id))
+              .where((item) => selectedItems.contains(item.id))
               .fold<double>(
                 0,
                 (sum, item) =>
@@ -541,8 +589,8 @@ class _CartPageState extends ConsumerState<CartPage> {
 
     return Container(
       margin: const EdgeInsets.only(top: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.symmetric(horizontal: 0),
+      decoration: const BoxDecoration(
         color: Colors.white,
       ),
       child: Column(
@@ -562,7 +610,7 @@ class _CartPageState extends ConsumerState<CartPage> {
                   child: TextField(
                     decoration: InputDecoration(
                       hintText: 'store.cart.promo.placeholder'.tr(),
-                      hintStyle: TextStyle(
+                      hintStyle: const TextStyle(
                         fontSize: 15,
                         color: AppColors.textSecondary,
                       ),
@@ -601,7 +649,7 @@ class _CartPageState extends ConsumerState<CartPage> {
             children: [
               Text(
                 'store.cart.summary.title'.tr(),
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
@@ -613,14 +661,14 @@ class _CartPageState extends ConsumerState<CartPage> {
                 children: [
                   Text(
                     'store.cart.summary.products'.tr(),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 14,
                       color: AppColors.textPrimary,
                     ),
                   ),
                   Text(
                     '${totalAmount.toStringAsFixed(0)} ₸',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 14,
                       color: AppColors.textPrimary,
                     ),
@@ -633,12 +681,12 @@ class _CartPageState extends ConsumerState<CartPage> {
                 children: [
                   Text(
                     'store.cart.summary.discount'.tr(),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 14,
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  Text(
+                  const Text(
                     '0 ₸',
                     style: TextStyle(
                       fontSize: 14,
@@ -653,7 +701,7 @@ class _CartPageState extends ConsumerState<CartPage> {
                 children: [
                   Text(
                     'store.cart.summary.total'.tr(),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
@@ -661,7 +709,7 @@ class _CartPageState extends ConsumerState<CartPage> {
                   ),
                   Text(
                     '${totalAmount.toStringAsFixed(0)} ₸',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,

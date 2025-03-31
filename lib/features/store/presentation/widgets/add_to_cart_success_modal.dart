@@ -58,9 +58,8 @@ class AddToCartSuccessModal extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'store.product.quantity'
-                          .tr(namedArgs: {'0': quantity.toString()}),
-                      style: TextStyle(
+                      'store.product.quantity'.tr(args: [quantity.toString()]),
+                      style: const TextStyle(
                         fontSize: 14,
                         color: AppColors.textSecondary,
                       ),
@@ -84,7 +83,7 @@ class AddToCartSuccessModal extends StatelessWidget {
               Expanded(
                 child: CustomButton(
                   onPressed: () => context.pop(),
-                  label: 'store.product.continue_shopping'.tr(),
+                  label: 'store.continue_shopping'.tr(),
                   variant: ButtonVariant.secondary,
                 ),
               ),
@@ -95,7 +94,7 @@ class AddToCartSuccessModal extends StatelessWidget {
                     context.pop();
                     context.push('/cart');
                   },
-                  label: 'store.product.go_to_cart'.tr(),
+                  label: 'store.go_to_cart'.tr(),
                   variant: ButtonVariant.primary,
                 ),
               ),

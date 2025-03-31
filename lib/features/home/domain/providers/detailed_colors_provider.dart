@@ -6,7 +6,13 @@ final currentPageProvider = StateProvider<int>((ref) => 1);
 final searchQueryProvider = StateProvider<String>((ref) => '');
 
 final detailedColorsProvider = StateNotifierProvider<DetailedColorsNotifier,
-    AsyncValue<List<DetailedColorModel>>>((ref) => DetailedColorsNotifier(ref));
+    AsyncValue<List<DetailedColorModel>>>((ref) {
+  // Create a new instance each time
+  final notifier = DetailedColorsNotifier(ref);
+  // Dispose the old instance if it exists
+  ref.onDispose(() => notifier.dispose());
+  return notifier;
+});
 
 class DetailedColorsNotifier
     extends StateNotifier<AsyncValue<List<DetailedColorModel>>> {
@@ -16,16 +22,28 @@ class DetailedColorsNotifier
   Map<String, dynamic>? _currentParams;
 
   DetailedColorsNotifier(this.ref) : super(const AsyncValue.loading()) {
-    loadColors();
+    // Don't load colors automatically
   }
 
   Future<void> loadColors({
     bool isLoadMore = false,
     Map<String, dynamic>? additionalParams,
+    bool forceRefresh = false,
   }) async {
     if (_isLoading || (!_hasMore && isLoadMore)) return;
 
     _isLoading = true;
+
+    // Reset all state if force refresh is requested
+    if (forceRefresh) {
+      ref.read(currentPageProvider.notifier).state = 1;
+      ref.read(searchQueryProvider.notifier).state = '';
+      _hasMore = true;
+      _currentParams = additionalParams;
+    } else if (additionalParams != null) {
+      _currentParams = additionalParams;
+    }
+
     final currentPage = ref.read(currentPageProvider);
     final searchQuery = ref.read(searchQueryProvider);
 
@@ -41,11 +59,6 @@ class DetailedColorsNotifier
         queryParams['searchKeyword'] = searchQuery;
       }
 
-      // Update current params
-      if (additionalParams != null) {
-        _currentParams = Map.from(additionalParams);
-      }
-
       // Add current params to query
       if (_currentParams != null) {
         queryParams.addAll(_currentParams!);
@@ -53,10 +66,6 @@ class DetailedColorsNotifier
 
       final response =
           await apiClient.get('/colors', queryParameters: queryParams);
-
-      if (response == null) {
-        throw Exception('Failed to load colors');
-      }
 
       final List<dynamic> colorsJson = response['data'] as List<dynamic>;
       final newColors =
@@ -84,13 +93,17 @@ class DetailedColorsNotifier
     }
   }
 
-  void resetAndSearch(String query) {
+  void resetAndSearch(String query, {Map<String, dynamic>? additionalParams}) {
     ref.read(currentPageProvider.notifier).state = 1;
     ref.read(searchQueryProvider.notifier).state = query;
     _hasMore = true;
-    if (query.isEmpty) {
+
+    if (query.isEmpty && additionalParams == null) {
       _currentParams = null;
+    } else if (additionalParams != null) {
+      _currentParams = additionalParams;
     }
+
     loadColors();
   }
 

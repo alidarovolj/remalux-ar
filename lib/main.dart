@@ -1,27 +1,66 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'core/api/firebase_setup.dart';
-// import 'core/utils/notification_utils.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:remalux_ar/core/providers/auth/auth_state.dart' as auth_state;
-// import 'package:remalux_ar/features/auth/presentation/pages/auth_check_page.dart';
 import 'package:remalux_ar/core/services/analytics_service.dart';
 import 'package:remalux_ar/core/router/app_router.dart';
 import 'package:remalux_ar/core/services/api_client.dart';
-// import 'package:yandex_mapkit/yandex_mapkit.dart';
-// import 'package:yandex_search/yandex_search.dart';
-// import 'package:chucker_flutter/chucker_flutter.dart';
+import 'package:remalux_ar/core/providers/shared_preferences_provider.dart';
+import 'package:remalux_ar/features/store/domain/providers/product_storage_service.dart';
+import 'package:remalux_ar/features/store/presentation/providers/compare_products_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
+import 'firebase_options.dart';
+import 'package:remalux_ar/core/api/firebase_setup.dart';
 
 void main() async {
   try {
     await dotenv.load();
     WidgetsFlutterBinding.ensureInitialized();
     await EasyLocalization.ensureInitialized();
+
+    // Initialize Firebase
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+
+    // Initialize Firebase setup and request permissions
+    await initializeFirebase();
+    await requestNotificationPermissions();
+
+    // Get FCM token with APNS handling
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      // Request APNS token first
+      final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+      print('APNS Token: $apnsToken');
+
+      // Wait for APNS token to be set
+      if (apnsToken == null) {
+        print('Waiting for APNS token...');
+        await Future.delayed(const Duration(seconds: 1));
+      }
+    }
+
+    // Get FCM token
+    final fcmToken = await FirebaseMessaging.instance.getToken();
+    print('FCM Token: $fcmToken');
+
+    // Listen for token refresh
+    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
+      print('FCM Token refreshed: $newToken');
+      // TODO: Send this token to your server
+    });
+
+    print('Initializing SharedPreferences...');
+    final prefs = await SharedPreferences.getInstance();
+    print('SharedPreferences initialized successfully with instance: $prefs');
 
     // Initialize Amplitude
     final amplitudeApiKey = dotenv.env['AMPLITUDE_API_KEY'];
@@ -31,11 +70,6 @@ void main() async {
 
     await initializeDateFormatting('ru', null);
     final router = AppRouter.router;
-
-    // Initialize Yandex MapKit
-    // await YandexMapKit.init(
-    //   apiKey: dotenv.env['YANDEX_MAPKIT_API_KEY'] ?? '',
-    // );
 
     runApp(
       EasyLocalization(
@@ -48,6 +82,12 @@ void main() async {
         fallbackLocale: const Locale('en'),
         useOnlyLangCode: true,
         child: ProviderScope(
+          overrides: [
+            sharedPreferencesProvider.overrideWithValue(prefs),
+            productStorageServiceProvider.overrideWithValue(
+              ProductStorageService(prefs),
+            ),
+          ],
           child: Consumer(
             builder: (context, ref, child) {
               try {

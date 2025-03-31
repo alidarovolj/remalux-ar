@@ -9,7 +9,6 @@ import 'package:remalux_ar/core/widgets/custom_snack_bar.dart';
 import 'package:remalux_ar/features/auth/domain/models/login_request.dart';
 import 'package:remalux_ar/features/auth/domain/providers/auth_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/rendering.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -263,7 +262,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                   alignment: Alignment.centerRight,
                                   child: TextButton(
                                     onPressed: () {
-                                      // TODO: Implement forgot password
+                                      context.push('/phone-verification');
                                     },
                                     style: TextButton.styleFrom(
                                       foregroundColor: AppColors.primary,
@@ -274,7 +273,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                           MaterialTapTargetSize.shrinkWrap,
                                     ),
                                     child: Text(
-                                      'auth.forgot_password'.tr(),
+                                      'auth.forgot_password.title'.tr(),
                                       style: const TextStyle(
                                         fontSize: 13,
                                         fontWeight: FontWeight.w500,

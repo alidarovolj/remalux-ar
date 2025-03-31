@@ -4,9 +4,18 @@ import 'package:go_router/go_router.dart';
 import 'package:remalux_ar/core/theme/colors.dart';
 import 'package:remalux_ar/features/home/domain/providers/selected_color_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:remalux_ar/features/store/domain/providers/product_color_selection_provider.dart';
+import 'package:remalux_ar/features/store/domain/models/product_detail.dart';
 
 class ColorSelection extends ConsumerWidget {
-  const ColorSelection({super.key});
+  final ProductDetail product;
+  final String? initialWeight;
+
+  const ColorSelection({
+    super.key,
+    required this.product,
+    this.initialWeight,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -83,8 +92,34 @@ class ColorSelection extends ConsumerWidget {
             color: AppColors.backgroundSecondary,
             borderRadius: BorderRadius.circular(12),
             child: InkWell(
-              onTap: () {
-                context.push('/colors');
+              onTap: () async {
+                try {
+                  print('\n\n=== COLOR SELECTION DEBUG ===');
+                  print('Button tapped');
+                  print('Product ID: ${product.id}');
+
+                  await ref
+                      .read(productColorSelectionProvider.notifier)
+                      .setProduct(product, initialWeight: initialWeight);
+                  print('Product set successfully');
+
+                  if (context.mounted) {
+                    print('Context is mounted, attempting navigation...');
+                    print(
+                        'Navigating to /colors with productId: ${product.id}');
+                    context.push('/colors', extra: {
+                      'productId': product.id,
+                      'fromProductDetail': true,
+                    });
+                    print('Navigation completed');
+                  } else {
+                    print('Context is not mounted');
+                  }
+                  print('===========================\n\n');
+                } catch (e) {
+                  print('Error navigating to colors page: $e');
+                  print('Stack trace: ${StackTrace.current}');
+                }
               },
               child: Container(
                 width: double.infinity,
@@ -119,8 +154,33 @@ class ColorSelection extends ConsumerWidget {
       color: const Color(0xFFF8F8F8),
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
-        onTap: () {
-          context.push('/colors');
+        onTap: () async {
+          try {
+            print('\n\n=== COLOR SELECTION DEBUG ===');
+            print('Button tapped');
+            print('Product ID: ${product.id}');
+
+            await ref
+                .read(productColorSelectionProvider.notifier)
+                .setProduct(product, initialWeight: initialWeight);
+            print('Product set successfully');
+
+            if (context.mounted) {
+              print('Context is mounted, attempting navigation...');
+              print('Navigating to /colors with productId: ${product.id}');
+              context.push('/colors', extra: {
+                'productId': product.id,
+                'fromProductDetail': true,
+              });
+              print('Navigation completed');
+            } else {
+              print('Context is not mounted');
+            }
+            print('===========================\n\n');
+          } catch (e) {
+            print('Error navigating to colors page: $e');
+            print('Stack trace: ${StackTrace.current}');
+          }
         },
         child: Container(
           width: double.infinity,

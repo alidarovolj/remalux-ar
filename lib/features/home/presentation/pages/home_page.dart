@@ -9,8 +9,6 @@ import 'package:remalux_ar/features/home/presentation/widgets/products_grid.dart
 import 'package:remalux_ar/features/home/presentation/widgets/news_grid.dart';
 import 'package:remalux_ar/features/home/presentation/widgets/ideas_grid.dart';
 import 'package:remalux_ar/features/home/presentation/widgets/colors_grid.dart';
-import 'package:remalux_ar/features/home/presentation/widgets/color_circles_skeleton.dart';
-import 'package:remalux_ar/core/widgets/detailed_color_card.dart';
 import 'package:remalux_ar/features/home/presentation/widgets/color_detail_modal.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:remalux_ar/features/home/domain/providers/detailed_colors_provider.dart';
@@ -169,9 +167,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                                     children: [
                                       Container(
                                         height: 50,
-                                        decoration: BoxDecoration(
+                                        decoration: const BoxDecoration(
                                           color: Colors.white,
-                                          borderRadius: const BorderRadius.only(
+                                          borderRadius: BorderRadius.only(
                                             topLeft: Radius.circular(16),
                                             topRight: Radius.circular(16),
                                           ),

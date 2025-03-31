@@ -12,7 +12,6 @@ import 'package:remalux_ar/features/profile/presentation/widgets/profile_skeleto
 import 'package:remalux_ar/features/profile/presentation/widgets/logout_confirmation_modal.dart';
 import 'package:flutter/services.dart';
 import 'package:remalux_ar/core/widgets/custom_app_bar.dart';
-import 'package:remalux_ar/features/profile/presentation/widgets/profile_menu_item.dart';
 import 'package:remalux_ar/features/profile/presentation/widgets/language_selection_modal.dart';
 import 'package:easy_localization/easy_localization.dart';
 
@@ -622,7 +621,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           context,
           icon: 'lib/core/assets/icons/profile/language.svg',
           title: 'profile.app_language'.tr(),
-          subtitle: context.locale.languageCode == 'kk'
+          subtitle: context.locale.languageCode == 'kz'
               ? 'Қазақша'
               : context.locale.languageCode == 'ru'
                   ? 'Русский'

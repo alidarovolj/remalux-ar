@@ -139,15 +139,15 @@ class ApiClient {
     print("------------------------------------");
   }
 
-  Future<Map<String, dynamic>?> get(
+  Future<Map<String, dynamic>> get(
     String endpoint, {
     Map<String, dynamic>? queryParameters,
     bool requiresAuth = true,
   }) async {
     try {
-      if (requiresAuth && _accessToken == null) {
-        print('❌ No token available for authenticated request: $endpoint');
-        return null;
+      // Remove auth header if no token
+      if (_accessToken == null) {
+        dio.options.headers.remove('Authorization');
       }
 
       final response = await dio.get(
@@ -159,7 +159,15 @@ class ApiClient {
       if (response.statusCode == 401) {
         print('❌ Unauthorized request: $endpoint');
         removeAccessToken();
-        return null;
+        return {
+          'data': [],
+          'meta': {
+            'current_page': 1,
+            'last_page': 1,
+            'total': 0,
+            'per_page': 10,
+          }
+        };
       }
 
       return response.data as Map<String, dynamic>;
@@ -172,20 +180,28 @@ class ApiClient {
         removeAccessToken();
       }
 
-      return null;
+      return {
+        'data': [],
+        'meta': {
+          'current_page': 1,
+          'last_page': 1,
+          'total': 0,
+          'per_page': 10,
+        }
+      };
     }
   }
 
-  Future<Map<String, dynamic>?> post(
+  Future<Map<String, dynamic>> post(
     String endpoint, {
     dynamic data,
     Map<String, dynamic>? queryParameters,
     bool requiresAuth = true,
   }) async {
     try {
-      if (requiresAuth && _accessToken == null) {
-        print('❌ No token available for authenticated request: $endpoint');
-        return null;
+      // Remove auth header if no token
+      if (_accessToken == null) {
+        dio.options.headers.remove('Authorization');
       }
 
       final response = await dio.post(
@@ -198,7 +214,15 @@ class ApiClient {
       if (response.statusCode == 401) {
         print('❌ Unauthorized request: $endpoint');
         removeAccessToken();
-        return null;
+        return {
+          'data': [],
+          'meta': {
+            'current_page': 1,
+            'last_page': 1,
+            'total': 0,
+            'per_page': 10,
+          }
+        };
       }
 
       return response.data as Map<String, dynamic>;
@@ -211,7 +235,15 @@ class ApiClient {
         removeAccessToken();
       }
 
-      return null;
+      return {
+        'data': [],
+        'meta': {
+          'current_page': 1,
+          'last_page': 1,
+          'total': 0,
+          'per_page': 10,
+        }
+      };
     }
   }
 }

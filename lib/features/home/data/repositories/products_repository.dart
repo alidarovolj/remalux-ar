@@ -16,10 +16,6 @@ class ProductsRepository {
         },
       );
 
-      if (response == null) {
-        throw Exception('API response is null');
-      }
-
       final List<dynamic> data = response['data'];
       return data
           .map((json) => Product.fromJson(json as Map<String, dynamic>))

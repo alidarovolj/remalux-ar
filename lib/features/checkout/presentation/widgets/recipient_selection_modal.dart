@@ -49,7 +49,7 @@ class RecipientSelectionModal extends ConsumerWidget {
               child: Text(
                 'checkout.recipient.empty'.tr(),
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   color: AppColors.textSecondary,
                 ),
@@ -103,7 +103,7 @@ class RecipientSelectionModal extends ConsumerWidget {
                               const SizedBox(height: 4),
                               Text(
                                 recipient.phoneNumber,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 12,
                                   color: AppColors.textSecondary,
                                 ),
@@ -112,7 +112,7 @@ class RecipientSelectionModal extends ConsumerWidget {
                           ),
                         ),
                         if (isSelected)
-                          Icon(
+                          const Icon(
                             Icons.check_circle,
                             color: AppColors.primary,
                             size: 24,
@@ -140,7 +140,7 @@ class RecipientSelectionModal extends ConsumerWidget {
               ),
               child: Text(
                 'checkout.recipient.add'.tr(),
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   color: AppColors.textPrimary,
                 ),

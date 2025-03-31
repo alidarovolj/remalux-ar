@@ -78,7 +78,7 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
     final ideaAsync = ref.watch(ideaDetailProvider(widget.ideaId));
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.backgroundLight,
       body: ideaAsync.when(
         data: (idea) {
           return Stack(
@@ -594,98 +594,190 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
     final colorsToShow =
         colors != null && colors.isNotEmpty ? colors : defaultColors;
 
-    // Используем цвет из color_title.hex с прозрачностью 60%
-    final backgroundColor =
-        idea?.colorTitle != null && idea!.colorTitle!['hex'] != null
-            ? _parseHexColor(idea.colorTitle!['hex']).withOpacity(0.4)
-            : (colorsToShow.isNotEmpty
-                ? _parseHexColor(colorsToShow[0]['hex']).withOpacity(0.4)
-                : const Color(0xFFF5B199).withOpacity(0.4));
+    String _getImageNameFromTitle(Map<String, dynamic>? colorTitle) {
+      if (colorTitle == null) {
+        print('DEBUG: colorTitle is null, using default grey.png');
+        return 'grey.png';
+      }
+
+      final ruTitle = colorTitle['ru']?.toLowerCase() ?? '';
+      print('DEBUG: colorTitle ru value: "$ruTitle"');
+
+      String imageName;
+      switch (ruTitle) {
+        case 'серый':
+          imageName = 'grey.png';
+          break;
+        case 'синий':
+          imageName = 'Blue.png';
+          break;
+        case 'розовый':
+          imageName = 'Pink.png';
+          break;
+        case 'оранжевый':
+          imageName = 'Yellow.png';
+          break;
+        case 'фиолетовый':
+          imageName = 'Purple.png';
+          break;
+        case 'коричневый':
+          imageName = 'Brown.png';
+          break;
+        case 'белый':
+          imageName = 'aqua.png';
+          break;
+        case 'зеленый':
+          imageName = 'Green.png';
+          break;
+        case 'желтый':
+          imageName = 'Yellow.png';
+          break;
+        default:
+          imageName = 'grey.png';
+          break;
+      }
+
+      print('DEBUG: Selected image: $imageName for color: $ruTitle');
+      return imageName;
+    }
+
+    // Давайте также проверим сам объект idea и его colorTitle
+    print('DEBUG: Full idea.colorTitle: ${idea?.colorTitle}');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Блок с градиентом и блюром
         Container(
-          margin: const EdgeInsets.only(bottom: 16),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: backgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.5),
-                    width: 1,
+          margin: const EdgeInsets.symmetric(vertical: 80),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              // Background color palettes
+              Positioned(
+                left: -50,
+                top: -50,
+                child: Container(
+                  width: 150,
+                  height: 150,
+                  color: Colors.white,
+                  child: Image.asset(
+                    'lib/core/assets/images/colors/${_getImageNameFromTitle(idea?.colorTitle)}',
+                    fit: BoxFit.cover,
+                    opacity: const AlwaysStoppedAnimation(1.0),
                   ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Заголовок
-                    Text(
-                      '${'ideas.color_scheme'.tr()}:',
-                      style: GoogleFonts.ysabeau(
-                        fontSize: 19,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Название цвета (title)
-                    if (content['title'] != null &&
-                        content['title'][currentLocale] != null)
-                      Text(
-                        '(${content['title'][currentLocale]})',
-                        style: const TextStyle(
-                          fontSize: 15,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-
-                    const SizedBox(height: 20),
-
-                    // Цветовые круги
-                    Row(
-                      children: [
-                        for (final color in colorsToShow)
-                          Padding(
-                            padding: const EdgeInsets.only(right: 16),
-                            child: Container(
-                              width: 48,
-                              height: 48,
-                              decoration: BoxDecoration(
-                                color: _parseHexColor(color['hex']),
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.15),
-                                    blurRadius: 6,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ],
+              ),
+              // Right center palette
+              Positioned(
+                right: -50,
+                top: 0,
+                child: Container(
+                  width: 125,
+                  height: 125,
+                  color: Colors.white,
+                  child: Image.asset(
+                    'lib/core/assets/images/colors/${_getImageNameFromTitle(idea?.colorTitle)}',
+                    fit: BoxFit.cover,
+                    opacity: const AlwaysStoppedAnimation(1.0),
+                  ),
                 ),
               ),
-            ),
+              // Bottom right palette
+              Positioned(
+                right: -50,
+                bottom: 0,
+                child: Container(
+                  width: 150,
+                  height: 150,
+                  color: Colors.white,
+                  child: Image.asset(
+                    'lib/core/assets/images/colors/${_getImageNameFromTitle(idea?.colorTitle)}',
+                    fit: BoxFit.cover,
+                    opacity: const AlwaysStoppedAnimation(1.0),
+                  ),
+                ),
+              ),
+              // Main content container with gradient and blur
+              Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment(-0.87, -0.5),
+                    end: Alignment(0.87, 0.5),
+                    colors: [
+                      Color.fromRGBO(255, 255, 255, 0.75),
+                      Color.fromRGBO(255, 255, 255, 0.5),
+                    ],
+                  ),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.5),
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Цветовая схема:',
+                            style: GoogleFonts.ysabeau(
+                              fontSize: 19,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+
+                          // Описание цвета
+                          if (texts != null && texts.isNotEmpty)
+                            Text(
+                              texts[0][currentLocale] ?? '',
+                              style: const TextStyle(
+                                fontSize: 15,
+                                color: Color.fromRGBO(38, 53, 79, 1),
+                              ),
+                            ),
+
+                          const SizedBox(height: 12),
+
+                          // Цветовые круги
+                          Row(
+                            children: [
+                              for (final color in colorsToShow)
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 12),
+                                  child: Container(
+                                    width: 32,
+                                    height: 32,
+                                    decoration: BoxDecoration(
+                                      color: _parseHexColor(color['hex']),
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
 
-        // Тексты после блока
-        if (texts != null && texts.isNotEmpty)
+        // Дополнительные тексты после блока
+        if (texts != null && texts.length > 1)
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              for (final textItem in texts)
+              for (final textItem in texts.skip(1))
                 if (textItem[currentLocale] != null)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 12),

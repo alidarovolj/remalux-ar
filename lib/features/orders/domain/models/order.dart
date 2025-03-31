@@ -6,7 +6,7 @@ class Order {
   final String totalAmount;
   final List<OrderItem> orderItems;
   final String? comments;
-  final String deliveryDate;
+  final String? deliveryDate;
   final OrderStatus status;
   final String createdAt;
   final bool isPaid;
@@ -19,7 +19,7 @@ class Order {
     required this.totalAmount,
     required this.orderItems,
     this.comments,
-    required this.deliveryDate,
+    this.deliveryDate,
     required this.status,
     required this.createdAt,
     required this.isPaid,
@@ -37,17 +37,30 @@ class Order {
     }
 
     return Order(
-      id: json['id'],
-      totalAmount: json['total_amount'],
+      id: json['id'] ?? 0,
+      totalAmount: json['total_amount'] ?? '0',
       orderItems: items,
       comments: json['comments'],
       deliveryDate: json['delivery_date'],
-      status: OrderStatus.fromJson(json['status']),
-      createdAt: json['created_at'],
-      isPaid: json['is_paid'],
-      userAddress: UserAddress.fromJson(json['user_address']),
-      paymentMethod: PaymentMethod.fromJson(json['payment_method']),
-      manager: Manager.fromJson(json['manager']),
+      status: json['status'] != null
+          ? OrderStatus.fromJson(json['status'])
+          : OrderStatus(code: 'processing', title: 'В обработке'),
+      createdAt: json['created_at'] ?? DateTime.now().toIso8601String(),
+      isPaid: json['is_paid'] ?? false,
+      userAddress: json['user_address'] != null
+          ? UserAddress.fromJson(json['user_address'])
+          : UserAddress(
+              id: 0,
+              address: '',
+              city: City(title: '', titleKz: '', titleEn: ''),
+              country: Country(title: '', titleKz: '', titleEn: ''),
+            ),
+      paymentMethod: json['payment_method'] != null
+          ? PaymentMethod.fromJson(json['payment_method'])
+          : PaymentMethod(id: 0, title: '', titleKz: '', titleEn: ''),
+      manager: json['manager'] != null
+          ? Manager.fromJson(json['manager'])
+          : Manager(id: 0, name: ''),
     );
   }
 
@@ -57,8 +70,10 @@ class Order {
     return formatter.format(dateTime);
   }
 
-  String get formattedDeliveryDate {
-    final dateTime = DateTime.parse(deliveryDate);
+  String? get formattedDeliveryDate {
+    if (deliveryDate == null) return null;
+
+    final dateTime = DateTime.parse(deliveryDate!);
     final formatter = DateFormat('dd.MM.yyyy');
     return formatter.format(dateTime);
   }

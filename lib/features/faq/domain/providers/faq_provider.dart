@@ -10,7 +10,7 @@ final questionsProvider =
   final dio = Dio(BaseOptions(
     baseUrl: dotenv.env['BASE_URL'] ?? 'https://api.remalux.kz',
   ));
-  return QuestionsNotifier(ApiClient(dio));
+  return QuestionsNotifier(ApiClient());
 });
 
 class QuestionsNotifier extends StateNotifier<AsyncValue<List<Faq>>> {

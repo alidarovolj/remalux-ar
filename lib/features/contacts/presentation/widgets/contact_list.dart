@@ -60,7 +60,7 @@ class ContactList extends StatelessWidget {
                             onTap: () =>
                                 launchUrl(Uri.parse('tel:${item.mainPhone}')),
                             child: Text(
-                              item.mainPhone!,
+                              item.mainPhone,
                               style: const TextStyle(
                                 fontSize: 15,
                                 color: AppColors.textPrimary,
@@ -96,7 +96,7 @@ class ContactList extends StatelessWidget {
                               onTap: () => launchUrl(
                                   Uri.parse('mailto:${item.mainEmail}')),
                               child: Text(
-                                item.mainEmail!,
+                                item.mainEmail,
                                 style: const TextStyle(
                                   fontSize: 15,
                                   color: AppColors.textPrimary,
@@ -109,60 +109,45 @@ class ContactList extends StatelessWidget {
                     ),
 
                     // Map and Work schedule in a row
-                    if (item.longitude != null)
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Work schedule
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'contacts.schedule.title'.tr(),
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.textPrimary,
-                                  ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Work schedule
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'contacts.schedule.title'.tr(),
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textPrimary,
                                 ),
-                                const SizedBox(height: 8),
-                                // Work days
-                                ...[
-                                  'contacts.schedule.weekdays.mon'.tr(),
-                                  'contacts.schedule.weekdays.tue'.tr(),
-                                  'contacts.schedule.weekdays.wed'.tr(),
-                                  'contacts.schedule.weekdays.thu'.tr(),
-                                  'contacts.schedule.weekdays.fri'.tr(),
-                                  'contacts.schedule.weekdays.sat'.tr(),
-                                  'contacts.schedule.weekdays.sun'.tr(),
-                                ].asMap().entries.map(
-                                  (entry) {
-                                    final workTime = item.workTime[entry.key];
-                                    final isWorkDay =
-                                        workTime.startTime != null;
+                              ),
+                              const SizedBox(height: 8),
+                              // Work days
+                              ...[
+                                'contacts.schedule.weekdays.mon'.tr(),
+                                'contacts.schedule.weekdays.tue'.tr(),
+                                'contacts.schedule.weekdays.wed'.tr(),
+                                'contacts.schedule.weekdays.thu'.tr(),
+                                'contacts.schedule.weekdays.fri'.tr(),
+                                'contacts.schedule.weekdays.sat'.tr(),
+                                'contacts.schedule.weekdays.sun'.tr(),
+                              ].asMap().entries.map(
+                                (entry) {
+                                  final workTime = item.workTime[entry.key];
+                                  final isWorkDay = workTime.startTime != null;
 
-                                    return Padding(
-                                      padding: const EdgeInsets.only(bottom: 4),
-                                      child: Row(
-                                        children: [
-                                          SizedBox(
-                                            width: 32,
-                                            child: Text(
-                                              entry.value,
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                color: isWorkDay
-                                                    ? AppColors.textPrimary
-                                                    : AppColors.textSecondary,
-                                              ),
-                                            ),
-                                          ),
-                                          Text(
-                                            isWorkDay
-                                                ? '${workTime.startTime} - ${workTime.endTime}'
-                                                : 'contacts.schedule.closed'
-                                                    .tr(),
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 4),
+                                    child: Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 32,
+                                          child: Text(
+                                            entry.value,
                                             style: TextStyle(
                                               fontSize: 15,
                                               color: isWorkDay
@@ -170,49 +155,61 @@ class ContactList extends StatelessWidget {
                                                   : AppColors.textSecondary,
                                             ),
                                           ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                ),
-                                // Break time
-                                if (item.breakTime.startTime != null) ...[
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'contacts.schedule.break'.tr(args: [
-                                      item.breakTime.startTime!,
-                                      item.breakTime.endTime!
-                                    ]),
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                      color: AppColors.textSecondary,
+                                        ),
+                                        Text(
+                                          isWorkDay
+                                              ? '${workTime.startTime} - ${workTime.endTime}'
+                                              : 'contacts.schedule.closed'.tr(),
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            color: isWorkDay
+                                                ? AppColors.textPrimary
+                                                : AppColors.textSecondary,
+                                          ),
+                                        ),
+                                      ],
                                     ),
+                                  );
+                                },
+                              ),
+                              // Break time
+                              if (item.breakTime.startTime != null) ...[
+                                const SizedBox(height: 8),
+                                Text(
+                                  'contacts.schedule.break'.tr(args: [
+                                    item.breakTime.startTime!,
+                                    item.breakTime.endTime!
+                                  ]),
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    color: AppColors.textSecondary,
                                   ),
-                                ],
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 14),
-                          // Map
-                          Expanded(
-                            child: Container(
-                              height: 200,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: AppColors.backgroundLight,
-                                  width: 1,
                                 ),
-                              ),
-                              clipBehavior: Clip.antiAlias,
-                              child: YandexMapView(
-                                latitude: double.parse(item.latitude),
-                                longitude: double.parse(item.longitude),
+                              ],
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        // Map
+                        Expanded(
+                          child: Container(
+                            height: 200,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: AppColors.backgroundLight,
+                                width: 1,
                               ),
                             ),
+                            clipBehavior: Clip.antiAlias,
+                            child: YandexMapView(
+                              latitude: double.parse(item.latitude),
+                              longitude: double.parse(item.longitude),
+                            ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
+                    ),
 
                     // Additional contacts
                     if (item.contactItems.phone.isNotEmpty) ...[

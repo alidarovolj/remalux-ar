@@ -25,6 +25,7 @@ class _MainTabBarScreenState extends ConsumerState<MainTabBarScreen>
   final Map<String, int> _routesToTabIndex = {
     '/': 0,
     '/store': 1,
+    '/products/': 1,
     '/ar': 2,
     '/cart': 3,
     '/checkout': 3,
@@ -73,7 +74,12 @@ class _MainTabBarScreenState extends ConsumerState<MainTabBarScreen>
   }
 
   void _updateTabIndex() {
-    final index = _routesToTabIndex[widget.currentRoute] ?? 0;
+    int index;
+    if (widget.currentRoute.startsWith('/products/')) {
+      index = 1; // Store tab
+    } else {
+      index = _routesToTabIndex[widget.currentRoute] ?? 0;
+    }
     if (_tabController.index != index) {
       _tabController.index = index;
     }

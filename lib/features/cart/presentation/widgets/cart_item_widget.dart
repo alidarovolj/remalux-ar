@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:remalux_ar/core/styles/theme.dart';
 import 'package:remalux_ar/features/cart/domain/models/cart_item.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';

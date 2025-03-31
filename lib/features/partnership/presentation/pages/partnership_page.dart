@@ -11,7 +11,7 @@ class PartnershipPage extends StatelessWidget {
   const PartnershipPage({super.key});
 
   Future<void> _launchInstagram() async {
-    final username = 'remalux.kz';
+    const username = 'remalux.kz';
     final uri = Uri.parse('instagram://user?username=$username');
     final webUri = Uri.parse('https://www.instagram.com/$username');
 

@@ -42,10 +42,6 @@ class ProductsRepository {
         queryParameters: params,
       );
 
-      if (response == null) {
-        return ProductsResponse(data: [], meta: Meta(total: 0));
-      }
-
       final List<dynamic> data = response['data'];
       final List<ProductVariant> variants = [];
 

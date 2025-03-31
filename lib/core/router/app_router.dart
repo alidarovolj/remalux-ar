@@ -27,6 +27,7 @@ import 'package:remalux_ar/features/about/presentation/pages/about_page.dart';
 import 'package:remalux_ar/features/cart/presentation/pages/cart_page.dart';
 import 'package:remalux_ar/features/checkout/presentation/pages/checkout_page.dart';
 import 'package:chucker_flutter/chucker_flutter.dart';
+import 'package:remalux_ar/features/auth/presentation/pages/phone_verification_page.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -44,6 +45,28 @@ class AppRouter {
     //   return null;
     // },
     routes: [
+      // Colors route moved outside ShellRoute
+      GoRoute(
+        path: '/colors',
+        name: 'colors',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final productId = extra?['productId'] as int?;
+          final fromProductDetail =
+              extra?['fromProductDetail'] as bool? ?? false;
+
+          // Get mainColorId from query parameters
+          final mainColorIdStr = state.uri.queryParameters['mainColorId'];
+          final mainColorId =
+              mainColorIdStr != null ? int.parse(mainColorIdStr) : null;
+
+          return ColorsPage(
+            mainColorId: mainColorId,
+            productId: productId,
+            fromProductDetail: fromProductDetail,
+          );
+        },
+      ),
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
         builder: (context, state, child) {
@@ -151,35 +174,26 @@ class AppRouter {
             builder: (context, state) => const FaqPage(),
           ),
           GoRoute(
-            path: '/colors',
-            name: 'colors',
-            builder: (context, state) {
-              final extra = state.extra as Map<String, dynamic>?;
-              final mainColorId = extra?['mainColorId'] as int?;
-              return ColorsPage(mainColorId: mainColorId);
-            },
-          ),
-          GoRoute(
             path: '/ideas/:id',
             builder: (context, state) {
               final ideaId = int.parse(state.pathParameters['id']!);
               return IdeaDetailPage(ideaId: ideaId);
             },
           ),
+          // Product detail route moved inside ShellRoute
+          GoRoute(
+            path: '/products/:id',
+            builder: (context, state) {
+              final productId = int.parse(state.pathParameters['id']!);
+              final extra = state.extra as Map<String, dynamic>?;
+              final initialWeight = extra?['initialWeight'] as String?;
+              return ProductDetailPage(
+                productId: productId,
+                initialWeight: initialWeight,
+              );
+            },
+          ),
         ],
-      ),
-      // Product detail route
-      GoRoute(
-        path: '/products/:id',
-        builder: (context, state) {
-          final productId = int.parse(state.pathParameters['id']!);
-          final extra = state.extra as Map<String, dynamic>?;
-          final initialWeight = extra?['initialWeight'] as String?;
-          return ProductDetailPage(
-            productId: productId,
-            initialWeight: initialWeight,
-          );
-        },
       ),
       // Compare products route
       GoRoute(
@@ -209,6 +223,10 @@ class AppRouter {
         path: '/registration',
         name: 'registration',
         builder: (context, state) => const RegistrationPage(),
+      ),
+      GoRoute(
+        path: '/phone-verification',
+        builder: (context, state) => const PhoneVerificationPage(),
       ),
     ],
   );

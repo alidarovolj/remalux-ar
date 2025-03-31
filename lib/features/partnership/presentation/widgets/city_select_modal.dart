@@ -76,9 +76,9 @@ class CitySelectModal extends StatelessWidget {
                     child: Theme(
                       data: ThemeData(
                         radioTheme: RadioThemeData(
-                          fillColor: MaterialStateProperty.resolveWith<Color>(
-                            (Set<MaterialState> states) {
-                              if (states.contains(MaterialState.selected)) {
+                          fillColor: WidgetStateProperty.resolveWith<Color>(
+                            (Set<WidgetState> states) {
+                              if (states.contains(WidgetState.selected)) {
                                 return AppColors.primary;
                               }
                               return const Color(0xFFDDDDDD);

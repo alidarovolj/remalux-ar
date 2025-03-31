@@ -11,10 +11,6 @@ class NewsRepository {
         'perPage': '10',
       });
 
-      if (response == null) {
-        throw Exception('API response is null');
-      }
-
       final List<dynamic> data = response['data'];
 
       final news = data.map((json) {
@@ -29,9 +25,6 @@ class NewsRepository {
 
   Future<News> getNewsDetail(int id) async {
     final response = await _apiClient.get('/news/$id');
-    if (response == null) {
-      throw Exception('API response is null');
-    }
     return News.fromJson(response);
   }
 }

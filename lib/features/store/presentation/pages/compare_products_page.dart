@@ -104,11 +104,12 @@ class CompareProductsPage extends ConsumerWidget {
                         products[0].title[currentLocale] ??
                             products[0].title['ru'] ??
                             '',
+                        textAlign: TextAlign.start,
                         style: const TextStyle(
                           fontSize: 13,
                           color: AppColors.textPrimary,
                         ),
-                        maxLines: 2,
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 4),
@@ -207,11 +208,12 @@ class CompareProductsPage extends ConsumerWidget {
                             products[1].title[currentLocale] ??
                                 products[1].title['ru'] ??
                                 '',
+                            textAlign: TextAlign.start,
                             style: const TextStyle(
                               fontSize: 13,
                               color: AppColors.textPrimary,
                             ),
-                            maxLines: 2,
+                            maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 4),
@@ -314,11 +316,11 @@ class CompareProductsPage extends ConsumerWidget {
             _buildComparisonSection(
               'store.category'.tr(),
               [
-                _buildSimpleRow(((products[0].category?['title']
+                _buildSimpleRow(((products[0].category['title']
                         as Map<String, dynamic>?)?['ru'] as String?) ??
                     ''),
                 products.length > 1
-                    ? _buildSimpleRow(((products[1].category?['title']
+                    ? _buildSimpleRow(((products[1].category['title']
                             as Map<String, dynamic>?)?['ru'] as String?) ??
                         '')
                     : null,
@@ -375,7 +377,7 @@ class CompareProductsPage extends ConsumerWidget {
                     ),
                 ],
               );
-            }).toList(),
+            }),
 
             // Description
             _buildComparisonSection(

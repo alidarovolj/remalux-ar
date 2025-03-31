@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:remalux_ar/core/widgets/section_widget.dart';
 import 'package:remalux_ar/features/home/domain/providers/colors_provider.dart';
+import 'package:remalux_ar/features/home/domain/providers/detailed_colors_provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:easy_localization/easy_localization.dart';
 
@@ -59,7 +60,7 @@ class ColorsGrid extends ConsumerWidget {
                 padding: const EdgeInsets.only(right: 12),
                 child: GestureDetector(
                   onTap: () {
-                    context.push('/colors', extra: {'mainColorId': color.id});
+                    context.push('/colors?mainColorId=${color.id}');
                   },
                   child: Column(
                     children: [

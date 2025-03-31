@@ -3,13 +3,24 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/core/widgets/custom_button.dart';
 
-class LanguageSelectionModal extends StatelessWidget {
+class LanguageSelectionModal extends StatefulWidget {
   const LanguageSelectionModal({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final currentLocale = context.locale.languageCode;
+  State<LanguageSelectionModal> createState() => _LanguageSelectionModalState();
+}
 
+class _LanguageSelectionModalState extends State<LanguageSelectionModal> {
+  late String selectedLocale;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedLocale = context.locale.languageCode;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -32,10 +43,11 @@ class LanguageSelectionModal extends StatelessWidget {
           const SizedBox(height: 24),
           RadioListTile<String>(
             value: 'kz',
-            groupValue: currentLocale,
+            groupValue: selectedLocale,
             onChanged: (value) {
-              context.setLocale(const Locale('kz'));
-              Navigator.pop(context);
+              setState(() {
+                selectedLocale = value!;
+              });
             },
             title: const Text(
               'Қазақша',
@@ -49,10 +61,11 @@ class LanguageSelectionModal extends StatelessWidget {
           ),
           RadioListTile<String>(
             value: 'ru',
-            groupValue: currentLocale,
+            groupValue: selectedLocale,
             onChanged: (value) {
-              context.setLocale(const Locale('ru'));
-              Navigator.pop(context);
+              setState(() {
+                selectedLocale = value!;
+              });
             },
             title: const Text(
               'Русский',
@@ -66,10 +79,11 @@ class LanguageSelectionModal extends StatelessWidget {
           ),
           RadioListTile<String>(
             value: 'en',
-            groupValue: currentLocale,
+            groupValue: selectedLocale,
             onChanged: (value) {
-              context.setLocale(const Locale('en'));
-              Navigator.pop(context);
+              setState(() {
+                selectedLocale = value!;
+              });
             },
             title: const Text(
               'English',
@@ -83,7 +97,10 @@ class LanguageSelectionModal extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           CustomButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              context.setLocale(Locale(selectedLocale));
+              Navigator.pop(context);
+            },
             label: 'common.update_language'.tr(),
           ),
           const SizedBox(height: 16),

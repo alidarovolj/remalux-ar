@@ -680,7 +680,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                             child: Column(
                               children: [
                                 Text(
-                                  'auth.registration.have_account'.tr(),
+                                  'auth.have_account'.tr(),
                                   style: const TextStyle(
                                     fontSize: 15,
                                     color: AppColors.textPrimary,
@@ -697,7 +697,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
                                         MaterialTapTargetSize.shrinkWrap,
                                   ),
                                   child: Text(
-                                    'auth.registration.login'.tr(),
+                                    'auth.login'.tr(),
                                     style: const TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w400,

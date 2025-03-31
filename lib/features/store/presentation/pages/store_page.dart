@@ -588,13 +588,14 @@ class _StorePageState extends ConsumerState<StorePage> {
                           Expanded(
                             child: AnimatedOpacity(
                               duration: const Duration(milliseconds: 200),
-                              opacity: _isHeaderExpanded ? 1 : 0,
-                              child: const Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  StoreCategoriesGrid(),
-                                ],
+                              opacity: _isHeaderExpanded ? 1.0 : 0.0,
+                              child: const SingleChildScrollView(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    StoreCategoriesGrid(),
+                                  ],
+                                ),
                               ),
                             ),
                           ),

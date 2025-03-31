@@ -11,10 +11,6 @@ class FiltersRepository {
         'perPage': '10',
       });
 
-      if (response == null) {
-        throw Exception('API response is null');
-      }
-
       final data = response['data'] as List<dynamic>;
 
       final filters = data.map((json) {

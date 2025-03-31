@@ -12,10 +12,6 @@ class CategoriesRepository {
         'perPage': '10',
       });
 
-      if (response == null) {
-        throw Exception('API response is null');
-      }
-
       final List<dynamic> data = response['data'];
 
       final categories = data.map((json) {

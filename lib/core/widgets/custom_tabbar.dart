@@ -16,7 +16,7 @@ class CustomTabBar extends StatelessWidget {
       clipBehavior: Clip.none,
       children: [
         Container(
-          padding: EdgeInsets.only(bottom: 0),
+          padding: const EdgeInsets.only(bottom: 0),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: const BorderRadius.only(

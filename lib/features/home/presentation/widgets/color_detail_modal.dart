@@ -11,10 +11,12 @@ import 'package:easy_localization/easy_localization.dart';
 
 class ColorDetailModal extends ConsumerStatefulWidget {
   final DetailedColorModel color;
+  final VoidCallback? onSelectColor;
 
   const ColorDetailModal({
     super.key,
     required this.color,
+    this.onSelectColor,
   });
 
   @override
@@ -191,27 +193,31 @@ class _ColorDetailModalState extends ConsumerState<ColorDetailModal> {
                 // Select paint button
                 InkWell(
                   onTap: () async {
-                    await ref
-                        .read(selectedColorProvider.notifier)
-                        .setColor(widget.color);
+                    if (widget.onSelectColor != null) {
+                      widget.onSelectColor!();
+                    } else {
+                      await ref
+                          .read(selectedColorProvider.notifier)
+                          .setColor(widget.color);
 
-                    if (context.mounted) {
-                      CustomSnackBar.show(
-                        context,
-                        message: 'home.colors.color_saved'.tr(),
-                        type: SnackBarType.success,
-                        duration: const Duration(seconds: 2),
-                      );
+                      if (context.mounted) {
+                        CustomSnackBar.show(
+                          context,
+                          message: 'home.colors.color_saved'.tr(),
+                          type: SnackBarType.success,
+                          duration: const Duration(seconds: 2),
+                        );
 
-                      if (widget.color.parentColor != null) {
-                        context.go('/store', extra: {
-                          'filter': {
-                            'filters[parentColor.id]':
-                                widget.color.parentColor!.id.toString()
-                          }
-                        });
-                      } else {
-                        context.go('/store');
+                        if (widget.color.parentColor != null) {
+                          context.go('/store', extra: {
+                            'filter': {
+                              'filters[parentColor.id]':
+                                  widget.color.parentColor!.id.toString()
+                            }
+                          });
+                        } else {
+                          context.go('/store');
+                        }
                       }
                     }
                   },

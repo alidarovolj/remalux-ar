@@ -12,13 +12,20 @@ import 'package:remalux_ar/core/widgets/custom_app_bar.dart';
 import 'package:remalux_ar/features/favorites/domain/providers/favorites_providers.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'dart:async';
+import 'package:remalux_ar/features/store/domain/providers/product_color_selection_provider.dart';
+import 'package:remalux_ar/features/home/domain/providers/selected_color_provider.dart';
+import 'package:go_router/go_router.dart';
 
 class ColorsPage extends ConsumerStatefulWidget {
   final int? mainColorId;
+  final int? productId;
+  final bool fromProductDetail;
 
   const ColorsPage({
     super.key,
     this.mainColorId,
+    this.productId,
+    this.fromProductDetail = false,
   });
 
   @override
@@ -50,11 +57,14 @@ class _ColorsPageState extends ConsumerState<ColorsPage> {
       setState(() {
         currentLocale = context.locale.languageCode;
       });
+
+      // Load colors with the selected color ID
       final colorsNotifier = ref.read(detailedColorsProvider.notifier);
       colorsNotifier.loadColors(
-        additionalParams: _selectedColorId != null
-            ? {'parentId': _selectedColorId.toString()}
+        additionalParams: widget.mainColorId != null
+            ? {'filters[parentColor.id]': widget.mainColorId.toString()}
             : null,
+        forceRefresh: true,
       );
     });
   }
@@ -91,7 +101,17 @@ class _ColorsPageState extends ConsumerState<ColorsPage> {
     _debounceTimer = Timer(const Duration(milliseconds: 500), () {
       if (value.length >= 3 || value.isEmpty) {
         final colorsNotifier = ref.read(detailedColorsProvider.notifier);
-        colorsNotifier.resetAndSearch(value);
+
+        // Add filter parameters if a main color is selected
+        Map<String, dynamic>? additionalParams;
+        if (_selectedColorId != null) {
+          additionalParams = {
+            'filters[parentColor.id]': _selectedColorId.toString()
+          };
+        }
+
+        colorsNotifier.resetAndSearch(value,
+            additionalParams: additionalParams);
       }
     });
   }
@@ -104,12 +124,14 @@ class _ColorsPageState extends ConsumerState<ColorsPage> {
     final colorsNotifier = ref.read(detailedColorsProvider.notifier);
     ref.read(currentPageProvider.notifier).state = 1;
 
+    // Preserve current search query
+    final currentSearchQuery = ref.read(searchQueryProvider);
+
     if (colorId != null) {
-      colorsNotifier.loadColors(
-        additionalParams: {'parentId': colorId.toString()},
-      );
+      colorsNotifier.resetAndSearch(currentSearchQuery,
+          additionalParams: {'filters[parentColor.id]': colorId.toString()});
     } else {
-      colorsNotifier.loadColors();
+      colorsNotifier.resetAndSearch(currentSearchQuery);
     }
   }
 
@@ -325,14 +347,54 @@ class _ColorsPageState extends ConsumerState<ColorsPage> {
                       final color = colors[index];
                       return DetailedColorCard(
                         color: color,
-                        onTap: () {
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            backgroundColor: Colors.transparent,
-                            builder: (context) =>
-                                ColorDetailModal(color: color),
-                          );
+                        onTap: () async {
+                          final hasProduct = await ref
+                              .read(productColorSelectionProvider.notifier)
+                              .hasSelectedProduct();
+
+                          if (hasProduct) {
+                            final productId = await ref
+                                .read(productColorSelectionProvider.notifier)
+                                .getSelectedProductId();
+
+                            if (productId != null) {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                builder: (context) => ColorDetailModal(
+                                  color: color,
+                                  onSelectColor: () async {
+                                    ref
+                                        .read(selectedColorProvider.notifier)
+                                        .setColor(color);
+                                    ref
+                                        .read(productColorSelectionProvider
+                                            .notifier)
+                                        .clear();
+                                    if (context.mounted) {
+                                      context.pushReplacement(
+                                          '/products/$productId',
+                                          extra: {
+                                            'initialWeight': ref
+                                                .read(
+                                                    productColorSelectionProvider)
+                                                .initialWeight,
+                                          });
+                                    }
+                                  },
+                                ),
+                              );
+                            }
+                          } else {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder: (context) =>
+                                  ColorDetailModal(color: color),
+                            );
+                          }
                         },
                         onFavoritePressed: () async {
                           await ref

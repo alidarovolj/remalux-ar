@@ -86,8 +86,10 @@ class OrderItem extends StatelessWidget {
 
                   // Delivery info
                   Text(
-                    'orders.order.delivery_courier'
-                        .tr(args: [order.formattedDeliveryDate]),
+                    order.formattedDeliveryDate != null
+                        ? 'orders.order.delivery_courier'
+                            .tr(args: [order.formattedDeliveryDate!])
+                        : 'orders.order.no_delivery_date'.tr(),
                     style: const TextStyle(
                       fontSize: 15,
                       color: AppColors.textPrimary,
