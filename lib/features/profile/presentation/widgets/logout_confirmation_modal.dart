@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/core/widgets/custom_button.dart';
 import 'package:remalux_ar/core/widgets/custom_snack_bar.dart';
@@ -31,7 +32,7 @@ class LogoutConfirmationModal extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
           Text(
-            'Выйти из профиля',
+            'profile.logout_confirmation.title'.tr(),
             style: GoogleFonts.ysabeau(
               fontSize: 22,
               fontWeight: FontWeight.w600,
@@ -39,9 +40,9 @@ class LogoutConfirmationModal extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Вы уверены, что хотите выйти из профиля?',
-            style: TextStyle(
+          Text(
+            'profile.logout_confirmation.message'.tr(),
+            style: const TextStyle(
               fontSize: 15,
               color: AppColors.textSecondary,
             ),
@@ -52,7 +53,7 @@ class LogoutConfirmationModal extends ConsumerWidget {
             children: [
               Expanded(
                 child: CustomButton(
-                  label: 'Отмена',
+                  label: 'common.cancel'.tr(),
                   onPressed: () => Navigator.of(context).pop(),
                   backgroundColor: const Color(0xFFF5F5F5),
                   textColor: AppColors.textPrimary,
@@ -61,14 +62,14 @@ class LogoutConfirmationModal extends ConsumerWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: CustomButton(
-                  label: 'Выйти',
+                  label: 'profile.logout_confirmation.confirm'.tr(),
                   onPressed: () async {
                     await ref.read(userProvider.notifier).logout();
                     if (context.mounted) {
                       Navigator.of(context).pop();
                       CustomSnackBar.show(
                         context,
-                        message: 'Вы успешно вышли из профиля',
+                        message: 'profile.logout_confirmation.success'.tr(),
                         type: SnackBarType.success,
                       );
                     }

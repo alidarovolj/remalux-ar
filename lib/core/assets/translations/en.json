@@ -45,7 +45,10 @@
     "phone_hint": "+7 (___) ___ __ __",
     "password": "Password",
     "password_hint": "Password",
-    "forgot_password": "Forgot password?",
+    "forgot_password": {
+      "title": "Forgot your password?",
+      "description": "Enter your phone number,\nwe will send you a verification code."
+    },
     "login_button": "Login",
     "no_account": "Don't have an account?",
     "register_link": "Please register",
@@ -109,7 +112,8 @@
     },
     "required_title": "Authentication Required",
     "required_description": "Please sign in to add items to your favorites",
-    "login": "Sign In",
+    "invalid_credentials": "Invalid phone number or password",
+    "error": "An error occurred while signing in. Please try again later",
     "register": "Register",
     "verification": {
       "add_phone": "Let's add a password!",
@@ -121,7 +125,10 @@
       "resend_timer": "Resend code in {} sec",
       "resend_code": "Resend code",
       "continue": "Continue",
-      "back": "Back"
+      "back": "Back",
+      "title": "Verification Code",
+      "code_sent": "We've sent a code to {}",
+      "resend_code_timer": "Resend new code {}"
     }
   },
   "store": {
@@ -293,6 +300,12 @@
     "favorites": "Favorites",
     "settings": "Settings",
     "logout": "Log out",
+    "logout_confirmation": {
+      "title": "Log out",
+      "message": "Are you sure you want to log out?",
+      "confirm": "Log out",
+      "success": "You have successfully logged out"
+    },
     "title": "Profile",
     "edit_profile": "Edit profile",
     "phone": "Phone",

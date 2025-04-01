@@ -39,7 +39,7 @@ class AuthRequiredModal extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           CustomButton(
-            label: 'auth.login'.tr(),
+            label: 'auth.login_button'.tr(),
             onPressed: () {
               Navigator.pop(context);
               context.push('/login');

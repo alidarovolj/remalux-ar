@@ -9,6 +9,7 @@ import 'package:remalux_ar/core/widgets/custom_snack_bar.dart';
 import 'package:remalux_ar/features/auth/domain/models/login_request.dart';
 import 'package:remalux_ar/features/auth/domain/providers/auth_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:dio/dio.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -64,6 +65,18 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
       if (!mounted) return;
 
+      // If login failed (authResponse is null), throw an error
+      if (authResponse == null) {
+        throw DioException(
+          requestOptions: RequestOptions(path: ''),
+          response: Response(
+            requestOptions: RequestOptions(path: ''),
+            statusCode: 401,
+            data: {'message': 'auth.invalid_credentials'.tr()},
+          ),
+        );
+      }
+
       // Get user info
       final user = await auth.getCurrentUser();
 
@@ -83,13 +96,22 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           context.go('/');
         }
       }
-    } on Exception catch (e) {
+    } catch (e) {
       if (mounted) {
-        CustomSnackBar.show(
-          context,
-          message: e.toString(),
-          type: SnackBarType.error,
-        );
+        if (e is DioException) {
+          // Show error message based on status code
+          CustomSnackBar.show(
+            context,
+            message: 'auth.invalid_credentials'.tr(),
+            type: SnackBarType.error,
+          );
+        } else {
+          CustomSnackBar.show(
+            context,
+            message: 'auth.invalid_credentials'.tr(),
+            type: SnackBarType.error,
+          );
+        }
       }
     } finally {
       if (mounted) {

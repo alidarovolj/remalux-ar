@@ -47,6 +47,10 @@ class _StorePageState extends ConsumerState<StorePage> {
     _scrollController.addListener(_onScroll);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Force refresh products and filters
+      ref.invalidate(productsProvider);
+      ref.invalidate(filtersProvider);
+
       if (widget.initialCategoryId != null) {
         ref
             .read(selectedFiltersProvider.notifier)

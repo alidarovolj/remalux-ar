@@ -12,11 +12,15 @@ class LanguageSelectionModal extends StatefulWidget {
 
 class _LanguageSelectionModalState extends State<LanguageSelectionModal> {
   late String selectedLocale;
+  bool _initialized = false;
 
   @override
-  void initState() {
-    super.initState();
-    selectedLocale = context.locale.languageCode;
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initialized) {
+      selectedLocale = context.locale.languageCode;
+      _initialized = true;
+    }
   }
 
   @override

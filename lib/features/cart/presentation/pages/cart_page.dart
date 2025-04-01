@@ -12,6 +12,8 @@ import 'package:remalux_ar/features/cart/presentation/widgets/delete_confirmatio
 import 'package:remalux_ar/features/cart/presentation/widgets/delete_confirmation_modal.dart';
 import 'package:remalux_ar/features/cart/presentation/widgets/cart_skeleton.dart';
 import 'package:remalux_ar/core/providers/auth/auth_state.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:remalux_ar/core/api/api_client.dart';
 
 class CartPage extends ConsumerStatefulWidget {
   const CartPage({super.key});
@@ -20,29 +22,139 @@ class CartPage extends ConsumerStatefulWidget {
   ConsumerState<CartPage> createState() => _CartPageState();
 }
 
-class _CartPageState extends ConsumerState<CartPage> {
+class _CartPageState extends ConsumerState<CartPage>
+    with WidgetsBindingObserver {
   String currentLocale = 'ru';
   Set<int> selectedItems = {};
+  bool _isAuthenticated = false;
 
   @override
   void initState() {
     super.initState();
     print('📱 CartPage initState');
+    // Register observer for app lifecycle events
+    WidgetsBinding.instance.addObserver(this);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         currentLocale = context.locale.languageCode;
       });
 
-      // Всегда делаем запрос при инициализации
+      // Check authentication status
+      _checkAuthStatus();
+
+      // Force refresh cart data
+      ref.invalidate(cartProvider);
+
+      // Always fetch cart on initialization
       _refreshCart();
     });
   }
 
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Check auth status when app comes back to foreground
+    if (state == AppLifecycleState.resumed) {
+      _checkAuthStatus();
+    }
+  }
+
+  @override
+  void didUpdateWidget(CartPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Check auth status when widget updates (e.g., when returning to the page)
+    _checkAuthStatus();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final newLocale = context.locale.languageCode;
+    if (currentLocale != newLocale) {
+      setState(() {
+        currentLocale = newLocale;
+      });
+    }
+
+    // Check auth status every time dependencies change
+    _checkAuthStatus();
+
+    // Listen for cart data changes
+    final cartData = ref.watch(cartProvider);
+    cartData.whenData((items) {
+      if (items.isNotEmpty && !_isAuthenticated) {
+        setState(() {
+          _isAuthenticated = true;
+        });
+      }
+    });
+  }
+
+  Future<void> _checkAuthStatus() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      // Check if there is a valid token in both SharedPreferences and ApiClient
+      ApiClient apiClient = ApiClient();
+      bool apiHasToken = apiClient.accessToken != null;
+
+      final isAuthenticated = token != null && token.isNotEmpty && apiHasToken;
+
+      print(
+          '🔑 Auth check: ${isAuthenticated ? 'Authenticated' : 'Not authenticated'} '
+          '(token in prefs: ${token != null}, API token: ${apiHasToken ? 'exists' : 'missing'})');
+
+      if (_isAuthenticated != isAuthenticated) {
+        setState(() {
+          _isAuthenticated = isAuthenticated;
+        });
+
+        // If authentication status changed and user is now logged out, invalidate cart
+        if (!isAuthenticated) {
+          ref.invalidate(cartProvider);
+        }
+      }
+    } catch (e) {
+      print('❌ Error checking auth status: $e');
+      setState(() {
+        _isAuthenticated = false;
+      });
+    }
+  }
+
   void _refreshCart() {
+    if (!_isAuthenticated) {
+      print('⚠️ Not refreshing cart because user is not authenticated');
+      return;
+    }
+
     ref.read(cartProvider.notifier).getCart().then((_) {
       print('✅ Cart refresh completed');
+
+      // Check cart data after refresh
+      final cartData = ref.read(cartProvider);
+      cartData.whenData((items) {
+        if (items.isNotEmpty) {
+          setState(() {
+            _isAuthenticated = true;
+          });
+        }
+      });
     }).catchError((error) {
       print('❌ Cart refresh failed: $error');
+      // If we get a 401, update our authentication status
+      if (error is DioException && error.response?.statusCode == 401) {
+        setState(() {
+          _isAuthenticated = false;
+        });
+      }
     });
   }
 
@@ -163,20 +275,22 @@ class _CartPageState extends ConsumerState<CartPage> {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final newLocale = context.locale.languageCode;
-    if (currentLocale != newLocale) {
-      setState(() {
-        currentLocale = newLocale;
-      });
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     final cartAsync = ref.watch(cartProvider);
     print('🎨 CartPage building with state: ${cartAsync.toString()}');
+
+    // Check if we have items in the cart
+    bool hasCartItems = cartAsync.maybeWhen(
+      data: (items) => items.isNotEmpty,
+      orElse: () => false,
+    );
+
+    // If we have items, we must be authenticated
+    if (hasCartItems && !_isAuthenticated) {
+      setState(() {
+        _isAuthenticated = true;
+      });
+    }
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -185,109 +299,84 @@ class _CartPageState extends ConsumerState<CartPage> {
       ),
       body: cartAsync.when(
         data: (items) {
-          if (items.isEmpty) {
-            return SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Column(
-                  children: [
-                    const Spacer(),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'store.cart.empty.title'.tr(),
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'store.cart.empty.description'.tr(),
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: AppColors.textSecondary,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                    const Spacer(),
-                    CustomButton(
-                      label: 'store.cart.empty.to_catalog'.tr(),
-                      onPressed: () => context.push('/store'),
-                    ),
-                    const SizedBox(height: 16),
-                  ],
+          // If we have items, we are definitely authenticated
+          if (items.isNotEmpty) {
+            return Column(
+              children: [
+                _buildSelectionHeader(items),
+                Expanded(
+                  child: ListView.separated(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: items.length + 1, // +1 for the bottom bar
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 16),
+                    itemBuilder: (context, index) {
+                      if (index == items.length) {
+                        return _buildBottomBar(context);
+                      }
+                      return _buildCartItem(items[index]);
+                    },
+                  ),
                 ),
-              ),
+              ],
             );
           }
 
-          return Column(
-            children: [
-              _buildSelectionHeader(items),
-              Expanded(
-                child: ListView.separated(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: items.length + 1, // +1 for the bottom bar
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 16),
-                  itemBuilder: (context, index) {
-                    if (index == items.length) {
-                      return _buildBottomBar(context);
-                    }
-                    return _buildCartItem(items[index]);
-                  },
-                ),
+          // Otherwise, check authentication status
+          if (!_isAuthenticated) {
+            return _buildAuthRequiredView(context);
+          }
+
+          // Empty cart for authenticated user
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Column(
+                children: [
+                  const Spacer(),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'store.cart.empty.title'.tr(),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'store.cart.empty.description'.tr(),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: AppColors.textSecondary,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                  const Spacer(),
+                  CustomButton(
+                    label: 'store.cart.empty.to_catalog'.tr(),
+                    onPressed: () => context.push('/store'),
+                  ),
+                  const SizedBox(height: 16),
+                ],
               ),
-            ],
+            ),
           );
         },
         loading: () => const CartSkeleton(),
         error: (error, stackTrace) {
           print('❌ Cart error: $error');
           if (error is DioException && error.response?.statusCode == 401) {
-            return SafeArea(
-              child: Column(
-                children: [
-                  Expanded(
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'store.cart.auth_required'.tr(),
-                            style: const TextStyle(
-                              fontSize: 15,
-                              color: AppColors.textPrimary,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      left: 12,
-                      right: 12,
-                      bottom: 16,
-                    ),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: CustomButton(
-                        label: 'auth.login_button'.tr(),
-                        onPressed: () => context.push('/login'),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
+            // Update authentication status and return the auth required view
+            setState(() {
+              _isAuthenticated = false;
+            });
+            return _buildAuthRequiredView(context);
           }
           return Center(
             child: Text(
@@ -299,6 +388,46 @@ class _CartPageState extends ConsumerState<CartPage> {
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildAuthRequiredView(BuildContext context) {
+    return SafeArea(
+      child: Column(
+        children: [
+          Expanded(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'store.cart.auth_required'.tr(),
+                    style: const TextStyle(
+                      fontSize: 15,
+                      color: AppColors.textPrimary,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(
+              left: 12,
+              right: 12,
+              bottom: 16,
+            ),
+            child: SizedBox(
+              width: double.infinity,
+              child: CustomButton(
+                label: 'auth.login_button'.tr(),
+                onPressed: () => context.push('/login'),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

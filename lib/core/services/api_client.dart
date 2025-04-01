@@ -54,6 +54,12 @@ class ApiClient {
     print('🔑 Token set in ApiClient: ${token.substring(0, 10)}...');
   }
 
+  void clearAccessToken() {
+    _accessToken = null;
+    _dio.options.headers.remove('Authorization');
+    print('🔑 Authorization header removed from ApiClient');
+  }
+
   Future<Response> post(
     String path, {
     dynamic data,
