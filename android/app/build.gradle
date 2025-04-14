@@ -1,59 +1,43 @@
-def localProperties = new Properties()
-def localPropertiesFile = rootProject.file('local.properties')
-if (localPropertiesFile.exists()) {
-    localPropertiesFile.withReader('UTF-8') { reader ->
-        localProperties.load(reader)
-    }
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+    id "com.google.gms.google-services"
 }
 
-def flutterRoot = localProperties.getProperty('flutter.sdk')
-if (flutterRoot == null) {
-    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
+dependencies {
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation platform('com.google.firebase:firebase-bom:33.7.0')
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'org.conscrypt:conscrypt-android:2.5.2'
+    implementation 'com.yandex.android:maps.mobile:4.6.1-lite'
+    implementation 'androidx.multidex:multidex:2.0.1'
 }
-
-def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
-if (flutterVersionCode == null) {
-    flutterVersionCode = '1'
-}
-
-def flutterVersionName = localProperties.getProperty('flutter.versionName')
-if (flutterVersionName == null) {
-    flutterVersionName = '1.0'
-}
-
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'com.google.gms.google-services'
-apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
-    namespace "kz.remalux.remaluxar"
-    compileSdkVersion flutter.compileSdkVersion
-    ndkVersion flutter.ndkVersion
+    namespace = "kz.remalux.remaluxar"
+    compileSdk = flutter.compileSdkVersion
+    ndkVersion = "27.0.12077973" // Explicitly set the NDK version
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+        coreLibraryDesugaringEnabled true
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
-    }
-
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
+        jvmTarget = JavaVersion.VERSION_17
     }
 
     defaultConfig {
-        applicationId "kz.remalux.remaluxar"
-        minSdkVersion flutter.minSdkVersion
-        targetSdkVersion flutter.targetSdkVersion
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
-        multiDexEnabled true
+        applicationId = "kz.remalux.remaluxar"
+        minSdk = flutter.minSdkVersion
+        targetSdk = flutter.targetSdkVersion
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
         manifestPlaceholders = [
-            YANDEX_MAPKIT_API_KEY: "4bf65d20-262c-427a-bd53-c9d12d3c2a7f",
-            applicationName: "androidx.multidex.MultiDexApplication"
+            YANDEX_MAPKIT_API_KEY: "4bf65d20-262c-427a-bd53-c9d12d3c2a7f"
         ]
     }
 
@@ -64,25 +48,24 @@ android {
             storeFile file('debug.keystore')
             storePassword 'android'
         }
+        release {
+            keyAlias 'aina'
+            keyPassword 'ec03537c'
+            storeFile file('../../android_keys/android-key.jks')
+            storePassword 'ec03537c'
+        }
     }
 
     buildTypes {
         release {
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             minifyEnabled true
             shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 }
 
-dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation platform('com.google.firebase:firebase-bom:32.7.4')
-    implementation 'com.google.firebase:firebase-analytics'
-    implementation 'org.conscrypt:conscrypt-android:2.5.2'
-    implementation 'org.openjsse:openjsse:1.1.10'
-    implementation 'com.android.support:multidex:1.0.3'
-    implementation 'com.yandex.android:maps.mobile:4.6.1-lite'
-    implementation 'androidx.multidex:multidex:2.0.1'
+flutter {
+    source = "../.."
 }
