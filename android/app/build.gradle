@@ -49,10 +49,10 @@ android {
             storePassword 'android'
         }
         release {
-            keyAlias 'aina'
-            keyPassword 'ec03537c'
-            storeFile file('../../android_keys/android-key.jks')
-            storePassword 'ec03537c'
+            keyAlias 'upload'
+            keyPassword 'android'
+            storeFile file('keystore.jks')
+            storePassword 'android'
         }
     }
 

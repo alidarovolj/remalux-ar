@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:remalux_ar/core/providers/auth/auth_state.dart';
 import 'custom_tabbar.dart';
+import 'development_notice_modal.dart';
 
 class MainTabBarScreen extends ConsumerStatefulWidget {
   final Widget child;
@@ -95,8 +96,22 @@ class _MainTabBarScreenState extends ConsumerState<MainTabBarScreen>
           return;
         }
       }
+
+      // Show development modal for AR tab
+      if (index == 2) {
+        showDevelopmentModal(context);
+        return;
+      }
+
       context.go(route);
     }
+  }
+
+  void showDevelopmentModal(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => const DevelopmentNoticeModal(),
+    );
   }
 
   @override

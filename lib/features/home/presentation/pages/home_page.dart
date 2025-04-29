@@ -5,6 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:remalux_ar/core/widgets/custom_button.dart';
+import 'package:remalux_ar/core/widgets/development_notice_modal.dart';
 import 'package:remalux_ar/features/home/presentation/widgets/categories_grid.dart';
 import 'package:remalux_ar/features/home/presentation/widgets/products_grid.dart';
 import 'package:remalux_ar/features/home/presentation/widgets/news_grid.dart';
@@ -497,7 +498,13 @@ class _HomePageState extends ConsumerState<HomePage> {
                                     const EdgeInsets.symmetric(horizontal: 12),
                                 child: CustomButton(
                                   label: 'home.visualize'.tr(),
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) =>
+                                          const DevelopmentNoticeModal(),
+                                    );
+                                  },
                                   type: ButtonType.normal,
                                   isFullWidth: true,
                                   isBackGradient: true,

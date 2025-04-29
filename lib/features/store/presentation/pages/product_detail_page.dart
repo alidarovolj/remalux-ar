@@ -27,6 +27,7 @@ import 'package:remalux_ar/features/store/presentation/providers/compare_product
 import 'package:remalux_ar/features/store/domain/providers/product_color_selection_provider.dart';
 import 'package:remalux_ar/core/services/storage_service.dart';
 import 'package:remalux_ar/core/widgets/auth_required_modal.dart';
+import 'package:remalux_ar/core/widgets/development_notice_modal.dart';
 import 'dart:async';
 import 'package:remalux_ar/features/favorites/domain/providers/favorites_providers.dart';
 
@@ -348,7 +349,13 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                     child: Material(
                                       color: Colors.transparent,
                                       child: InkWell(
-                                        onTap: () {},
+                                        onTap: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) =>
+                                                const DevelopmentNoticeModal(),
+                                          );
+                                        },
                                         borderRadius: BorderRadius.circular(12),
                                         child: Padding(
                                           padding: const EdgeInsets.symmetric(
