@@ -17,6 +17,13 @@ import 'dart:async';
 import 'package:remalux_ar/features/auth/domain/providers/auth_provider.dart';
 import 'package:remalux_ar/core/providers/auth/auth_state.dart' as auth_state;
 import 'package:remalux_ar/features/profile/presentation/pages/profile_page.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:remalux_ar/features/store/presentation/providers/store_providers.dart';
+import 'package:remalux_ar/features/store/presentation/widgets/single_filter_modal.dart';
+import 'package:remalux_ar/features/store/presentation/widgets/sorting_modal.dart';
+import 'package:remalux_ar/features/store/presentation/widgets/store_categories_grid.dart';
+import 'package:remalux_ar/features/home/presentation/providers/categories_provider.dart';
+import 'package:remalux_ar/features/profile/presentation/pages/profile_page.dart';
 
 class StorePage extends ConsumerStatefulWidget {
   final int? initialCategoryId;
@@ -210,8 +217,7 @@ class _StorePageState extends ConsumerState<StorePage> {
                   // Products count and sorting
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding:
-                          const EdgeInsets.only(left: 12, right: 12, top: 16),
+                      padding: const EdgeInsets.only(left: 12, right: 12),
                       child: Row(
                         children: [
                           Text(
@@ -302,7 +308,7 @@ class _StorePageState extends ConsumerState<StorePage> {
                   ),
 
                   const SliverToBoxAdapter(
-                    child: SizedBox(height: 16),
+                    child: SizedBox(height: 8),
                   ),
 
                   // Products Grid
@@ -420,15 +426,8 @@ class _StorePageState extends ConsumerState<StorePage> {
                             (selectedColor != null ? 64 : 12.5)),
                     padding: EdgeInsets.only(
                         top: MediaQuery.of(context).padding.top),
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -459,9 +458,56 @@ class _StorePageState extends ConsumerState<StorePage> {
                                   left: 0,
                                   right: 0,
                                   child: Center(
-                                    child: Image.asset(
-                                      'lib/core/assets/images/logos/main.png',
-                                      height: 40,
+                                    child: Consumer(
+                                      builder: (context, ref, child) {
+                                        final selectedCategory = ref
+                                            .watch(selectedFiltersProvider
+                                                .notifier)
+                                            .selectedCategory;
+                                        final categoriesAsync =
+                                            ref.watch(categoriesProvider);
+                                        final currentLocale =
+                                            context.locale.languageCode;
+
+                                        return categoriesAsync.when(
+                                          data: (categories) {
+                                            if (selectedCategory != null) {
+                                              final category =
+                                                  categories.firstWhere(
+                                                (cat) =>
+                                                    cat.id == selectedCategory,
+                                                orElse: () => categories.first,
+                                              );
+                                              return Text(
+                                                category.title[currentLocale] ??
+                                                    category.title['ru'] ??
+                                                    '',
+                                                style: GoogleFonts.ysabeau(
+                                                  fontSize: 23,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: AppColors.textPrimary,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              );
+                                            } else {
+                                              return SvgPicture.asset(
+                                                'lib/core/assets/icons/logo.svg',
+                                                height: 40,
+                                              );
+                                            }
+                                          },
+                                          loading: () => SvgPicture.asset(
+                                            'lib/core/assets/icons/logo.svg',
+                                            height: 40,
+                                          ),
+                                          error: (_, __) => SvgPicture.asset(
+                                            'lib/core/assets/icons/logo.svg',
+                                            height: 40,
+                                          ),
+                                        );
+                                      },
                                     ),
                                   ),
                                 ),
@@ -823,9 +869,9 @@ class _StorePageState extends ConsumerState<StorePage> {
                                     Container(
                                       width: 32,
                                       height: 32,
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFF8F8F8),
-                                        borderRadius: BorderRadius.circular(8),
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFFF8F8F8),
+                                        shape: BoxShape.circle,
                                       ),
                                       child: IconButton(
                                         onPressed: () {
@@ -848,9 +894,9 @@ class _StorePageState extends ConsumerState<StorePage> {
                                     Container(
                                       width: 32,
                                       height: 32,
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFF8F8F8),
-                                        borderRadius: BorderRadius.circular(8),
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFFF8F8F8),
+                                        shape: BoxShape.circle,
                                       ),
                                       child: IconButton(
                                         onPressed: () {
@@ -873,9 +919,9 @@ class _StorePageState extends ConsumerState<StorePage> {
                                     Container(
                                       width: 32,
                                       height: 32,
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFF8F8F8),
-                                        borderRadius: BorderRadius.circular(8),
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFFF8F8F8),
+                                        shape: BoxShape.circle,
                                       ),
                                       child: IconButton(
                                         onPressed: () {
@@ -937,7 +983,7 @@ class _StorePageState extends ConsumerState<StorePage> {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 12,
                     color: isExpanded
                         ? AppColors.borderDark
                         : AppColors.textPrimary,

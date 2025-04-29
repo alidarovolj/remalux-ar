@@ -28,6 +28,7 @@ import 'package:remalux_ar/features/store/domain/providers/product_color_selecti
 import 'package:remalux_ar/core/services/storage_service.dart';
 import 'package:remalux_ar/core/widgets/auth_required_modal.dart';
 import 'dart:async';
+import 'package:remalux_ar/features/favorites/domain/providers/favorites_providers.dart';
 
 class ProductDetailPage extends ConsumerStatefulWidget {
   final int productId;
@@ -51,6 +52,8 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
   int quantity = 1;
   final PageController _pageController = PageController();
   Timer? _timer;
+  final TextEditingController _quantityController = TextEditingController();
+  final FocusNode _quantityFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -58,6 +61,10 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
     _startAutoSlide();
+
+    // Always set the initial quantity to 1
+    quantity = 1;
+    _quantityController.text = "1";
 
     // Set initial weight if provided
     if (widget.initialWeight != null) {
@@ -68,6 +75,13 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
+    // Reset quantity to 1 when dependencies change
+    setState(() {
+      quantity = 1;
+      _quantityController.text = "1";
+    });
+
     // Set selectedVariant based on selectedWeight after dependencies are initialized
     if (selectedWeight != null) {
       final productDetailAsync =
@@ -89,6 +103,8 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
     _scrollController.dispose();
     _timer?.cancel();
     _pageController.dispose();
+    _quantityController.dispose();
+    _quantityFocusNode.dispose();
     super.dispose();
   }
 
@@ -237,7 +253,22 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                           BlendMode.srcIn,
                         ),
                       ),
-                      onPressed: () {
+                      onPressed: () async {
+                        // Check authentication
+                        final token = await StorageService.getToken();
+                        if (token == null) {
+                          if (mounted) {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder: (context) => const AuthRequiredModal(),
+                            );
+                          }
+                          return;
+                        }
+
+                        // User is authenticated, navigate to favorites
                         context.push('/favorites');
                       },
                       padding: EdgeInsets.zero,
@@ -325,8 +356,8 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                           child: Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              SvgPicture.asset(
-                                                'lib/core/assets/icons/cube.svg',
+                                              Image.asset(
+                                                'lib/core/assets/images/cube.png',
                                                 width: 32,
                                                 height: 32,
                                               ),
@@ -374,20 +405,20 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     // Product title
-                                    if (product.isColorable == true) ...[
-                                      Image.asset(
-                                        'lib/core/assets/images/color_wheel.png',
-                                        width: 24,
-                                        height: 24,
-                                      ),
-                                      const SizedBox(height: 8),
-                                    ],
+                                    // if (product.isColorable == true) ...[
+                                    //   Image.asset(
+                                    //     'lib/core/assets/images/color_wheel.png',
+                                    //     width: 24,
+                                    //     height: 24,
+                                    //   ),
+                                    //   const SizedBox(height: 8),
+                                    // ],
                                     Text(
                                       product.title[currentLocale] ??
                                           product.title['ru'] ??
                                           '',
-                                      style: const TextStyle(
-                                        fontSize: 24,
+                                      style: GoogleFonts.ysabeau(
+                                        fontSize: 19,
                                         fontWeight: FontWeight.w600,
                                         color: AppColors.textPrimary,
                                       ),
@@ -447,16 +478,6 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                       const SizedBox(height: 8),
                                       GestureDetector(
                                         onTap: () async {
-                                          print(
-                                              '\n\n=== COLOR SELECTION DEBUG ===');
-                                          print(
-                                              'Color selection button tapped');
-                                          print('Product ID: ${product.id}');
-                                          print(
-                                              'Selected weight: $selectedWeight');
-                                          print(
-                                              '===========================\n\n');
-
                                           try {
                                             await ref
                                                 .read(
@@ -466,11 +487,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                                     initialWeight:
                                                         selectedWeight);
 
-                                            print('Product saved successfully');
-
                                             if (context.mounted) {
-                                              print(
-                                                  'Navigating to colors page');
                                               context.push('/colors', extra: {
                                                 'productId': product.id,
                                                 'fromProductDetail': true,
@@ -576,10 +593,25 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                               children: [
                                                 TextSpan(
                                                   text:
-                                                      'store.product.usage_rate'
-                                                          .tr(args: [
-                                                    product.expense.toString()
-                                                  ]),
+                                                      'store.product.usage_rate_prefix'
+                                                          .tr(),
+                                                  style: const TextStyle(
+                                                    color:
+                                                        AppColors.textSecondary,
+                                                  ),
+                                                ),
+                                                TextSpan(
+                                                  text:
+                                                      '${product.expense.toString()} ',
+                                                  style: const TextStyle(
+                                                    color: AppColors.primary,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                                TextSpan(
+                                                  text:
+                                                      'store.product.usage_rate_suffix'
+                                                          .tr(),
                                                   style: const TextStyle(
                                                     color:
                                                         AppColors.textSecondary,
@@ -598,22 +630,25 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                               children: [
                                                 TextSpan(
                                                   text:
-                                                      'store.product.coverage_calculation'
-                                                          .tr(args: [
-                                                    (selectedWeight != null
-                                                            ? ((double.parse(
-                                                                        selectedWeight!) *
-                                                                    1000) /
-                                                                product.expense)
-                                                            : (product
-                                                                    .productVariants
-                                                                    .first
-                                                                    .weight *
-                                                                1000 /
-                                                                product
-                                                                    .expense))
-                                                        .toStringAsFixed(2)
-                                                  ]),
+                                                      'store.product.coverage_calculation_prefix'
+                                                          .tr(),
+                                                  style: const TextStyle(
+                                                    color:
+                                                        AppColors.textSecondary,
+                                                  ),
+                                                ),
+                                                TextSpan(
+                                                  text:
+                                                      '${(selectedWeight != null ? ((double.parse(selectedWeight!) * 1000) / product.expense) : (product.productVariants.first.weight * 1000 / product.expense)).toStringAsFixed(2)} ',
+                                                  style: const TextStyle(
+                                                    color: AppColors.primary,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                                TextSpan(
+                                                  text:
+                                                      'store.product.coverage_calculation_suffix'
+                                                          .tr(),
                                                   style: const TextStyle(
                                                     color:
                                                         AppColors.textSecondary,
@@ -671,6 +706,8 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                                                 .first;
                                                       }
                                                       quantity = result as int;
+                                                      _quantityController.text =
+                                                          quantity.toString();
                                                     });
                                                   }
                                                 });
@@ -762,6 +799,107 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                                               width: 12),
                                                           Text(
                                                             'store.product.compare'
+                                                                .tr(),
+                                                            style:
+                                                                const TextStyle(
+                                                              fontSize: 15,
+                                                              color: AppColors
+                                                                  .textPrimary,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 12),
+                                              Expanded(
+                                                child: Material(
+                                                  color: Colors.transparent,
+                                                  child: InkWell(
+                                                    onTap: () async {
+                                                      // Проверка авторизации
+                                                      final token =
+                                                          await StorageService
+                                                              .getToken();
+                                                      if (token == null) {
+                                                        if (mounted) {
+                                                          showModalBottomSheet(
+                                                            context: context,
+                                                            isScrollControlled:
+                                                                true,
+                                                            backgroundColor:
+                                                                Colors
+                                                                    .transparent,
+                                                            builder: (context) =>
+                                                                const AuthRequiredModal(),
+                                                          );
+                                                        }
+                                                        return;
+                                                      }
+
+                                                      // Добавляем в избранное
+                                                      try {
+                                                        await ref
+                                                            .read(
+                                                                favoriteProductsProvider
+                                                                    .notifier)
+                                                            .toggleFavorite(
+                                                              product.id,
+                                                              context,
+                                                              product.title[context
+                                                                      .locale
+                                                                      .languageCode] ??
+                                                                  product.title[
+                                                                      'ru'] ??
+                                                                  '',
+                                                              false, // Мы не знаем текущий статус избранного
+                                                            );
+                                                      } catch (error) {
+                                                        // Ошибка уже обработана в toggleFavorite
+                                                      }
+                                                    },
+                                                    child: Container(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          vertical: 12),
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Container(
+                                                            width: 44,
+                                                            height: 44,
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(12),
+                                                            decoration:
+                                                                const BoxDecoration(
+                                                              color: Color(
+                                                                  0xFFF8F8F8),
+                                                              shape: BoxShape
+                                                                  .circle,
+                                                            ),
+                                                            child: SvgPicture
+                                                                .asset(
+                                                              'lib/core/assets/icons/heart.svg',
+                                                              width: 24,
+                                                              height: 24,
+                                                              colorFilter:
+                                                                  const ColorFilter
+                                                                      .mode(
+                                                                AppColors
+                                                                    .textPrimary,
+                                                                BlendMode.srcIn,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                              width: 12),
+                                                          Text(
+                                                            'store.product.add_to_favorites'
                                                                 .tr(),
                                                             style:
                                                                 const TextStyle(
@@ -1359,6 +1497,8 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                       if (quantity > 1) {
                                         setState(() {
                                           quantity--;
+                                          _quantityController.text =
+                                              quantity.toString();
                                         });
                                       }
                                     },
@@ -1374,11 +1514,69 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                     shape: BoxShape.circle,
                                   ),
                                   child: Center(
-                                    child: Text(
-                                      quantity.toString(),
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
+                                    child: InkWell(
+                                      onTap: () {
+                                        // Set text selection position after a frame has been rendered
+                                        WidgetsBinding.instance
+                                            .addPostFrameCallback((_) {
+                                          _quantityController.selection =
+                                              TextSelection.fromPosition(
+                                            TextPosition(
+                                                offset: _quantityController
+                                                    .text.length),
+                                          );
+                                        });
+                                        _quantityFocusNode.requestFocus();
+                                      },
+                                      child: TextField(
+                                        controller: _quantityController,
+                                        focusNode: _quantityFocusNode,
+                                        textAlign: TextAlign.center,
+                                        keyboardType: TextInputType.number,
+                                        decoration: const InputDecoration(
+                                          border: InputBorder.none,
+                                          isDense: true,
+                                          contentPadding: EdgeInsets.zero,
+                                        ),
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        onChanged: (value) {
+                                          final parsedValue =
+                                              int.tryParse(value);
+                                          if (parsedValue != null &&
+                                              parsedValue > 0) {
+                                            setState(() {
+                                              quantity = parsedValue;
+                                            });
+                                          } else if (value.isEmpty) {
+                                            // If field is empty, reset to 1 after a brief delay
+                                            Future.delayed(
+                                                const Duration(
+                                                    milliseconds: 100), () {
+                                              if (_quantityController
+                                                  .text.isEmpty) {
+                                                setState(() {
+                                                  quantity = 1;
+                                                  _quantityController.text =
+                                                      "1";
+                                                });
+                                              }
+                                            });
+                                          }
+                                        },
+                                        onSubmitted: (value) {
+                                          final parsedValue =
+                                              int.tryParse(value);
+                                          if (parsedValue == null ||
+                                              parsedValue <= 0) {
+                                            setState(() {
+                                              quantity = 1;
+                                              _quantityController.text = "1";
+                                            });
+                                          }
+                                        },
                                       ),
                                     ),
                                   ),
@@ -1395,6 +1593,8 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                     onPressed: () {
                                       setState(() {
                                         quantity++;
+                                        _quantityController.text =
+                                            quantity.toString();
                                       });
                                     },
                                     icon: const Icon(Icons.add),

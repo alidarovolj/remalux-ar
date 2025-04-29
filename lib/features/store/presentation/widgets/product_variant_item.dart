@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/features/store/domain/models/product.dart';
 import 'package:remalux_ar/features/favorites/domain/providers/favorites_providers.dart';
@@ -48,11 +49,15 @@ class ProductVariantItem extends ConsumerWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFF3B4D8B).withOpacity(0.1),
+          width: 0.5,
+        ),
         boxShadow: [
           BoxShadow(
             color: const Color(0xFF3B4D8B).withOpacity(0.1),
             offset: const Offset(0, 1),
-            blurRadius: 5,
+            blurRadius: 4,
             spreadRadius: 0,
           ),
         ],
@@ -177,142 +182,144 @@ class ProductVariantItem extends ConsumerWidget {
           ),
 
           // Product Info
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Title
-                Text(
-                  title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.textPrimary,
-                    height: 1.2,
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Title
+                  Text(
+                    title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.textPrimary,
+                      height: 1.2,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 8),
 
-                // Rating and Category
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF8F8F8),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.star,
-                            color: variant.rating != null
-                                ? Colors.amber
-                                : const Color(0xFFE0E0E0),
-                            size: 14,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            variant.rating != null
-                                ? '${variant.rating!.toStringAsFixed(1)}${variant.reviewsCount > 0 ? ' (${variant.reviewsCount})' : ''}'
-                                : '0.0',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppColors.textPrimary,
+                  // Rating and Category
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF8F8F8),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.star,
+                              color: variant.rating != null
+                                  ? Colors.amber
+                                  : const Color(0xFFE0E0E0),
+                              size: 14,
                             ),
+                            const SizedBox(width: 4),
+                            Text(
+                              variant.rating != null
+                                  ? '${variant.rating!.toStringAsFixed(1)}${variant.reviewsCount > 0 ? ' (${variant.reviewsCount})' : ''}'
+                                  : '0.0',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF8F8F8),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          'store.weight_value'
+                              .tr(args: [variant.value.toString()]),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppColors.textPrimary,
                           ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+
+                  // Price and Cart
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (variant.discount_price != null) ...[
+                            Text(
+                              'store.price_value'.tr(args: [
+                                variant.discount_price!.toInt().toString()
+                              ]),
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'store.price_value'
+                                  .tr(args: [variant.price.toInt().toString()]),
+                              style: TextStyle(
+                                fontSize: 12,
+                                decoration: TextDecoration.lineThrough,
+                                color: AppColors.textPrimary.withOpacity(0.5),
+                              ),
+                            ),
+                          ] else
+                            Text(
+                              'store.price_value'
+                                  .tr(args: [variant.price.toInt().toString()]),
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
                         ],
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF8F8F8),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        'store.weight_value'
-                            .tr(args: [variant.value.toString()]),
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-
-                // Price and Cart
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (variant.discount_price != null) ...[
-                          Text(
-                            'store.price_value'.tr(args: [
-                              variant.discount_price!.toInt().toString()
-                            ]),
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimary,
+                      if (onAddToCart != null && variant.isAvailable)
+                        GestureDetector(
+                          onTap: onAddToCart,
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                          ),
-                          Text(
-                            'store.price_value'
-                                .tr(args: [variant.price.toInt().toString()]),
-                            style: TextStyle(
-                              fontSize: 12,
-                              decoration: TextDecoration.lineThrough,
-                              color: AppColors.textPrimary.withOpacity(0.5),
+                            child: const Icon(
+                              Icons.add_shopping_cart,
+                              color: Colors.white,
+                              size: 20,
                             ),
-                          ),
-                        ] else
-                          Text(
-                            'store.price_value'
-                                .tr(args: [variant.price.toInt().toString()]),
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                      ],
-                    ),
-                    if (onAddToCart != null && variant.isAvailable)
-                      GestureDetector(
-                        onTap: onAddToCart,
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(
-                            Icons.add_shopping_cart,
-                            color: Colors.white,
-                            size: 20,
                           ),
                         ),
-                      ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ],

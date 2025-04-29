@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/core/widgets/custom_app_bar.dart';
@@ -28,8 +29,8 @@ class AboutPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Center(
-                    child: Image.asset(
-                      'lib/core/assets/images/logos/main.png',
+                    child: SvgPicture.asset(
+                      'lib/core/assets/icons/logo.svg',
                       height: 40,
                     ),
                   ),

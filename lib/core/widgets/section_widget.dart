@@ -58,7 +58,7 @@ class SectionWidget extends StatelessWidget {
                   child: Text(
                     buttonTitle!,
                     style: const TextStyle(
-                      fontSize: 14,
+                      fontSize: 12,
                       fontWeight: FontWeight.w500,
                       color: AppColors.textPrimary,
                     ),
@@ -67,7 +67,6 @@ class SectionWidget extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 16),
         child,
       ],
     );

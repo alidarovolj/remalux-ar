@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:remalux_ar/core/theme/colors.dart';
 import 'package:remalux_ar/features/home/domain/providers/selected_color_provider.dart';
@@ -87,43 +88,32 @@ class ColorSelection extends ConsumerWidget {
               ],
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 16),
           Material(
             color: AppColors.backgroundSecondary,
             borderRadius: BorderRadius.circular(12),
             child: InkWell(
               onTap: () async {
                 try {
-                  print('\n\n=== COLOR SELECTION DEBUG ===');
-                  print('Button tapped');
-                  print('Product ID: ${product.id}');
-
                   await ref
                       .read(productColorSelectionProvider.notifier)
                       .setProduct(product, initialWeight: initialWeight);
-                  print('Product set successfully');
 
                   if (context.mounted) {
-                    print('Context is mounted, attempting navigation...');
-                    print(
-                        'Navigating to /colors with productId: ${product.id}');
                     context.push('/colors', extra: {
                       'productId': product.id,
                       'fromProductDetail': true,
                     });
-                    print('Navigation completed');
                   } else {
                     print('Context is not mounted');
                   }
-                  print('===========================\n\n');
                 } catch (e) {
-                  print('Error navigating to colors page: $e');
                   print('Stack trace: ${StackTrace.current}');
                 }
               },
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -156,29 +146,19 @@ class ColorSelection extends ConsumerWidget {
       child: InkWell(
         onTap: () async {
           try {
-            print('\n\n=== COLOR SELECTION DEBUG ===');
-            print('Button tapped');
-            print('Product ID: ${product.id}');
-
             await ref
                 .read(productColorSelectionProvider.notifier)
                 .setProduct(product, initialWeight: initialWeight);
-            print('Product set successfully');
 
             if (context.mounted) {
-              print('Context is mounted, attempting navigation...');
-              print('Navigating to /colors with productId: ${product.id}');
               context.push('/colors', extra: {
                 'productId': product.id,
                 'fromProductDetail': true,
               });
-              print('Navigation completed');
             } else {
               print('Context is not mounted');
             }
-            print('===========================\n\n');
           } catch (e) {
-            print('Error navigating to colors page: $e');
             print('Stack trace: ${StackTrace.current}');
           }
         },

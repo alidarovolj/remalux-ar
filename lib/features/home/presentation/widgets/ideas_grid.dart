@@ -19,7 +19,7 @@ class IdeasGrid extends ConsumerWidget {
       buttonTitle: 'home.ideas.view_all'.tr(),
       onButtonPressed: () => context.push('/ideas'),
       child: SizedBox(
-        height: 290,
+        height: 270,
         child: ideasAsync.when(
           data: (ideas) {
             if (ideas.isEmpty) {

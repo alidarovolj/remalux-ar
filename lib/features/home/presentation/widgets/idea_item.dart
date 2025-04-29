@@ -4,6 +4,7 @@ import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/features/home/domain/models/idea.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class IdeaItem extends StatelessWidget {
   final Idea idea;
@@ -83,7 +84,7 @@ class IdeaItem extends StatelessWidget {
 
                   // Content
                   SizedBox(
-                    height: 100,
+                    height: 80,
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
                       child: Column(
@@ -92,12 +93,12 @@ class IdeaItem extends StatelessWidget {
                           // Title
                           Text(
                             idea.title[currentLocale] ?? idea.title['ru'] ?? '',
-                            maxLines: 2,
+                            maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               fontSize: 15,
                               color: AppColors.textPrimary,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.w400,
                             ),
                           ),
 
@@ -116,12 +117,13 @@ class IdeaItem extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
-                                  idea.roomTitle?[currentLocale] ??
-                                      idea.roomTitle?['ru'] ??
-                                      '',
-                                  style: TextStyle(
+                                  (idea.roomTitle?[currentLocale] ??
+                                          idea.roomTitle?['ru'] ??
+                                          '')
+                                      .toUpperCase(),
+                                  style: GoogleFonts.ysabeau(
                                     fontSize: 12,
-                                    fontWeight: FontWeight.w500,
+                                    fontWeight: FontWeight.w600,
                                     color: firstTextColor,
                                   ),
                                 ),
@@ -137,10 +139,11 @@ class IdeaItem extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
-                                  idea.colorTitle?[currentLocale] ??
-                                      idea.colorTitle?['ru'] ??
-                                      '',
-                                  style: TextStyle(
+                                  (idea.colorTitle?[currentLocale] ??
+                                          idea.colorTitle?['ru'] ??
+                                          '')
+                                      .toUpperCase(),
+                                  style: GoogleFonts.ysabeau(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
                                     color: secondTextColor,
@@ -162,7 +165,7 @@ class IdeaItem extends StatelessWidget {
                   right: 12,
                   top: 12,
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(28),
                     child: BackdropFilter(
                       filter: ImageFilter.blur(
                         sigmaX: 55.0,

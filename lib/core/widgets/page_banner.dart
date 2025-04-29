@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 enum BannerType {
@@ -128,8 +129,8 @@ class PageBanner extends StatelessWidget {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Image.asset(
-                      'lib/core/assets/images/logos/main.png',
+                    child: SvgPicture.asset(
+                      'lib/core/assets/icons/logo.svg',
                       fit: BoxFit.contain,
                       errorBuilder: (context, error, stackTrace) {
                         // Если изображение не найдено, показываем текст

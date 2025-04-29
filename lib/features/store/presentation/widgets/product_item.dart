@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/features/store/domain/models/product.dart';
 
@@ -22,11 +23,15 @@ class ProductItem extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: const Color(0xFF3B4D8B).withOpacity(0.1),
+            width: 0.5,
+          ),
           boxShadow: [
             BoxShadow(
               color: const Color(0xFF3B4D8B).withOpacity(0.1),
               offset: const Offset(0, 1),
-              blurRadius: 5,
+              blurRadius: 4,
               spreadRadius: 0,
             ),
           ],
@@ -93,121 +98,121 @@ class ProductItem extends StatelessWidget {
             ),
 
             // Product Info
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Title
-                  Text(
-                    product.title['ru'] ?? '',
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w400,
-                      color: AppColors.textPrimary,
-                      height: 1.2,
+            Expanded(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Title
+                    Text(
+                      product.title['ru'] ?? '',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.textPrimary,
+                        height: 1.2,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
 
-                  // Rating and Category
-                  Row(
-                    children: [
-                      if (product.rating != null)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF8F8F8),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.star,
-                                color: Colors.amber,
-                                size: 14,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                product.rating!.toStringAsFixed(1),
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF8F8F8),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            product.category.title['ru'] ?? '',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppColors.textPrimary,
+                    // Rating and Category
+                    Row(
+                      children: [
+                        if (product.rating != null)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  // Price and Cart
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'от ${product.priceRange[0].toInt()} ₸',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                        ],
-                      ),
-                      if (onAddToCart != null)
-                        GestureDetector(
-                          onTap: onAddToCart,
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: AppColors.primary,
+                              color: const Color(0xFFF8F8F8),
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: const Icon(
-                              Icons.add_shopping_cart,
-                              color: Colors.white,
-                              size: 20,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.star,
+                                  color: Colors.amber,
+                                  size: 14,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  product.rating!.toStringAsFixed(1),
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF8F8F8),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              product.category.title['ru'] ?? '',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textPrimary,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+
+                    // Price and Cart
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'от ${product.priceRange[0].toInt()} ₸',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (onAddToCart != null)
+                          GestureDetector(
+                            onTap: onAddToCart,
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppColors.primary,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(
+                                Icons.add_shopping_cart,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

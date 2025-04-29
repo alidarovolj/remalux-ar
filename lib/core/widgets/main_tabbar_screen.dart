@@ -91,11 +91,11 @@ class _MainTabBarScreenState extends ConsumerState<MainTabBarScreen>
       if (index == 4) {
         final authState = ref.read(authProvider);
         if (!authState.isAuthenticated) {
-          context.push('/profile');
+          context.go('/profile');
           return;
         }
       }
-      context.push(route);
+      context.go(route);
     }
   }
 

@@ -58,12 +58,12 @@ class FiltersModal extends ConsumerWidget {
                 width: 32,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEEEEEE),
+                  color: AppColors.borderLight,
                   borderRadius: BorderRadius.circular(2),
                 ),
                 margin: const EdgeInsets.symmetric(horizontal: 12),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 16),
               Text(
                 'store.filters'.tr(),
                 style: GoogleFonts.ysabeau(
@@ -73,7 +73,9 @@ class FiltersModal extends ConsumerWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 16),
+              const Divider(
+                  color: AppColors.borderLight, height: 1, thickness: 1),
             ],
           ),
           Expanded(
@@ -123,47 +125,61 @@ class FiltersModal extends ConsumerWidget {
                         Center(child: Text('common.error'.tr())),
                   ),
                   const SizedBox(height: 24),
+                  const Divider(
+                      color: AppColors.borderLight, height: 1, thickness: 1),
+                  const SizedBox(height: 24),
                   filtersAsync.when(
                     data: (filters) => Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: filters
-                          .map((filter) => Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  Text(
-                                    filter.title[context.locale.languageCode] ??
-                                        '',
-                                    style: GoogleFonts.ysabeau(
-                                      fontSize: 19,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.textPrimary,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  ...filter.values
-                                      .map((value) => _buildCheckboxItem(
-                                            value.values[context
-                                                    .locale.languageCode] ??
-                                                '',
-                                            isSelected: selectedFilters
-                                                .contains(value.id),
-                                            onChanged: (bool? checked) {
-                                              if (checked != null) {
-                                                selectedFiltersNotifier
-                                                    .toggleFilter(value.id);
-                                              }
-                                            },
-                                          )),
-                                  const SizedBox(height: 24),
-                                ],
-                              ))
-                          .toList(),
+                      children: filters.asMap().entries.map((entry) {
+                        final index = entry.key;
+                        final filter = entry.value;
+
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            if (index > 0) ...[
+                              const Divider(
+                                  color: AppColors.borderLight,
+                                  height: 1,
+                                  thickness: 1),
+                              const SizedBox(height: 24),
+                            ],
+                            Text(
+                              filter.title[context.locale.languageCode] ?? '',
+                              style: GoogleFonts.ysabeau(
+                                fontSize: 19,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            ...filter.values.map((value) => _buildCheckboxItem(
+                                  value.values[context.locale.languageCode] ??
+                                      '',
+                                  isSelected:
+                                      selectedFilters.contains(value.id),
+                                  onChanged: (bool? checked) {
+                                    if (checked != null) {
+                                      selectedFiltersNotifier
+                                          .toggleFilter(value.id);
+                                    }
+                                  },
+                                )),
+                            const SizedBox(height: 24),
+                          ],
+                        );
+                      }).toList(),
                     ),
                     loading: () =>
                         const Center(child: CircularProgressIndicator()),
                     error: (error, stack) =>
                         Center(child: Text('common.error'.tr())),
                   ),
+                  const SizedBox(height: 24),
+                  const Divider(
+                      color: AppColors.borderLight, height: 1, thickness: 1),
+                  const SizedBox(height: 24),
                   Text(
                     'store.price.title'.tr(),
                     style: GoogleFonts.ysabeau(
@@ -173,78 +189,103 @@ class FiltersModal extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  RangeSlider(
-                    values: const RangeValues(3000, 5000),
-                    min: 0,
-                    max: 10000,
-                    activeColor: AppColors.primary,
-                    inactiveColor: const Color(0xFFF8F8F8),
-                    onChanged: (RangeValues values) {},
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 0),
+                    child: RangeSlider(
+                      values: const RangeValues(3000, 5000),
+                      min: 0,
+                      max: 10000,
+                      activeColor: AppColors.primary,
+                      inactiveColor: const Color(0xFFEEEEEE),
+                      onChanged: (RangeValues values) {},
+                      divisions: 100,
+                    ),
                   ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'store.price.from'.tr(),
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF8F8F8),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                '3000 ${'common.currency'.tr()}',
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: AppColors.textPrimary,
+                  const SizedBox(height: 12),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(left: 0),
+                                child: Text(
+                                  'store.price.from'.tr(),
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.textSecondary,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'store.price.to'.tr(),
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF8F8F8),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                '5000 ${'common.currency'.tr()}',
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: AppColors.textPrimary,
+                              const SizedBox(height: 4),
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border:
+                                      Border.all(color: AppColors.borderLight),
+                                ),
+                                child: Text(
+                                  '3000 ₸',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(left: 4),
+                                child: Text(
+                                  'store.price.to'.tr(),
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border:
+                                      Border.all(color: AppColors.borderLight),
+                                ),
+                                child: Text(
+                                  '5000 ₸',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -259,9 +300,17 @@ class FiltersModal extends ConsumerWidget {
             ),
             decoration: const BoxDecoration(
               color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Color.fromRGBO(0, 0, 0, 0.05),
+                  offset: Offset(0, -2),
+                  blurRadius: 8,
+                  spreadRadius: 0,
+                ),
+              ],
               border: Border(
                 top: BorderSide(
-                  color: Color(0xFFEEEEEE),
+                  color: AppColors.borderLight,
                   width: 1,
                 ),
               ),
@@ -292,8 +341,9 @@ class FiltersModal extends ConsumerWidget {
                   },
                   label: 'common.save'.tr(),
                   type: ButtonType.normal,
+                  isFullWidth: true,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 CustomButton(
                   onPressed: () {
                     selectedFiltersNotifier.reset();
@@ -302,7 +352,7 @@ class FiltersModal extends ConsumerWidget {
                   },
                   label: 'common.cancel'.tr(),
                   type: ButtonType.normal,
-                  backgroundColor: const Color(0xFFF8F8F8),
+                  backgroundColor: const Color(0xFFF5F6FA),
                   textColor: AppColors.textPrimary,
                   isFullWidth: true,
                 ),

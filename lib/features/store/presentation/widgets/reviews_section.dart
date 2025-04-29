@@ -71,8 +71,8 @@ class ReviewsSection extends StatelessWidget {
             );
           },
           type: ButtonType.normal,
-          backgroundColor: const Color(0xFFF8F8F8),
-          textColor: AppColors.textPrimary,
+          backgroundColor: const Color(0xFF3162C3),
+          textColor: Colors.white,
         ),
       ],
     );

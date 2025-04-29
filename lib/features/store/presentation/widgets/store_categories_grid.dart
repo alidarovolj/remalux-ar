@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/features/home/domain/models/category.dart';
 import 'package:remalux_ar/features/home/presentation/providers/categories_provider.dart';
@@ -25,8 +26,8 @@ class StoreCategoriesGrid extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Text(
             'store.categories.title'.tr(),
-            style: const TextStyle(
-              fontSize: 20,
+            style: GoogleFonts.ysabeau(
+              fontSize: 19,
               fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
             ),

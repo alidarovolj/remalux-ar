@@ -33,7 +33,7 @@ class _ProductsGridState extends ConsumerState<ProductsGrid> {
       buttonTitle: 'home.products.view_all'.tr(),
       onButtonPressed: () => context.push('/store'),
       child: SizedBox(
-        height: 285,
+        height: 293,
         child: productsAsync.when(
           data: (products) {
             if (products.isEmpty) {

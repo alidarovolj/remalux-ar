@@ -40,13 +40,10 @@ class _CartPageState extends ConsumerState<CartPage>
         currentLocale = context.locale.languageCode;
       });
 
-      // Check authentication status
-      _checkAuthStatus();
-
-      // Force refresh cart data
+      // Force refresh cart data regardless of authentication status
       ref.invalidate(cartProvider);
 
-      // Always fetch cart on initialization
+      // Always try to fetch cart on initialization
       _refreshCart();
     });
   }
@@ -61,95 +58,47 @@ class _CartPageState extends ConsumerState<CartPage>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // Check auth status when app comes back to foreground
     if (state == AppLifecycleState.resumed) {
-      _checkAuthStatus();
+      ref.invalidate(cartProvider);
+      _refreshCart();
     }
   }
 
   @override
   void didUpdateWidget(CartPage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Check auth status when widget updates (e.g., when returning to the page)
-    _checkAuthStatus();
+    // Force refresh cart when widget is updated
+    ref.invalidate(cartProvider);
+    _refreshCart();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
+    // Обновляем только локаль, если она изменилась
     final newLocale = context.locale.languageCode;
     if (currentLocale != newLocale) {
       setState(() {
         currentLocale = newLocale;
       });
     }
-
-    // Check auth status every time dependencies change
-    _checkAuthStatus();
-
-    // Listen for cart data changes
-    final cartData = ref.watch(cartProvider);
-    cartData.whenData((items) {
-      if (items.isNotEmpty && !_isAuthenticated) {
-        setState(() {
-          _isAuthenticated = true;
-        });
-      }
-    });
-  }
-
-  Future<void> _checkAuthStatus() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-
-      // Check if there is a valid token in both SharedPreferences and ApiClient
-      ApiClient apiClient = ApiClient();
-      bool apiHasToken = apiClient.accessToken != null;
-
-      final isAuthenticated = token != null && token.isNotEmpty && apiHasToken;
-
-      print(
-          '🔑 Auth check: ${isAuthenticated ? 'Authenticated' : 'Not authenticated'} '
-          '(token in prefs: ${token != null}, API token: ${apiHasToken ? 'exists' : 'missing'})');
-
-      if (_isAuthenticated != isAuthenticated) {
-        setState(() {
-          _isAuthenticated = isAuthenticated;
-        });
-
-        // If authentication status changed and user is now logged out, invalidate cart
-        if (!isAuthenticated) {
-          ref.invalidate(cartProvider);
-        }
-      }
-    } catch (e) {
-      print('❌ Error checking auth status: $e');
-      setState(() {
-        _isAuthenticated = false;
-      });
-    }
   }
 
   void _refreshCart() {
-    if (!_isAuthenticated) {
-      print('⚠️ Not refreshing cart because user is not authenticated');
-      return;
-    }
+    print('🔄 Attempting to refresh cart...');
 
+    // Всегда пытаемся загрузить корзину, независимо от состояния _isAuthenticated
     ref.read(cartProvider.notifier).getCart().then((_) {
-      print('✅ Cart refresh completed');
+      print('✅ Cart refresh completed successfully');
 
-      // Check cart data after refresh
-      final cartData = ref.read(cartProvider);
-      cartData.whenData((items) {
-        if (items.isNotEmpty) {
-          setState(() {
-            _isAuthenticated = true;
-          });
-        }
+      // Если мы успешно получили данные, значит пользователь аутентифицирован
+      setState(() {
+        _isAuthenticated = true;
       });
     }).catchError((error) {
       print('❌ Cart refresh failed: $error');
-      // If we get a 401, update our authentication status
+
+      // Если получили ошибку 401, значит пользователь не аутентифицирован
       if (error is DioException && error.response?.statusCode == 401) {
         setState(() {
           _isAuthenticated = false;
@@ -279,19 +228,6 @@ class _CartPageState extends ConsumerState<CartPage>
     final cartAsync = ref.watch(cartProvider);
     print('🎨 CartPage building with state: ${cartAsync.toString()}');
 
-    // Check if we have items in the cart
-    bool hasCartItems = cartAsync.maybeWhen(
-      data: (items) => items.isNotEmpty,
-      orElse: () => false,
-    );
-
-    // If we have items, we must be authenticated
-    if (hasCartItems && !_isAuthenticated) {
-      setState(() {
-        _isAuthenticated = true;
-      });
-    }
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: CustomAppBar(
@@ -299,7 +235,7 @@ class _CartPageState extends ConsumerState<CartPage>
       ),
       body: cartAsync.when(
         data: (items) {
-          // If we have items, we are definitely authenticated
+          // Если есть элементы в корзине - показываем содержимое
           if (items.isNotEmpty) {
             return Column(
               children: [
@@ -322,12 +258,7 @@ class _CartPageState extends ConsumerState<CartPage>
             );
           }
 
-          // Otherwise, check authentication status
-          if (!_isAuthenticated) {
-            return _buildAuthRequiredView(context);
-          }
-
-          // Empty cart for authenticated user
+          // Если корзина пуста - показываем пустое состояние
           return SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -371,13 +302,13 @@ class _CartPageState extends ConsumerState<CartPage>
         loading: () => const CartSkeleton(),
         error: (error, stackTrace) {
           print('❌ Cart error: $error');
+
+          // Если ошибка 401 - показываем экран необходимости авторизации
           if (error is DioException && error.response?.statusCode == 401) {
-            // Update authentication status and return the auth required view
-            setState(() {
-              _isAuthenticated = false;
-            });
             return _buildAuthRequiredView(context);
           }
+
+          // Для других ошибок - простое сообщение
           return Center(
             child: Text(
               'store.cart.error'.tr(),
@@ -401,13 +332,43 @@ class _CartPageState extends ConsumerState<CartPage>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // Иконка корзины
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFF5F6FA),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.shopping_cart_outlined,
+                      size: 40,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  // Заголовок
                   Text(
-                    'store.cart.auth_required'.tr(),
+                    'store.cart.auth_required_title'.tr(),
                     style: const TextStyle(
-                      fontSize: 15,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
                     textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 12),
+                  // Подсказка
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32),
+                    child: Text(
+                      'store.cart.auth_required'.tr(),
+                      style: const TextStyle(
+                        fontSize: 15,
+                        color: AppColors.textSecondary,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ],
               ),

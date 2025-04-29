@@ -140,7 +140,7 @@
       "price_asc": "По возрастанию цены",
       "price_desc": "По убыванию цены"
     },
-    "products_count": "Найдено {} товаров",
+    "products_count": "{} товаров",
     "no_products_found": "К сожалению, по заданным критериям товаров не найдено",
     "try_different_filters": "Измените или ослабьте фильтры и попробуйте снова",
     "categories": {
@@ -159,6 +159,11 @@
     "quantity": "Количество: {}",
     "continue_shopping": "Продолжить покупки",
     "go_to_cart": "Перейти в корзину",
+    "cart_modal": {
+      "continue_shopping": "Продолжить покупки",
+      "go_to_cart": "Перейти в корзину",
+      "quantity": "Количество: {}"
+    },
     "product": {
       "visualize": "Визуализировать",
       "article": "Артикул: {}",
@@ -166,7 +171,11 @@
       "weight": "Вес",
       "weight_unit": "кг",
       "usage_rate": "Норма расхода: {} м²/л",
+      "usage_rate_prefix": "Норма расхода: ",
+      "usage_rate_suffix": "г/м2",
       "coverage_calculation": "Расчет площади покрытия краской: {} м²",
+      "coverage_calculation_prefix": "Расчет площади покрытия краской: ",
+      "coverage_calculation_suffix": "кв/м2",
       "paint_calculator": "Калькулятор краски",
       "compare": "Сравнить",
       "add_to_favorites": "В избранное",

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/features/home/domain/models/product.dart';
 import 'package:remalux_ar/features/favorites/domain/providers/favorites_providers.dart';
@@ -26,6 +27,8 @@ class ProductItem extends ConsumerWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       color: Colors.white,
+      elevation: 5,
+      shadowColor: const Color.fromRGBO(59, 77, 139, 0.1),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -58,7 +61,7 @@ class ProductItem extends ConsumerWidget {
                             'lib/core/assets/images/color_wheel.png',
                             width: 24,
                             height: 24,
-                          )
+                          ),
                         ],
                       ),
                     ),
@@ -168,7 +171,7 @@ class ProductItem extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 12),
                   Text(
                     '${product.priceRange[0]} - ${product.priceRange[1]} ₸',
                     style: const TextStyle(

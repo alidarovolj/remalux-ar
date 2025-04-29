@@ -136,10 +136,10 @@
     "filters": "Сүзгілер",
     "sorting": "Сұрыптау",
     "sorting_options": {
-      "price_asc": "Бағасы: төменнен жоғары",
-      "price_desc": "Бағасы: жоғарыдан төмен"
+      "price_asc": "Бағасы бойынша өсу",
+      "price_desc": "Бағасы бойынша кему"
     },
-    "products_count": "{} тауар табылды",
+    "products_count": "{} тауар",
     "no_products_found": "Өкінішке орай, берілген критерийлер бойынша тауарлар табылмады",
     "try_different_filters": "Сүзгілерді өзгертіп немесе әлсіретіп, қайталап көріңіз",
     "categories": {
@@ -161,7 +161,11 @@
       "weight": "Салмақ",
       "weight_unit": "кг",
       "usage_rate": "Тұтыну нормасы: {} м²/л",
+      "usage_rate_prefix": "Тұтыну нормасы: ",
+      "usage_rate_suffix": "г/м2",
       "coverage_calculation": "Бояуды жабу ауданын есептеу: {} м²",
+      "coverage_calculation_prefix": "Бояуды жабу ауданын есептеу: ",
+      "coverage_calculation_suffix": "шаршы м2",
       "paint_calculator": "Бояу калькуляторы",
       "compare": "Салыстыру",
       "add_to_favorites": "Таңдаулыларға қосу",
@@ -773,7 +777,13 @@
       "title": "Тапсырыс рәсімделді",
       "message": "Сіздің тапсырысыңыз сәтті рәсімделді",
       "order_number": "Тапсырыс нөмірі: {number}",
-      "continue_shopping": "Сатып алуды жалғастыру"
+      "continue_shopping": "Сатып алуды жалғастыру",
+      "go_to_cart": "Себетке өту",
+      "cart_modal": {
+        "continue_shopping": "Сатып алуды жалғастыру",
+        "go_to_cart": "Себетке өту",
+        "quantity": "Саны: {}"
+      }
     }
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
@@ -264,8 +265,8 @@ class _PhoneVerificationPageState extends ConsumerState<PhoneVerificationPage> {
             ),
           ),
         ),
-        title: Image.asset(
-          'lib/core/assets/images/logos/main.png',
+        title: SvgPicture.asset(
+          'lib/core/assets/icons/logo.svg',
           height: 32,
         ),
         centerTitle: true,

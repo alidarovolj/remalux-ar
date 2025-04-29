@@ -82,17 +82,20 @@ class _CustomButtonState extends State<CustomButton> {
 
   @override
   Widget build(BuildContext context) {
-    final backgroundColor = switch (widget.variant) {
+    final defaultBgColor = switch (widget.variant) {
       ButtonVariant.primary =>
         widget.isEnabled ? AppColors.primary : AppColors.buttonDisabled,
       ButtonVariant.secondary =>
         widget.isEnabled ? AppColors.buttonSecondary : AppColors.buttonDisabled,
     };
 
-    final textColor = switch (widget.variant) {
+    final defaultTextColor = switch (widget.variant) {
       ButtonVariant.primary => Colors.white,
       ButtonVariant.secondary => AppColors.primary,
     };
+
+    final Color actualBgColor = widget.backgroundColor ?? defaultBgColor;
+    final Color actualTextColor = widget.textColor ?? defaultTextColor;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
@@ -114,15 +117,15 @@ class _CustomButtonState extends State<CustomButton> {
             ? const Color(0xFFE0E0E0) // Серый цвет для disabled состояния
             : widget.isBackGradient
                 ? null
-                : backgroundColor,
+                : actualBgColor,
         borderRadius: BorderRadius.circular(AppLength.xs),
       ),
       child: MaterialButton(
         minWidth: widget.isFullWidth ? double.infinity : 0.0,
-        height: widget.type == ButtonType.small ? 24 : 40,
+        height: widget.type == ButtonType.small ? 24 : 48,
         padding: _padding,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppLength.xs),
+          borderRadius: BorderRadius.circular(12),
         ),
         onPressed: widget.isEnabled ? widget.onPressed : null,
         color: Colors.transparent,
@@ -147,7 +150,7 @@ class _CustomButtonState extends State<CustomButton> {
             : AnimatedDefaultTextStyle(
                 duration: const Duration(milliseconds: 200),
                 style: _textStyle.copyWith(
-                  color: textColor,
+                  color: actualTextColor,
                 ),
                 child: Text(widget.label),
               ),

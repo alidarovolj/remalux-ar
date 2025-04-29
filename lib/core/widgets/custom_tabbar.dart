@@ -16,7 +16,7 @@ class CustomTabBar extends StatelessWidget {
       clipBehavior: Clip.none,
       children: [
         Container(
-          padding: const EdgeInsets.only(bottom: 0),
+          padding: const EdgeInsets.only(bottom: 10),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: const BorderRadius.only(
@@ -52,6 +52,7 @@ class CustomTabBar extends StatelessWidget {
                   fontSize: 10,
                   fontWeight: FontWeight.w500,
                 ),
+                dividerColor: Colors.transparent,
                 tabs: [
                   Tab(
                     icon: SvgPicture.asset(

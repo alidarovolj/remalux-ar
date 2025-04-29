@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
 
 class LoaderModal extends StatefulWidget {
@@ -98,8 +99,8 @@ class _LoaderModalState extends State<LoaderModal>
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(AppLength.body),
-              child: Image.asset(
-                'lib/core/assets/images/logos/main.png',
+              child: SvgPicture.asset(
+                'lib/core/assets/icons/logo.svg',
                 height: 80,
                 fit: BoxFit.contain,
               ),

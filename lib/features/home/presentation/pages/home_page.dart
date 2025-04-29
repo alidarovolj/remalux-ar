@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:remalux_ar/core/widgets/custom_button.dart';
 import 'package:remalux_ar/features/home/presentation/widgets/categories_grid.dart';
 import 'package:remalux_ar/features/home/presentation/widgets/products_grid.dart';
@@ -145,138 +146,120 @@ class _HomePageState extends ConsumerState<HomePage> {
                       Positioned(
                         top: 155,
                         right: 16,
-                        child: Consumer(
-                          builder: (context, ref, child) {
-                            final colorsAsync =
-                                ref.watch(detailedColorsProvider);
-
-                            return colorsAsync.when(
-                              loading: () => Shimmer.fromColors(
-                                baseColor: Colors.grey[300]!,
-                                highlightColor: Colors.grey[100]!,
-                                child: Container(
-                                  width: 80,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Container(
-                                        height: 50,
-                                        decoration: const BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(16),
-                                            topRight: Radius.circular(16),
-                                          ),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 6, horizontal: 4),
-                                        child: Container(
-                                          height: 24,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(4),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(6.91),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 23, sigmaY: 23),
+                            child: Container(
+                              width: 60,
+                              height: 80,
+                              padding: const EdgeInsets.fromLTRB(
+                                  4.6, 4.6, 4.6, 9.21),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(6.91),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.8),
+                                  width: 0.93,
                                 ),
                               ),
-                              error: (error, stack) => const SizedBox(),
-                              data: (colors) {
-                                if (colors.isEmpty) return const SizedBox();
+                              child: Consumer(
+                                builder: (context, ref, child) {
+                                  final colorsAsync =
+                                      ref.watch(detailedColorsProvider);
 
-                                final currentColor = colors.firstWhere(
-                                  (color) =>
-                                      _parseHexColor(color.hex) ==
-                                      _currentColor,
-                                  orElse: () => colors[0],
-                                );
-
-                                return AnimatedOpacity(
-                                  duration: const Duration(milliseconds: 300),
-                                  opacity: 1.0,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      showModalBottomSheet(
-                                        context: context,
-                                        backgroundColor: Colors.transparent,
-                                        isScrollControlled: true,
-                                        builder: (context) => ColorDetailModal(
-                                          color: currentColor,
-                                        ),
-                                      );
-                                    },
-                                    child: Container(
-                                      width: 80,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(16),
-                                        boxShadow: const [
-                                          BoxShadow(
-                                            color: Color.fromRGBO(
-                                                59, 77, 139, 0.1),
-                                            blurRadius: 5,
-                                            offset: Offset(0, 1),
-                                            spreadRadius: 0,
-                                          ),
-                                        ],
-                                      ),
+                                  return colorsAsync.when(
+                                    loading: () => Shimmer.fromColors(
+                                      baseColor: Colors.grey[300]!,
+                                      highlightColor: Colors.grey[100]!,
                                       child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        mainAxisSize: MainAxisSize.min,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
-                                          AnimatedContainer(
-                                            duration: const Duration(
-                                                milliseconds: 500),
-                                            height: 50,
+                                          Container(
+                                            width: 51,
+                                            height: 51,
                                             decoration: BoxDecoration(
-                                              color: _currentColor,
+                                              color: Colors.white,
                                               borderRadius:
-                                                  const BorderRadius.only(
-                                                topLeft: Radius.circular(16),
-                                                topRight: Radius.circular(16),
-                                              ),
+                                                  BorderRadius.circular(5),
                                             ),
                                           ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 6, horizontal: 4),
-                                            child: Text(
-                                              currentColor.title[context
-                                                      .locale.languageCode] ??
-                                                  '',
-                                              style: const TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                              textAlign: TextAlign.center,
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
+                                          Container(
+                                            height: 10,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(2),
                                             ),
                                           ),
                                         ],
                                       ),
                                     ),
-                                  ),
-                                );
-                              },
-                            );
-                          },
+                                    error: (error, stack) => const SizedBox(),
+                                    data: (colors) {
+                                      if (colors.isEmpty)
+                                        return const SizedBox();
+
+                                      final currentColor = colors.firstWhere(
+                                        (color) =>
+                                            _parseHexColor(color.hex) ==
+                                            _currentColor,
+                                        orElse: () => colors[0],
+                                      );
+
+                                      return GestureDetector(
+                                        onTap: () {
+                                          showModalBottomSheet(
+                                            context: context,
+                                            backgroundColor: Colors.transparent,
+                                            isScrollControlled: true,
+                                            builder: (context) =>
+                                                ColorDetailModal(
+                                              color: currentColor,
+                                            ),
+                                          );
+                                        },
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Container(
+                                              width: 51,
+                                              height: 51,
+                                              decoration: BoxDecoration(
+                                                color: _currentColor,
+                                                borderRadius:
+                                                    BorderRadius.circular(5),
+                                              ),
+                                            ),
+                                            Text(
+                                              currentColor.title[context
+                                                      .locale.languageCode] ??
+                                                  '',
+                                              style: const TextStyle(
+                                                fontSize: 8,
+                                                fontWeight: FontWeight.w700,
+                                                color: Color(0xFF333333),
+                                              ),
+                                              textAlign: TextAlign.center,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                       // Hand with phone
-                      Center(
+                      Align(
+                        alignment: const Alignment(0.4, 0),
                         child: Padding(
                           padding: const EdgeInsets.only(top: 70),
                           child: Stack(
@@ -349,30 +332,11 @@ class _HomePageState extends ConsumerState<HomePage> {
                           baseColor: Colors.grey[300]!,
                           highlightColor: Colors.grey[100]!,
                           child: Container(
-                            height: 176,
-                            padding: const EdgeInsets.all(8),
+                            height: 180,
+                            width: 48,
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.6),
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: List.generate(
-                                4,
-                                (index) => Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 4),
-                                  child: Container(
-                                    width: 32,
-                                    height: 32,
-                                    decoration: const BoxDecoration(
-                                      color: Colors.white,
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                ),
-                              ),
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(24),
                             ),
                           ),
                         ),
@@ -381,43 +345,42 @@ class _HomePageState extends ConsumerState<HomePage> {
                           duration: const Duration(milliseconds: 300),
                           opacity: 1.0,
                           child: ClipRRect(
-                            borderRadius: BorderRadius.circular(14),
+                            borderRadius: BorderRadius.circular(24),
                             child: BackdropFilter(
                               filter: ImageFilter.blur(
-                                sigmaX: 55.0,
-                                sigmaY: 55.0,
+                                sigmaX: 14.56,
+                                sigmaY: 14.56,
                               ),
                               child: Container(
-                                height: 176,
-                                padding: const EdgeInsets.all(8),
+                                height: 180,
+                                width: 48,
+                                padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.6),
-                                  borderRadius: BorderRadius.circular(14),
+                                  color: Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(24),
+                                  border: Border.all(
+                                    color: Colors.white.withOpacity(0.8),
+                                    width: 0.59,
+                                  ),
                                 ),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: _usedColors
-                                      .map((color) => Padding(
-                                            padding: const EdgeInsets.symmetric(
+                                      .map((color) => Container(
+                                            width: 32,
+                                            height: 32,
+                                            margin: const EdgeInsets.symmetric(
                                                 vertical: 4),
-                                            child: AnimatedContainer(
-                                              duration: const Duration(
-                                                  milliseconds: 500),
-                                              width: 32,
-                                              height: 32,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: color,
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.black
-                                                        .withOpacity(0.1),
-                                                    spreadRadius: 0,
-                                                    blurRadius: 4,
-                                                    offset: const Offset(0, 1),
-                                                  ),
-                                                ],
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: color,
+                                              border: Border.all(
+                                                color: Colors.white
+                                                    .withOpacity(0.6),
+                                                width: 2,
                                               ),
                                             ),
                                           ))
@@ -447,8 +410,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                           const Expanded(child: SizedBox()),
                           SizedBox(
                             height: 40,
-                            child: Image.asset(
-                              'lib/core/assets/images/logos/main.png',
+                            child: SvgPicture.asset(
+                              'lib/core/assets/icons/logo.svg',
                               fit: BoxFit.contain,
                             ),
                           ),
@@ -508,8 +471,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                               // Text
                               Text(
                                 'home.try_colors'.tr(),
-                                style: const TextStyle(
-                                  fontSize: 24,
+                                style: GoogleFonts.ysabeauInfant(
+                                  fontSize: 19,
                                   fontWeight: FontWeight.w600,
                                   color: Color(0xFF1F1F1F),
                                   height: 1.2,
@@ -521,7 +484,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                 'home.try_colors_description'.tr(),
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 15,
                                   color: Color(0xFF1F1F1F),
                                   height: 1.3,
                                 ),

@@ -137,11 +137,11 @@
     "filters": "Filters",
     "sorting": "Sorting",
     "sorting_options": {
-      "price_asc": "Price: Low to High",
-      "price_desc": "Price: High to Low"
+      "price_asc": "Price ascending",
+      "price_desc": "Price descending"
     },
-    "products_count": "{} products found",
-    "no_products_found": "No products found",
+    "products_count": "{} products",
+    "no_products_found": "Sorry, no products found for the selected criteria",
     "try_different_filters": "Try different filters",
     "categories": {
       "title": "Categories"
@@ -162,7 +162,11 @@
       "weight": "Weight",
       "weight_unit": "kg",
       "usage_rate": "Usage rate: {} m²/l",
+      "usage_rate_prefix": "Usage rate: ",
+      "usage_rate_suffix": "g/m2",
       "coverage_calculation": "Paint coverage calculation: {} m²",
+      "coverage_calculation_prefix": "Paint coverage calculation: ",
+      "coverage_calculation_suffix": "sq/m2",
       "paint_calculator": "Paint calculator",
       "compare": "Compare",
       "add_to_favorites": "Add to favorites",
@@ -188,7 +192,12 @@
       "quantity": "Quantity: {}",
       "continue_shopping": "Continue shopping",
       "go_to_cart": "Go to cart",
-      "added_to_compare": "Product added to comparison"
+      "added_to_compare": "Product added to comparison",
+      "cart_modal": {
+        "continue_shopping": "Continue shopping",
+        "go_to_cart": "Go to cart",
+        "quantity": "Quantity: {}"
+      }
     },
     "paint_calculator": {
       "title": "Paint Calculator",

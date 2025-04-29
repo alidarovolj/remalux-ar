@@ -43,8 +43,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             )
           : null,
       title: showLogo
-          ? Image.asset(
-              logoAssetPath ?? 'lib/core/assets/images/logos/main.png',
+          ? SvgPicture.asset(
+              logoAssetPath ?? 'lib/core/assets/icons/logo.svg',
               height: logoHeight,
             )
           : (showTitle

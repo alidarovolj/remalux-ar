@@ -48,7 +48,7 @@ class ColorsGrid extends ConsumerWidget {
       buttonTitle: 'home.colors.view_all'.tr(),
       onButtonPressed: () => context.push('/colors'),
       child: SizedBox(
-        height: 120,
+        height: 90,
         child: colorsAsync.when(
           data: (colors) => ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -77,14 +77,14 @@ class ColorsGrid extends ConsumerWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        color.title[currentLocale] ?? color.title['ru'] ?? '',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Color(0xFF1F1F1F),
-                        ),
-                      ),
+                      // const SizedBox(height: 8),
+                      // Text(
+                      //   color.title[currentLocale] ?? color.title['ru'] ?? '',
+                      //   style: const TextStyle(
+                      //     fontSize: 12,
+                      //     color: Color(0xFF1F1F1F),
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),
