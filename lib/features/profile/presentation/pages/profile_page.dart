@@ -65,33 +65,38 @@ class UserNotifier extends StateNotifier<AsyncValue<User?>> {
       }
     } catch (e) {
       print('❌ getCurrentUser failed: $e');
-      await StorageService.removeToken();
-      state = const AsyncValue.data(null);
+      state = AsyncValue.error(e, StackTrace.current);
     }
   }
 
   Future<void> refresh() async {
-    print('🔄 Starting profile refresh...');
+    print('🔄 Refreshing user data...');
 
-    final token = await StorageService.getToken();
-    if (token == null) {
-      print('❌ No token for refresh');
-      state = const AsyncValue.data(null);
-      return;
+    // Keep the current state while refreshing
+    final currentUser = state.valueOrNull;
+    if (currentUser != null) {
+      state = AsyncValue.loading();
     }
-    print('🔑 Token found for refresh');
 
-    state = const AsyncValue.loading();
-    await getCurrentUser();
+    try {
+      await getCurrentUser();
+      print('✅ User refresh completed');
+    } catch (e) {
+      print('❌ User refresh failed: $e');
+      // If refresh fails but we had a user before, restore the previous state
+      // instead of showing an error or logging out
+      if (currentUser != null) {
+        state = AsyncValue.data(currentUser);
+      } else {
+        state = AsyncValue.error(e, StackTrace.current);
+      }
+    }
   }
 
   Future<void> logout() async {
-    print('👋 Logging out...');
+    print('🚪 Logging out user...');
     await StorageService.removeToken();
-    final apiClient = ref.read(apiClientProvider);
-    apiClient.clearAccessToken();
     state = const AsyncValue.data(null);
-    print('✅ Logout completed');
   }
 }
 
@@ -146,7 +151,54 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               ? _buildAuthenticatedProfile(context, user)
               : _buildUnauthenticatedProfile(context),
           loading: () => const ProfileSkeleton(),
-          error: (_, __) => _buildUnauthenticatedProfile(context),
+          error: (error, stack) => _buildErrorState(context, error),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorState(BuildContext context, Object error) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 48,
+              color: Colors.red.shade800,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'profile.error_loading'.tr(),
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              error.toString(),
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.grey,
+              ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () {
+                ref.read(userProvider.notifier).refresh();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFB71C1C),
+                foregroundColor: Colors.white,
+              ),
+              child: Text('profile.retry'.tr()),
+            ),
+          ],
         ),
       ),
     );
@@ -169,16 +221,42 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   color: const Color(0xFFB71C1C),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: Center(
-                  child: Text(
-                    user.name[0].toUpperCase(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
+                child: user.imageUrl != null && user.imageUrl!.isNotEmpty
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Image.network(
+                          user.imageUrl!,
+                          width: 40,
+                          height: 40,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Center(
+                              child: Text(
+                                user.name.isNotEmpty
+                                    ? user.name[0].toUpperCase()
+                                    : '?',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      )
+                    : Center(
+                        child: Text(
+                          user.name.isNotEmpty
+                              ? user.name[0].toUpperCase()
+                              : '?',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -286,7 +364,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        user.email ?? 'profile.not_specified'.tr(),
+                        user.email != null && user.email!.isNotEmpty
+                            ? user.email!
+                            : 'profile.no_email'.tr(),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(

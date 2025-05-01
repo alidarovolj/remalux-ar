@@ -48,7 +48,7 @@ class ColorsGrid extends ConsumerWidget {
       buttonTitle: 'home.colors.view_all'.tr(),
       onButtonPressed: () => context.push('/colors'),
       child: SizedBox(
-        height: 90,
+        height: 80,
         child: colorsAsync.when(
           data: (colors) => ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -100,26 +100,13 @@ class ColorsGrid extends ConsumerWidget {
               child: Shimmer.fromColors(
                 baseColor: Colors.grey[300]!,
                 highlightColor: Colors.grey[100]!,
-                child: Column(
-                  children: [
-                    Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      width: 60,
-                      height: 12,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    ),
-                  ],
+                child: Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
             ),

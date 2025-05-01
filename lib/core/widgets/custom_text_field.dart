@@ -15,6 +15,7 @@ class CustomTextField extends StatelessWidget {
   final String? statusText;
   final TextAlign textAlign;
   final String? hintText;
+  final FocusNode? focusNode;
 
   const CustomTextField({
     super.key,
@@ -30,6 +31,7 @@ class CustomTextField extends StatelessWidget {
     this.statusText,
     this.textAlign = TextAlign.start,
     this.hintText,
+    this.focusNode,
   });
 
   @override
@@ -53,6 +55,7 @@ class CustomTextField extends StatelessWidget {
           obscureText: obscureText,
           inputFormatters: inputFormatters,
           textAlign: textAlign,
+          focusNode: focusNode,
           style: const TextStyle(
             fontSize: 15,
             color: AppColors.textPrimary,

@@ -17,8 +17,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'firebase_options.dart';
 import 'package:remalux_ar/core/api/firebase_setup.dart';
+
+// Function to configure Google Fonts to use local fonts
+Future<void> _loadGoogleFonts() async {
+  // Отключаем загрузку шрифтов через интернет
+  GoogleFonts.config.allowRuntimeFetching = false;
+
+  // Используем предварительно загруженные локальные шрифты
+  print('Fonts configured to use only bundled assets');
+}
 
 void main() async {
   try {
@@ -30,6 +40,9 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+
+    // Load Google Fonts before app starts
+    await _loadGoogleFonts();
 
     // Initialize Firebase setup and request permissions
     await initializeFirebase();

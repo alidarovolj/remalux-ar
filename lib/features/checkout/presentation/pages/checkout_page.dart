@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -17,6 +18,7 @@ import 'package:remalux_ar/features/checkout/presentation/widgets/checkout_skele
 import 'package:remalux_ar/features/checkout/presentation/widgets/address_selection_modal.dart';
 import 'package:remalux_ar/features/checkout/presentation/widgets/recipient_selection_modal.dart';
 import 'package:remalux_ar/features/recipients/domain/providers/recipients_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CheckoutPage extends ConsumerWidget {
   const CheckoutPage({super.key});
@@ -191,13 +193,6 @@ class CheckoutPage extends ConsumerWidget {
                   decoration: BoxDecoration(
                     color: AppColors.buttonSecondary,
                     borderRadius: BorderRadius.circular(14),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF3B4D8B).withOpacity(0.1),
-                        blurRadius: 5,
-                        offset: const Offset(0, 1),
-                      ),
-                    ],
                   ),
                   padding: const EdgeInsets.all(3),
                   child: Row(
@@ -312,6 +307,40 @@ class CheckoutPage extends ConsumerWidget {
                 ),
                 const SizedBox(height: 24),
 
+                // Free delivery notification
+                if (selectedDeliveryType?.id == 1)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFDF6EC),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 24,
+                          height: 24,
+                          alignment: Alignment.center,
+                          child: Icon(
+                            Icons.info_outline,
+                            size: 16,
+                            color: const Color(0xFFBF7200),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'checkout.delivery.free_delivery_notice'.tr(),
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: const Color(0xFFBF7200),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                const SizedBox(height: 24),
+
                 // Delivery Address Section
                 if (selectedDeliveryType?.id == 1) ...[
                   Container(
@@ -351,35 +380,34 @@ class CheckoutPage extends ConsumerWidget {
                             'checkout.delivery_address.hint'.tr(),
                             style: const TextStyle(
                               fontSize: 14,
-                              color: AppColors.textSecondary,
+                              color: AppColors.primary,
                             ),
                           ),
                         const SizedBox(height: 12),
                         GestureDetector(
                           onTap: () => _showAddressSelectionModal(context),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
                             decoration: BoxDecoration(
-                              color: AppColors.buttonSecondary,
+                              color: const Color(0xFFF5F7FF),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                SvgPicture.asset(
-                                  'lib/core/assets/icons/cart/edit.svg',
-                                  width: 16,
-                                  height: 16,
-                                  color: AppColors.textPrimary,
+                                const Icon(
+                                  Icons.add,
+                                  size: 18,
+                                  color: Color(0xFF2E7CF6),
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  selectedAddress != null
-                                      ? 'checkout.delivery_address.change'.tr()
-                                      : 'checkout.delivery_address.add'.tr(),
+                                  'checkout.delivery_address.add_button'.tr(),
                                   style: const TextStyle(
                                     fontSize: 14,
-                                    color: AppColors.textPrimary,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color(0xFF2E7CF6),
                                   ),
                                 ),
                               ],
@@ -424,41 +452,36 @@ class CheckoutPage extends ConsumerWidget {
                               fontSize: 14,
                               color: AppColors.textSecondary,
                             ),
-                          )
-                        else
-                          Text(
-                            'checkout.delivery_time.hint'.tr(),
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: AppColors.textSecondary,
-                            ),
                           ),
                         const SizedBox(height: 12),
                         GestureDetector(
                           onTap: () => _showDeliveryTimeModal(context, ref),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
                             decoration: BoxDecoration(
-                              color: AppColors.buttonSecondary,
+                              color: const Color(0xFFF5F7FF),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                SvgPicture.asset(
-                                  'lib/core/assets/icons/cart/edit.svg',
-                                  width: 16,
-                                  height: 16,
-                                  color: AppColors.textPrimary,
+                                const Icon(
+                                  Icons.add,
+                                  size: 18,
+                                  color: Color(0xFF2E7CF6),
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
                                   selectedDeliveryTime != null
-                                      ? 'checkout.delivery_time.change'.tr()
-                                      : 'checkout.delivery_time.add'.tr(),
+                                      ? 'checkout.delivery_time.change_button'
+                                          .tr()
+                                      : 'checkout.delivery_time.select_button'
+                                          .tr(),
                                   style: const TextStyle(
                                     fontSize: 14,
-                                    color: AppColors.textPrimary,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color(0xFF2E7CF6),
                                   ),
                                 ),
                               ],
@@ -507,35 +530,34 @@ class CheckoutPage extends ConsumerWidget {
                           'checkout.recipient.hint'.tr(),
                           style: const TextStyle(
                             fontSize: 14,
-                            color: AppColors.textSecondary,
+                            color: AppColors.primary,
                           ),
                         ),
                       const SizedBox(height: 12),
                       GestureDetector(
                         onTap: () => _showRecipientSelectionModal(context),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
                           decoration: BoxDecoration(
-                            color: AppColors.buttonSecondary,
+                            color: const Color(0xFFF5F7FF),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              SvgPicture.asset(
-                                'lib/core/assets/icons/cart/edit.svg',
-                                width: 16,
-                                height: 16,
-                                color: AppColors.textPrimary,
+                              const Icon(
+                                Icons.add,
+                                size: 18,
+                                color: Color(0xFF2E7CF6),
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                selectedRecipient != null
-                                    ? 'checkout.recipient.change'.tr()
-                                    : 'checkout.recipient.add'.tr(),
+                                'checkout.recipient.add_button'.tr(),
                                 style: const TextStyle(
                                   fontSize: 14,
-                                  color: AppColors.textPrimary,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color(0xFF2E7CF6),
                                 ),
                               ),
                             ],
@@ -560,13 +582,6 @@ class CheckoutPage extends ConsumerWidget {
                   decoration: BoxDecoration(
                     color: AppColors.buttonSecondary,
                     borderRadius: BorderRadius.circular(14),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF3B4D8B).withOpacity(0.1),
-                        blurRadius: 5,
-                        offset: const Offset(0, 1),
-                      ),
-                    ],
                   ),
                   padding: const EdgeInsets.all(3),
                   child: Row(
@@ -785,22 +800,20 @@ class CheckoutPage extends ConsumerWidget {
 
                 // Comments Section
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: const Color(0xFFF5F7FF),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: const Color(0xFFE0E0E0),
-                      width: 1,
-                    ),
                   ),
                   child: TextField(
+                    controller: commentController,
                     maxLines: 3,
                     decoration: InputDecoration(
                       hintText: 'checkout.comments.placeholder'.tr(),
                       hintStyle: const TextStyle(
                         fontSize: 15,
-                        color: AppColors.textSecondary,
+                        color: Color(0xFF8A96AD),
                       ),
                       border: InputBorder.none,
                     ),
@@ -828,11 +841,27 @@ class CheckoutPage extends ConsumerWidget {
                     ),
                     const SizedBox(width: 8),
                     Expanded(
-                      child: Text(
-                        'checkout.terms'.tr(),
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: AppColors.textPrimary,
+                      child: RichText(
+                        text: TextSpan(
+                          text: 'checkout.terms_agree_with'.tr(),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: AppColors.textPrimary,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: 'checkout.terms_conditions'.tr(),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: AppColors.links,
+                                decoration: TextDecoration.underline,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  launchUrl(Uri.parse("https://youtube.com"));
+                                },
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -898,7 +927,12 @@ class CheckoutPage extends ConsumerWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 16),
+                      const Divider(
+                        color: AppColors.borderLight,
+                        height: 1,
+                      ),
+                      const SizedBox(height: 16),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [

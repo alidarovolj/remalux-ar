@@ -58,8 +58,8 @@ class _RecipientsPageState extends ConsumerState<RecipientsPage> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: const CustomAppBar(
-        title: 'Получатели',
+      appBar: CustomAppBar(
+        title: 'recipients.title'.tr(),
         showBottomBorder: true,
       ),
       body: recipientsAsync.when(
@@ -69,20 +69,20 @@ class _RecipientsPageState extends ConsumerState<RecipientsPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Center(
+                Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.location_on_outlined,
                         size: 96,
                         color: AppColors.primary,
                       ),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
                       Text(
-                        'У вас пока нет сохраненных\nполучателей',
+                        'recipients.empty.message'.tr(),
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 17,
                           color: AppColors.textPrimary,
                         ),
@@ -115,9 +115,9 @@ class _RecipientsPageState extends ConsumerState<RecipientsPage> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text(
-                        'Добавить получателя',
-                        style: TextStyle(
+                      child: Text(
+                        'recipients.add'.tr(),
+                        style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w400,
                           color: Colors.white,
@@ -165,7 +165,7 @@ class _RecipientsPageState extends ConsumerState<RecipientsPage> {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          'Добавить нового получателя',
+                          'recipients.add_new'.tr(),
                           style: TextStyle(
                             fontSize: 15,
                             color: Colors.blue[600],
@@ -207,7 +207,7 @@ class _RecipientsPageState extends ConsumerState<RecipientsPage> {
                           if (context.mounted) {
                             CustomSnackBar.show(
                               context,
-                              message: 'Получатель удален',
+                              message: 'recipients.deleted'.tr(),
                               type: SnackBarType.success,
                             );
                           }
@@ -215,7 +215,7 @@ class _RecipientsPageState extends ConsumerState<RecipientsPage> {
                           if (context.mounted) {
                             CustomSnackBar.show(
                               context,
-                              message: 'Ошибка при удалении получателя',
+                              message: 'recipients.error.delete'.tr(),
                               type: SnackBarType.error,
                             );
                           }
@@ -266,7 +266,7 @@ class _RecipientsPageState extends ConsumerState<RecipientsPage> {
                                 if (context.mounted) {
                                   CustomSnackBar.show(
                                     context,
-                                    message: 'Получатель удален',
+                                    message: 'recipients.deleted'.tr(),
                                     type: SnackBarType.success,
                                   );
                                 }
@@ -274,7 +274,7 @@ class _RecipientsPageState extends ConsumerState<RecipientsPage> {
                                 if (context.mounted) {
                                   CustomSnackBar.show(
                                     context,
-                                    message: 'Ошибка при удалении получателя',
+                                    message: 'recipients.error.delete'.tr(),
                                     type: SnackBarType.error,
                                   );
                                 }
@@ -319,7 +319,7 @@ class _RecipientsPageState extends ConsumerState<RecipientsPage> {
           ],
         ),
         error: (error, stackTrace) => Center(
-          child: Text('Error: $error'),
+          child: Text('recipients.error.generic'.tr() + ': $error'),
         ),
       ),
     );

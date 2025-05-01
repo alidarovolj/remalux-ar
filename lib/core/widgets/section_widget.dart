@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
+import 'package:remalux_ar/core/styles/text_styles.dart';
 
 class SectionWidget extends StatelessWidget {
   final String title;
@@ -33,11 +33,7 @@ class SectionWidget extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: GoogleFonts.ysabeau(
-                  fontSize: 19,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
-                ),
+                style: AppTextStyles.heading2(),
               ),
               const Spacer(),
               if (buttonTitle != null && onButtonPressed != null)

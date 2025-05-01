@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:remalux_ar/core/widgets/custom_button.dart';
 import 'package:remalux_ar/core/widgets/development_notice_modal.dart';
 import 'package:remalux_ar/features/home/presentation/widgets/categories_grid.dart';
@@ -14,10 +13,27 @@ import 'package:remalux_ar/features/home/presentation/widgets/colors_grid.dart';
 import 'package:remalux_ar/features/home/presentation/widgets/color_detail_modal.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:remalux_ar/features/home/domain/providers/detailed_colors_provider.dart';
+import 'package:remalux_ar/core/styles/text_styles.dart';
 import 'dart:math';
 import 'dart:async';
 import 'dart:ui';
 import 'package:shimmer/shimmer.dart';
+
+// Helper function to get the text style with fallback
+TextStyle getHeadingStyle({
+  required double fontSize,
+  Color color = const Color(0xFF1F1F1F),
+  double height = 1.2,
+  FontWeight fontWeight = FontWeight.w600,
+}) {
+  // Используем локальный шрифт напрямую вместо Google Fonts API
+  return AppTextStyles.infantHeading(
+    fontSize: fontSize,
+    color: color,
+    height: height,
+    weight: fontWeight,
+  );
+}
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -47,29 +63,39 @@ class _HomePageState extends ConsumerState<HomePage> {
     _colorTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
       if (!mounted) return;
 
-      final colorsAsync = ref.read(detailedColorsProvider);
-      colorsAsync.whenData((colors) {
-        if (colors.isEmpty) return;
+      try {
+        final colorsAsync = ref.read(detailedColorsProvider);
+        colorsAsync.whenData((colors) {
+          if (colors.isEmpty) return;
 
-        setState(() {
-          final randomColor = colors[Random().nextInt(colors.length)];
-          final newColor = _parseHexColor(randomColor.hex);
+          try {
+            final randomColor = colors[Random().nextInt(colors.length)];
+            final newColor = _parseHexColor(randomColor.hex);
 
-          // Update current color for the animated background
-          _currentColor = newColor;
+            // Update current color for the animated background
+            if (mounted) {
+              setState(() {
+                _currentColor = newColor;
 
-          // Update used colors list
-          if (_usedColors.isEmpty) {
-            // Initialize with the first color if empty
-            _usedColors.add(newColor);
-          } else {
-            if (_usedColors.length >= 4) {
-              _usedColors.removeLast();
+                // Update used colors list
+                if (_usedColors.isEmpty) {
+                  // Initialize with the first color if empty
+                  _usedColors.add(newColor);
+                } else {
+                  if (_usedColors.length >= 4) {
+                    _usedColors.removeLast();
+                  }
+                  _usedColors.insert(0, newColor);
+                }
+              });
             }
-            _usedColors.insert(0, newColor);
+          } catch (e) {
+            print('Error processing color: $e');
           }
         });
-      });
+      } catch (e) {
+        print('Error in color animation timer: $e');
+      }
     });
   }
 
@@ -472,12 +498,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                               // Text
                               Text(
                                 'home.try_colors'.tr(),
-                                style: GoogleFonts.ysabeauInfant(
-                                  fontSize: 19,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFF1F1F1F),
-                                  height: 1.2,
-                                ),
+                                style: getHeadingStyle(fontSize: 19),
                                 textAlign: TextAlign.center,
                               ),
                               const SizedBox(height: 8),

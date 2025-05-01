@@ -4,8 +4,8 @@ platform :ios, '14.0'
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
 
-# Set Yandex MapKit variant to 'lite'
-ENV['YANDEX_MAPKIT_VARIANT'] = 'lite'
+# Set Yandex MapKit variant to 'full'
+ENV['YANDEX_MAPKIT_VARIANT'] = 'full'
 
 # Use CDN for pods
 source 'https://cdn.cocoapods.org/'

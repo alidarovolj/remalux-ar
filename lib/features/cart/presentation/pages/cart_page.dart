@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:dio/dio.dart';
@@ -237,21 +238,36 @@ class _CartPageState extends ConsumerState<CartPage>
         data: (items) {
           // Если есть элементы в корзине - показываем содержимое
           if (items.isNotEmpty) {
-            return Column(
+            return Stack(
               children: [
-                _buildSelectionHeader(items),
-                Expanded(
-                  child: ListView.separated(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: items.length + 1, // +1 for the bottom bar
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: 16),
-                    itemBuilder: (context, index) {
-                      if (index == items.length) {
-                        return _buildBottomBar(context);
-                      }
-                      return _buildCartItem(items[index]);
-                    },
+                ListView.separated(
+                  padding: const EdgeInsets.only(
+                      left: 16, right: 16, top: 16, bottom: 88),
+                  itemCount: items.length + 2, // +2 for header and summary
+                  separatorBuilder: (context, index) => index == 0
+                      ? const SizedBox(height: 8)
+                      : const SizedBox(height: 16),
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return _buildSelectionHeader(items);
+                    } else if (index == items.length + 1) {
+                      return _buildSummarySection();
+                    } else {
+                      return _buildCartItem(items[index - 1]);
+                    }
+                  },
+                ),
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: SafeArea(
+                    bottom: true,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      child: _buildCheckoutButton(),
+                    ),
                   ),
                 ),
               ],
@@ -404,11 +420,12 @@ class _CartPageState extends ConsumerState<CartPage>
           color: AppColors.borderLight,
           width: 1,
         ),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: Color.fromRGBO(59, 77, 139, 0.1),
+            offset: Offset(0, 1),
+            blurRadius: 5,
+            spreadRadius: 0,
           ),
         ],
       ),
@@ -581,7 +598,15 @@ class _CartPageState extends ConsumerState<CartPage>
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: IconButton(
-                        icon: const Icon(Icons.delete_outline),
+                        icon: SvgPicture.asset(
+                          'lib/core/assets/icons/trash.svg',
+                          width: 20,
+                          height: 20,
+                          colorFilter: const ColorFilter.mode(
+                            AppColors.textIconsSecondary,
+                            BlendMode.srcIn,
+                          ),
+                        ),
                         onPressed: () {
                           showModalBottomSheet(
                             context: context,
@@ -626,7 +651,7 @@ class _CartPageState extends ConsumerState<CartPage>
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(),
                             iconSize: 20,
-                            color: AppColors.textSecondary,
+                            color: AppColors.textIconsSecondary,
                           ),
                           const SizedBox(width: 12),
                           Text(
@@ -647,7 +672,7 @@ class _CartPageState extends ConsumerState<CartPage>
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(),
                             iconSize: 20,
-                            color: AppColors.textSecondary,
+                            color: AppColors.textIconsSecondary,
                           ),
                         ],
                       ),
@@ -662,7 +687,8 @@ class _CartPageState extends ConsumerState<CartPage>
     );
   }
 
-  Widget _buildBottomBar(BuildContext context) {
+  // Split the bottom bar into two parts: summary and button
+  Widget _buildSummarySection() {
     final cartAsync = ref.watch(cartProvider);
     final totalAmount = cartAsync.whenOrNull(
           data: (items) => items
@@ -715,7 +741,7 @@ class _CartPageState extends ConsumerState<CartPage>
                   // TODO: Apply promo code
                 },
                 style: TextButton.styleFrom(
-                  foregroundColor: AppColors.primary,
+                  foregroundColor: AppColors.links,
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   minimumSize: const Size(0, 48),
                   shape: RoundedRectangleBorder(
@@ -810,21 +836,42 @@ class _CartPageState extends ConsumerState<CartPage>
             ],
           ),
           const SizedBox(height: 16),
-          // Continue button
-          SizedBox(
-            width: double.infinity,
-            child: CustomButton(
-              label: 'store.cart.summary.continue'.tr(namedArgs: {
-                'count': selectedItems.length.toString(),
-                'amount': totalAmount.toStringAsFixed(0),
-              }),
-              isEnabled: selectedItems.isNotEmpty,
-              onPressed: () {
-                context.push('/checkout');
-              },
-            ),
+          const Divider(
+            color: AppColors.borderLight,
+            height: 1,
           ),
+          const SizedBox(height: 0), // Space for the fixed button
         ],
+      ),
+    );
+  }
+
+  Widget _buildCheckoutButton() {
+    final cartAsync = ref.watch(cartProvider);
+    final totalAmount = cartAsync.whenOrNull(
+          data: (items) => items
+              .where((item) => selectedItems.contains(item.id))
+              .fold<double>(
+                0,
+                (sum, item) =>
+                    sum +
+                    double.parse(item.productVariant.price.toString()) *
+                        item.quantity,
+              ),
+        ) ??
+        0.0;
+
+    return SizedBox(
+      width: double.infinity,
+      child: CustomButton(
+        label: 'store.cart.summary.continue'.tr(namedArgs: {
+          'count': selectedItems.length.toString(),
+          'amount': totalAmount.toStringAsFixed(0),
+        }),
+        isEnabled: selectedItems.isNotEmpty,
+        onPressed: () {
+          context.push('/checkout');
+        },
       ),
     );
   }

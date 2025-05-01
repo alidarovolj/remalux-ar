@@ -18,6 +18,7 @@ import 'package:remalux_ar/features/orders/presentation/pages/orders_page.dart';
 import 'package:remalux_ar/features/favorites/presentation/pages/favorites_page.dart';
 import 'package:remalux_ar/features/recipients/presentation/pages/recipients_page.dart';
 import 'package:remalux_ar/features/addresses/presentation/pages/addresses_page.dart';
+import 'package:remalux_ar/features/addresses/presentation/pages/add_address_page.dart';
 import 'package:remalux_ar/features/contacts/presentation/pages/contacts_page.dart';
 import 'package:remalux_ar/features/projects/presentation/pages/projects_page.dart';
 import 'package:remalux_ar/features/faq/presentation/pages/faq_page.dart';
@@ -102,10 +103,6 @@ class AppRouter {
             builder: (context, state) => const CartPage(),
           ),
           GoRoute(
-            path: '/checkout',
-            builder: (context, state) => const CheckoutPage(),
-          ),
-          GoRoute(
             path: '/news',
             name: 'news',
             builder: (context, state) => const NewsPage(),
@@ -182,6 +179,10 @@ class AppRouter {
           ),
         ],
       ),
+      GoRoute(
+        path: '/checkout',
+        builder: (context, state) => const CheckoutPage(),
+      ),
       // Product detail route moved inside ShellRoute
       GoRoute(
         path: '/products/:id',
@@ -218,6 +219,11 @@ class AppRouter {
         path: '/login',
         name: 'login',
         builder: (context, state) => const LoginPage(),
+      ),
+      GoRoute(
+        path: '/addresses/add',
+        name: 'add_address',
+        builder: (context, state) => const AddAddressPage(),
       ),
       GoRoute(
         path: '/registration',

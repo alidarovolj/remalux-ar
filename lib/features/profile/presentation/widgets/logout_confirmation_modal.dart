@@ -74,7 +74,7 @@ class LogoutConfirmationModal extends ConsumerWidget {
                       );
                     }
                   },
-                  backgroundColor: Colors.red,
+                  backgroundColor: AppColors.primary,
                   textColor: Colors.white,
                 ),
               ),

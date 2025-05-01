@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -30,6 +31,8 @@ class _AddAddressSheetState extends ConsumerState<AddAddressSheet> {
   Point? _selectedPoint;
   List<MapObject> mapObjects = [];
   final _mapKey = UniqueKey();
+  final String _uniqueMapId =
+      'yandex_map_${DateTime.now().millisecondsSinceEpoch}';
 
   @override
   void dispose() {
@@ -38,7 +41,10 @@ class _AddAddressSheetState extends ConsumerState<AddAddressSheet> {
     _floorController.dispose();
     _apartmentController.dispose();
     _debounce?.cancel();
-    _mapController?.dispose();
+    if (_mapController != null) {
+      _mapController!.dispose();
+      _mapController = null;
+    }
     super.dispose();
   }
 
@@ -198,105 +204,61 @@ class _AddAddressSheetState extends ConsumerState<AddAddressSheet> {
     return WillPopScope(
       onWillPop: _handlePop,
       child: Container(
-        height: MediaQuery.of(context).size.height * 0.9,
+        padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
         decoration: const BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Align(
-              alignment: Alignment.center,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(2),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'addresses.add.title'.tr(),
+                  style: GoogleFonts.manrope(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
                   ),
                 ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Text(
-                'addresses.add.title'.tr(),
-                textAlign: TextAlign.center,
-                style: GoogleFonts.ysabeau(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.close),
                 ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: CustomTextField(
-                  controller: _addressController,
-                  onChanged: _onAddressChanged,
-                  label: 'addresses.add.address_hint'.tr(),
-                  suffixIcon: _isSearching
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : const Icon(Icons.search),
-                ),
-              ),
+              ],
             ),
             const SizedBox(height: 16),
             Expanded(
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onVerticalDragStart: (_) {},
-                onVerticalDragUpdate: (_) {},
-                onVerticalDragEnd: (_) {},
-                child: Stack(
-                  children: [
-                    RepaintBoundary(
-                      child: YandexMap(
-                        key: _mapKey,
-                        onMapCreated: _onMapCreated,
-                        mapObjects: mapObjects,
-                        onMapTap: (Point point) async {
-                          setState(() {
-                            _selectedPoint = point;
-                            mapObjects = [
-                              PlacemarkMapObject(
-                                mapId: const MapObjectId('selected_address'),
-                                point: point,
-                                icon: PlacemarkIcon.single(
-                                  PlacemarkIconStyle(
-                                    image: BitmapDescriptor.fromAssetImage(
-                                        'lib/core/assets/images/point.png'),
-                                    scale: 0.8,
-                                    anchor: const Offset(0.5, 1.0),
-                                  ),
+              child: Stack(
+                children: [
+                  RepaintBoundary(
+                    child: YandexMap(
+                      key: _mapKey,
+                      onMapCreated: _onMapCreated,
+                      mapObjects: mapObjects,
+                      onMapTap: (Point point) async {
+                        setState(() {
+                          _selectedPoint = point;
+                          mapObjects = [
+                            PlacemarkMapObject(
+                              mapId: const MapObjectId('selected_address'),
+                              point: point,
+                              icon: PlacemarkIcon.single(
+                                PlacemarkIconStyle(
+                                  image: BitmapDescriptor.fromAssetImage(
+                                      'lib/core/assets/images/point.png'),
+                                  scale: 0.8,
+                                  anchor: const Offset(0.5, 1.0),
                                 ),
-                                opacity: 1.0,
                               ),
-                            ];
-                          });
+                              opacity: 1.0,
+                            ),
+                          ];
+                        });
 
+                        try {
                           final searchResult = await YandexSearch.searchByPoint(
                             point: point,
                             searchOptions: const SearchOptions(
@@ -305,76 +267,28 @@ class _AddAddressSheetState extends ConsumerState<AddAddressSheet> {
                             ),
                           );
 
-                          final results = await (searchResult).$2;
+                          final results = await searchResult.$2;
                           if (results.items?.isNotEmpty == true) {
                             setState(() {
                               _addressController.text =
                                   results.items!.first.name;
                             });
                           }
-                        },
-                      ),
+                        } catch (e) {
+                          debugPrint('Ошибка при поиске по точке: $e');
+                        }
+                      },
                     ),
-                    Positioned(
-                      top: 16,
-                      right: 16,
-                      child: Column(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              children: [
-                                IconButton(
-                                  onPressed: () {
-                                    _mapController?.moveCamera(
-                                      CameraUpdate.zoomIn(),
-                                    );
-                                  },
-                                  icon: const Icon(Icons.add),
-                                  color: AppColors.textPrimary,
-                                ),
-                                Container(
-                                  height: 1,
-                                  color: Colors.grey[300],
-                                ),
-                                IconButton(
-                                  onPressed: () {
-                                    _mapController?.moveCamera(
-                                      CameraUpdate.zoomOut(),
-                                    );
-                                  },
-                                  icon: const Icon(Icons.remove),
-                                  color: AppColors.textPrimary,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (_searchResults.isNotEmpty)
-                      Positioned(
-                        top: 0,
-                        left: 16,
-                        right: 16,
-                        child: Container(
-                          margin: const EdgeInsets.only(top: 4),
-                          constraints: BoxConstraints(
-                            maxHeight: MediaQuery.of(context).size.height * 0.3,
-                          ),
+                  ),
+                  Positioned(
+                    top: 16,
+                    right: 16,
+                    child: Column(
+                      children: [
+                        Container(
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(8),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withOpacity(0.05),
@@ -383,31 +297,81 @@ class _AddAddressSheetState extends ConsumerState<AddAddressSheet> {
                               ),
                             ],
                           ),
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            padding: EdgeInsets.zero,
-                            itemCount: _searchResults.length,
-                            itemBuilder: (context, index) {
-                              final result = _searchResults[index];
-                              return ListTile(
-                                title: Text(result.name),
-                                subtitle: Text(
-                                  result.toponymMetadata?.address
-                                          .formattedAddress ??
-                                      result.businessMetadata?.address
-                                          .formattedAddress ??
-                                      '',
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                onTap: () => _onAddressSelected(result),
-                              );
-                            },
+                          child: Column(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  _mapController?.moveCamera(
+                                    CameraUpdate.zoomIn(),
+                                  );
+                                },
+                                icon: const Icon(Icons.add),
+                                color: AppColors.textPrimary,
+                              ),
+                              Container(
+                                height: 1,
+                                color: Colors.grey[300],
+                              ),
+                              IconButton(
+                                onPressed: () {
+                                  _mapController?.moveCamera(
+                                    CameraUpdate.zoomOut(),
+                                  );
+                                },
+                                icon: const Icon(Icons.remove),
+                                color: AppColors.textPrimary,
+                              ),
+                            ],
                           ),
                         ),
+                      ],
+                    ),
+                  ),
+                  if (_searchResults.isNotEmpty)
+                    Positioned(
+                      top: 0,
+                      left: 16,
+                      right: 16,
+                      child: Container(
+                        margin: const EdgeInsets.only(top: 4),
+                        constraints: BoxConstraints(
+                          maxHeight: MediaQuery.of(context).size.height * 0.3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          padding: EdgeInsets.zero,
+                          itemCount: _searchResults.length,
+                          itemBuilder: (context, index) {
+                            final result = _searchResults[index];
+                            return ListTile(
+                              title: Text(result.name),
+                              subtitle: Text(
+                                result.toponymMetadata?.address
+                                        .formattedAddress ??
+                                    result.businessMetadata?.address
+                                        .formattedAddress ??
+                                    '',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              onTap: () => _onAddressSelected(result),
+                            );
+                          },
+                        ),
                       ),
-                  ],
-                ),
+                    ),
+                ],
               ),
             ),
             Container(
@@ -431,6 +395,7 @@ class _AddAddressSheetState extends ConsumerState<AddAddressSheet> {
                           controller: _entranceController,
                           label: 'addresses.add.entrance'.tr(),
                           keyboardType: TextInputType.number,
+                          hintText: 'addresses.add.entrance_hint'.tr(),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -439,6 +404,7 @@ class _AddAddressSheetState extends ConsumerState<AddAddressSheet> {
                           controller: _floorController,
                           label: 'addresses.add.floor'.tr(),
                           keyboardType: TextInputType.number,
+                          hintText: 'addresses.add.floor_hint'.tr(),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -447,6 +413,7 @@ class _AddAddressSheetState extends ConsumerState<AddAddressSheet> {
                           controller: _apartmentController,
                           label: 'addresses.add.apartment'.tr(),
                           keyboardType: TextInputType.number,
+                          hintText: 'addresses.add.apartment_hint'.tr(),
                         ),
                       ),
                     ],
@@ -494,6 +461,7 @@ class _AddAddressSheetState extends ConsumerState<AddAddressSheet> {
   Future<bool> _handlePop() async {
     if (_mapController != null) {
       _mapController!.dispose();
+      _mapController = null;
     }
     if (mounted) {
       Navigator.pop(context);

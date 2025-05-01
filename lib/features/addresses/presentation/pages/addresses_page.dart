@@ -4,10 +4,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/core/widgets/custom_app_bar.dart';
 import 'package:remalux_ar/features/addresses/domain/providers/addresses_provider.dart';
-import 'package:remalux_ar/features/addresses/presentation/widgets/add_address_sheet.dart';
 import 'package:remalux_ar/core/widgets/custom_snack_bar.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:go_router/go_router.dart';
 
 class AddressesPage extends ConsumerStatefulWidget {
   const AddressesPage({super.key});
@@ -101,12 +101,10 @@ class _AddressesPageState extends ConsumerState<AddressesPage> {
                     height: 52,
                     child: ElevatedButton(
                       onPressed: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          builder: (context) => const AddAddressSheet(),
-                        );
+                        context.pushNamed('add_address').then((_) {
+                          // Refresh addresses when returning from the add page
+                          _refreshAddresses();
+                        });
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
@@ -136,12 +134,10 @@ class _AddressesPageState extends ConsumerState<AddressesPage> {
                 padding: const EdgeInsets.all(12),
                 child: InkWell(
                   onTap: () {
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
-                      builder: (context) => const AddAddressSheet(),
-                    );
+                    context.pushNamed('add_address').then((_) {
+                      // Refresh addresses when returning from the add page
+                      _refreshAddresses();
+                    });
                   },
                   child: Container(
                     height: 52,

@@ -427,7 +427,9 @@
       "colors": "Recommended colors",
       "no_products": "No products available",
       "no_colors": "No colors available"
-    }
+    },
+    "remove_confirmation": "Remove from favorites?",
+    "delete": "Delete"
   },
   "addresses": {
     "title": "Delivery Addresses",
@@ -439,15 +441,21 @@
       "new": "Add new address",
       "title": "Add new address",
       "address_hint": "Enter address",
+      "search_address": "Search for address",
+      "select_address": "Select address on map",
       "entrance": "Entrance",
+      "entrance_hint": "Enter entrance number",
       "floor": "Floor",
+      "floor_hint": "Enter floor number",
       "apartment": "Apartment",
+      "apartment_hint": "Enter apartment number",
       "save": "Save",
       "error": {
         "select_address": "Please select an address on the map",
         "save_failed": "Failed to save address",
         "success": "Address successfully added"
-      }
+      },
+      "search_title": "Search for address"
     },
     "details": {
       "entrance": "Entrance {}",
@@ -742,27 +750,35 @@
       "courier": "Delivery",
       "pickup": "Pickup"
     },
+    "delivery": {
+      "free_delivery_notice": "Free delivery for orders over 300kg"
+    },
     "delivery_address": {
       "title": "Delivery Address",
-      "add": "Add Address",
-      "empty": "Please add and select an address for delivery",
+      "add": "Add address",
+      "add_button": "Add address",
+      "empty": "You need to add and select a delivery address",
       "entrance": "Entrance {number}",
       "floor": "Floor {number}",
+      "hint": "*You need to add and select a delivery address to complete the order",
       "change": "Change",
-      "hint": "Add delivery address"
+      "courier": "Courier delivery"
     },
     "delivery_time": {
       "title": "Delivery Time",
-      "hint": "Choose convenient delivery time",
+      "hint": "Choose a convenient delivery time",
       "add": "Add",
-      "change": "Change"
+      "change": "Change",
+      "change_button": "Change time",
+      "select_button": "Select delivery time"
     },
     "recipient": {
       "title": "Recipient Details",
-      "add": "Add Recipient",
-      "empty": "Please add and select a recipient to proceed with the order",
-      "change": "Choose Another Recipient",
-      "hint": "Please add recipient"
+      "add": "Add recipient",
+      "add_button": "Add recipient",
+      "empty": "You need to add and select a recipient to complete the order",
+      "change": "Choose another recipient",
+      "hint": "* You need to add and select a recipient to complete the order"
     },
     "payment": {
       "title": "Payment",
@@ -773,7 +789,8 @@
     },
     "comments": {
       "title": "Order Comments",
-      "placeholder": "Enter your comment"
+      "placeholder": "Enter your comment",
+      "terms": "I agree with the terms of return and reclamation"
     },
     "promo": {
       "applied": "Applied",
@@ -789,7 +806,9 @@
       "total": "Total",
       "button": "{} products • {} ₸"
     },
-    "terms": "I agree to the return and claim terms",
+    "terms": "I agree with the terms of return and reclamation",
+    "terms_agree_with": "I agree with ",
+    "terms_conditions": "terms of return and reclamation",
     "validation": {
       "address_required": "Please select a delivery address",
       "delivery_time_required": "Please select a delivery time",
@@ -809,5 +828,22 @@
         "description": "We are currently developing this feature. Please check back later."
       }
     }
+  },
+  "recipients": {
+    "title": "Recipients",
+    "empty": {
+      "message": "You don't have any saved recipients yet"
+    },
+    "add": "Add recipient",
+    "add_new": "Add new recipient",
+    "deleted": "Recipient deleted",
+    "error": {
+      "refresh": "Failed to refresh recipients",
+      "delete": "Error deleting recipient",
+      "generic": "Error loading recipients"
+    }
+  },
+  "errors": {
+    "generic": "Error: {0}"
   }
 }

@@ -24,6 +24,7 @@ import 'package:remalux_ar/features/store/presentation/widgets/sorting_modal.dar
 import 'package:remalux_ar/features/store/presentation/widgets/store_categories_grid.dart';
 import 'package:remalux_ar/features/home/presentation/providers/categories_provider.dart';
 import 'package:remalux_ar/features/profile/presentation/pages/profile_page.dart';
+import 'package:remalux_ar/core/widgets/auth_required_modal.dart';
 
 class StorePage extends ConsumerStatefulWidget {
   final int? initialCategoryId;
@@ -536,7 +537,14 @@ class _StorePageState extends ConsumerState<StorePage> {
                                                 if (user != null) {
                                                   context.push('/favorites');
                                                 } else {
-                                                  context.push('/login');
+                                                  showModalBottomSheet(
+                                                    context: context,
+                                                    isScrollControlled: true,
+                                                    backgroundColor:
+                                                        Colors.transparent,
+                                                    builder: (context) =>
+                                                        const AuthRequiredModal(),
+                                                  );
                                                 }
                                               },
                                               icon: SvgPicture.asset(
@@ -566,8 +574,16 @@ class _StorePageState extends ConsumerState<StorePage> {
                                               padding: EdgeInsets.zero,
                                             ),
                                             error: (_, __) => IconButton(
-                                              onPressed: () =>
-                                                  context.push('/login'),
+                                              onPressed: () {
+                                                showModalBottomSheet(
+                                                  context: context,
+                                                  isScrollControlled: true,
+                                                  backgroundColor:
+                                                      Colors.transparent,
+                                                  builder: (context) =>
+                                                      const AuthRequiredModal(),
+                                                );
+                                              },
                                               icon: SvgPicture.asset(
                                                 'lib/core/assets/icons/heart.svg',
                                                 width: 24,
