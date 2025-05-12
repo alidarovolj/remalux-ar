@@ -48,13 +48,13 @@ class ApiClient {
   void setAccessToken(String token) {
     _accessToken = token;
     dio.options.headers['Authorization'] = 'Bearer $token';
-    print('🔑 Token set in ApiClient: ${token.substring(0, 10)}...');
+    // print('🔑 Token set in ApiClient: ${token.substring(0, 10)}...');
   }
 
   void removeAccessToken() {
     _accessToken = null;
     dio.options.headers.remove('Authorization');
-    print('🔑 Token removed from ApiClient');
+    // print('🔑 Token removed from ApiClient');
   }
 
   String? get accessToken => _accessToken;
@@ -67,36 +67,36 @@ class ApiClient {
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
-          _logDivider();
-          print("➡️ Запрос");
-          print("Метод: ${options.method}");
-          print("URL: ${options.uri}");
-          if (options.headers.isNotEmpty) {
-            print("Заголовки: ${options.headers}");
-          }
-          if (options.data != null) {
-            print("Данные: ${options.data}");
-          }
-          _logDivider();
+          // _logDivider();
+          // print("➡️ Запрос");
+          // print("Метод: ${options.method}");
+          // print("URL: ${options.uri}");
+          // if (options.headers.isNotEmpty) {
+          //   print("Заголовки: ${options.headers}");
+          // }
+          // if (options.data != null) {
+          //   print("Данные: ${options.data}");
+          // }
+          // _logDivider();
           return handler.next(options);
         },
         onResponse: (response, handler) {
-          _logDivider();
-          print("✅ Ответ");
-          print("Статус: ${response.statusCode}");
-          print("Данные: ${response.data}");
-          _logDivider();
+          // _logDivider();
+          // print("✅ Ответ");
+          // print("Статус: ${response.statusCode}");
+          // print("Данные: ${response.data}");
+          // _logDivider();
           return handler.next(response);
         },
         onError: (DioException e, handler) {
-          _logDivider();
-          print("❌ Ошибка");
-          print("Статус: ${e.response?.statusCode ?? 'Нет ответа'}");
-          print("Сообщение: ${e.message}");
-          if (e.response?.data != null) {
-            print("Данные ошибки: ${e.response?.data}");
-          }
-          _logDivider();
+          // _logDivider();
+          // print("❌ Ошибка");
+          // print("Статус: ${e.response?.statusCode ?? 'Нет ответа'}");
+          // print("Сообщение: ${e.message}");
+          // if (e.response?.data != null) {
+          //   print("Данные ошибки: ${e.response?.data}");
+          // }
+          // _logDivider();
           return handler.next(e);
         },
       ),
@@ -105,12 +105,12 @@ class ApiClient {
     // LogInterceptor for detailed logs
     dio.interceptors.add(
       LogInterceptor(
-        request: true,
-        requestBody: true,
-        requestHeader: true,
-        responseBody: true,
+        request: false,
+        requestBody: false,
+        requestHeader: false,
+        responseBody: false,
         responseHeader: false,
-        error: true,
+        error: false,
         logPrint: (log) => print(log), // Redirect logs to console
       ),
     );
@@ -136,9 +136,9 @@ class ApiClient {
     return "curl -X ${options.method} '${options.uri}' $headers $data";
   }
 
-  void _logDivider() {
-    print("------------------------------------");
-  }
+  // void _logDivider() {
+  //   print("------------------------------------");
+  // }
 
   Future<Map<String, dynamic>> get(
     String endpoint, {
@@ -158,7 +158,7 @@ class ApiClient {
 
       // Handle unauthorized response
       if (response.statusCode == 401) {
-        print('❌ Unauthorized request: $endpoint');
+        // print('❌ Unauthorized request: $endpoint');
         removeAccessToken();
         return {
           'data': [],
@@ -173,8 +173,8 @@ class ApiClient {
 
       return response.data as Map<String, dynamic>;
     } on DioException catch (e) {
-      print('API Error: ${e.message}');
-      print('Response: ${e.response?.data}');
+      // print('API Error: ${e.message}');
+      // print('Response: ${e.response?.data}');
 
       // Handle unauthorized error
       if (e.response?.statusCode == 401) {
@@ -213,7 +213,7 @@ class ApiClient {
 
       // Handle unauthorized response
       if (response.statusCode == 401) {
-        print('❌ Unauthorized request: $endpoint');
+        // print('❌ Unauthorized request: $endpoint');
         removeAccessToken();
         return {
           'data': [],
@@ -228,8 +228,8 @@ class ApiClient {
 
       return response.data as Map<String, dynamic>;
     } on DioException catch (e) {
-      print('API Error: ${e.message}');
-      print('Response: ${e.response?.data}');
+      // print('API Error: ${e.message}');
+      // print('Response: ${e.response?.data}');
 
       // Handle unauthorized error
       if (e.response?.statusCode == 401) {

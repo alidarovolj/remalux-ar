@@ -10,6 +10,8 @@ import 'package:flutter/services.dart'; // Needed for rootBundle to load the mod
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:image/image.dart' as img;
+import 'package:flutter/foundation.dart'; // Needed for kIsWeb
+import 'dart:io'; // Needed for Platform
 // import 'package:onnxruntime/onnxruntime.dart'; // Not needed if model is out
 // import 'package:path_provider/path_provider.dart'; // Not needed for now
 // import 'package:permission_handler/permission_handler.dart'; // Permissions removed for now
@@ -29,6 +31,7 @@ class _WallPainterScreenState extends State<WallPainterScreen> {
   late Color _selectedColor;
 
   Interpreter? _interpreter;
+  IsolateInterpreter? _isolateInterpreter;
   bool _isModelLoaded = false;
   Path? _maskPath;
   bool _isProcessing = false;
@@ -91,15 +94,27 @@ class _WallPainterScreenState extends State<WallPainterScreen> {
       const modelPath = 'assets/ml/1.tflite';
       print("Attempting to load model $modelPath");
       final interpreterOptions = InterpreterOptions();
-      // Potentially add delegates like GPU if needed, e.g.:
-      // if (Platform.isAndroid) {
-      //   interpreterOptions.addDelegate(GpuDelegateV2());
-      // } else if (Platform.isIOS) {
-      //   interpreterOptions.addDelegate(GpuDelegate());
-      // }
+      // Potentially add delegates like GPU if needed
+      // Check if running on a mobile platform (excluding web)
+      /* // MODIFIED_BLOCK_START: Commenting out delegate logic
+      if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) { 
+        if (Platform.isAndroid) {
+           // Use GpuDelegateV2 for Android if available
+           // interpreterOptions.addDelegate(GpuDelegateV2()); 
+           print("Android platform detected, GPU delegate (V2) could be added here.");
+        } else if (Platform.isIOS) {
+           // Use GpuDelegate for Metal on iOS
+           // interpreterOptions.addDelegate(GpuDelegate()); // Commenting this out
+           print("iOS platform detected, GPU (Metal) delegate was attempted."); // Keep log for info
+        }
+      }
+      */ // MODIFIED_BLOCK_END
+
+      // Create the base interpreter
       _interpreter =
           await Interpreter.fromAsset(modelPath, options: interpreterOptions);
 
+      // Allocate tensors for the base interpreter
       _interpreter!.allocateTensors();
 
       final inputTensor = _interpreter!.getInputTensor(0);
@@ -110,15 +125,25 @@ class _WallPainterScreenState extends State<WallPainterScreen> {
       _outputShape = outputTensor.shape;
       _outputType = outputTensor.type;
 
-      print('Model Input Shape: $_inputShape, Type: $_inputType');
-      print('Model Output Shape: $_outputShape, Type: $_outputType');
+      print('Base Model Input Shape: $_inputShape, Type: $_inputType');
+      print('Base Model Output Shape: $_outputShape, Type: $_outputType');
+
+      // Create the IsolateInterpreter
+      print('Creating IsolateInterpreter...');
+      _isolateInterpreter =
+          await IsolateInterpreter.create(address: _interpreter!.address);
+      print('IsolateInterpreter created.');
 
       setState(() {
         _isModelLoaded = true;
       });
-      print('TFLite model loaded successfully.');
+      print('TFLite model loaded and IsolateInterpreter created successfully.');
     } catch (e) {
-      print('Error loading TFLite model: $e');
+      print('Error loading TFLite model or creating IsolateInterpreter: $e');
+      // Ensure model is marked as not loaded on error
+      setState(() {
+        _isModelLoaded = false;
+      });
     }
   }
 
@@ -204,21 +229,21 @@ class _WallPainterScreenState extends State<WallPainterScreen> {
     }
   }
 
-  Float32List _prepareImageForModel(CameraImage cameraImage) {
+  List<List<List<List<double>>>> _prepareImageForModel(
+      CameraImage cameraImage) {
     if (_inputShape == null || _inputType == null) {
       print("Error: Model input shape or type is null.");
-      return Float32List(0);
+      return [];
     }
     if (_inputType != TensorType.float32) {
       print("Error: Model input type is not Float32. Got $_inputType");
-      return Float32List(0);
+      return [];
     }
 
     img.Image image = _convertCameraImage(cameraImage);
     if (image.width <= 1 || image.height <= 1) {
-      // Check for minimal image
       print("Error: Converted image has invalid dimensions.");
-      return Float32List(0);
+      return [];
     }
 
     final modelInputHeight = _inputShape![1];
@@ -226,23 +251,28 @@ class _WallPainterScreenState extends State<WallPainterScreen> {
     img.Image resizedImage =
         img.copyResize(image, width: modelInputWidth, height: modelInputHeight);
 
-    var inputAsFloatList =
-        Float32List(1 * modelInputHeight * modelInputWidth * 3);
-    int pixelIndex = 0;
-    for (int y = 0; y < modelInputHeight; y++) {
-      for (int x = 0; x < modelInputWidth; x++) {
-        final pixel = resizedImage.getPixel(x, y);
-        inputAsFloatList[pixelIndex++] = (pixel.r.toDouble() - 127.5) / 127.5;
-        inputAsFloatList[pixelIndex++] = (pixel.g.toDouble() - 127.5) / 127.5;
-        inputAsFloatList[pixelIndex++] = (pixel.b.toDouble() - 127.5) / 127.5;
-      }
-    }
-    return inputAsFloatList;
+    var inputBatch = List.generate(
+        1,
+        (_) => List.generate(
+            modelInputHeight,
+            (y) => List.generate(modelInputWidth, (x) {
+                  final pixel = resizedImage.getPixel(x, y);
+                  return [
+                    (pixel.r.toDouble() - 127.5) / 127.5,
+                    (pixel.g.toDouble() - 127.5) / 127.5,
+                    (pixel.b.toDouble() - 127.5) / 127.5
+                  ];
+                }, growable: false),
+            growable: false),
+        growable: false);
+
+    return inputBatch;
   }
 
-  void _processCameraImage(CameraImage cameraImage) {
+  Future<void> _processCameraImage(CameraImage cameraImage) async {
     if (!_isModelLoaded ||
         _interpreter == null ||
+        _isolateInterpreter == null ||
         _isProcessing ||
         _inputShape == null ||
         _outputShape == null ||
@@ -261,51 +291,56 @@ class _WallPainterScreenState extends State<WallPainterScreen> {
 
       var output = <int, Object>{};
       if (_outputType == TensorType.float32) {
-        // Prepare buffer for output. Shape [1, H, W, C]
-        final outputBuffer = List.generate(
-            _outputShape![0], // Batch size (should be 1)
-            (_) => List.generate(
-                _outputShape![1], // Height
-                (_) => List.generate(
-                    _outputShape![2], // Width
-                    (_) =>
-                        Float32List(_outputShape![3]), // Channels (numClasses)
-                    growable: false),
-                growable: false),
-            growable: false);
-        output = {0: outputBuffer};
+        final outputSize = _outputShape!.reduce((a, b) => a * b);
+        final flatOutputBuffer = Float32List(outputSize);
+        output = {0: flatOutputBuffer};
       } else {
         print("Error: Model output type is not Float32. Got $_outputType");
         _isProcessing = false;
         return;
       }
 
-      _interpreter!.run([input], output);
+      await _isolateInterpreter!.run(input, output);
 
-      List<List<List<Float32List>>> logits =
-          output[0]! as List<List<List<Float32List>>>;
+      // --- Temporarily comment out output processing to test if run succeeds ---
+      // /* // MODIFIED_BLOCK_START - REMOVING COMMENT
 
-      final int outputHeight = _outputShape![1];
-      final int outputWidth = _outputShape![2];
-      final int numClasses = _outputShape![3];
-      const int wallClassIndex = 1; // ADE20K 'wall' class index
+      // Get the flat output buffer
+      final flatOutputBuffer = output[0]! as Float32List;
+
+      final int outputHeight = _outputShape![1]; // 65
+      final int outputWidth = _outputShape![2]; // 65
+      final int numClasses = _outputShape![3]; // 21
+      // TODO: IMPORTANT! Verify and update this index for your specific '1.tflite' model!
+      const int wallClassIndex = 1; // Placeholder index
 
       Path newMaskPath = Path();
-      double scaleX = MediaQuery.of(context).size.width / outputWidth;
-      double scaleY = MediaQuery.of(context).size.height / outputHeight;
+      // Scaling factors to map model output coordinates to screen coordinates
+      // Note: This assumes the CameraPreview fills the screen width/height.
+      // Adjust if your layout is different.
+      final double scaleX = MediaQuery.of(context).size.width / outputWidth;
+      final double scaleY = MediaQuery.of(context).size.height / outputHeight;
 
+      // Iterate through the output buffer
       for (int y = 0; y < outputHeight; y++) {
         for (int x = 0; x < outputWidth; x++) {
-          Float32List pixelLogits = logits[0][y][x]; // Batch is 0
-          double maxLogit = -double.infinity;
+          // Find the class with the highest score for pixel (y, x)
+          double maxScore = -double.infinity;
           int predictedClass = 0;
+          // Calculate the starting index for this pixel's class scores in the flat buffer
+          int pixelStartIndex = y * outputWidth * numClasses + x * numClasses;
+
           for (int c = 0; c < numClasses; c++) {
-            if (pixelLogits[c] > maxLogit) {
-              maxLogit = pixelLogits[c];
+            final score = flatOutputBuffer[pixelStartIndex + c];
+            if (score > maxScore) {
+              maxScore = score;
               predictedClass = c;
             }
           }
+
+          // If the predicted class is the wall class, add a rectangle to the mask path
           if (predictedClass == wallClassIndex) {
+            // Use scale factors for screen coordinates
             newMaskPath
                 .addRect(Rect.fromLTWH(x * scaleX, y * scaleY, scaleX, scaleY));
           }
@@ -317,6 +352,8 @@ class _WallPainterScreenState extends State<WallPainterScreen> {
           _maskPath = newMaskPath;
         });
       }
+      // */ // MODIFIED_BLOCK_END - REMOVING COMMENT
+      // --- End of temporarily commented out block ---
     } catch (e, stackTrace) {
       print("Error processing image: $e");
       print("Stack trace: $stackTrace");
@@ -370,7 +407,8 @@ class _WallPainterScreenState extends State<WallPainterScreen> {
     _cameraController
         ?.stopImageStream(); // Stop stream before disposing controller
     _cameraController?.dispose();
-    _interpreter?.close();
+    _isolateInterpreter?.close();
+    _interpreter?.close(); // Close original interpreter
     // _ortSession?.release(); // Commented out
     // _ortEnv?.release(); // Commented out
     super.dispose();
