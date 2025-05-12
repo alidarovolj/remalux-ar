@@ -50,6 +50,12 @@ dependencies:
   google_maps_flutter: ^2.10.1
   easy_localization: ^3.0.5
   flutter_local_notifications: ^19.0.0
+  camera: ^0.10.5+9
+  image: ^4.1.7
+  flutter_colorpicker: ^1.0.3
+  path_provider: ^2.1.2
+  onnxruntime: ^1.4.1
+  tflite_flutter: ^0.11.0
 
 dev_dependencies:
   flutter_test:
@@ -77,6 +83,10 @@ flutter:
     - lib/core/assets/images/partnership/
     - lib/core/assets/images/part_prods/
     - lib/core/assets/icons/cart/
+    - assets/ml/
+    - assets/ml/model.onnx
+    - assets/ml/segformer.tflite
+    - assets/ml/deeplabv3_mnv2_ade20k_1.tflite
 
   # Fonts будут добавлены позже
   # fonts:

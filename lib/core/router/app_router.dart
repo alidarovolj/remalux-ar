@@ -29,6 +29,7 @@ import 'package:remalux_ar/features/cart/presentation/pages/cart_page.dart';
 import 'package:remalux_ar/features/checkout/presentation/pages/checkout_page.dart';
 // import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:remalux_ar/features/auth/presentation/pages/phone_verification_page.dart';
+import 'package:remalux_ar/screens/wall_painter_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -233,6 +234,20 @@ class AppRouter {
       GoRoute(
         path: '/phone-verification',
         builder: (context, state) => const PhoneVerificationPage(),
+      ),
+      // Добавляем маршрут для AR-перекрашивания стен
+      GoRoute(
+        path: '/wall-painter',
+        name: 'wall_painter',
+        builder: (context, state) {
+          // Получаем цвет из параметров, если он был передан
+          final colorHex = state.uri.queryParameters['color'];
+          final color = colorHex != null
+              ? Color(int.parse(colorHex, radix: 16) | 0xFF000000)
+              : null;
+
+          return WallPainterScreen(initialColor: color);
+        },
       ),
     ],
   );

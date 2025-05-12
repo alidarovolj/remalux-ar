@@ -43,7 +43,7 @@
 	<key>NSPhotoLibraryUsageDescription</key>
     <string>Мы используем вашу фотогалерею для выбора изображений</string>
     <key>NSCameraUsageDescription</key>
-    <string>Мы используем вашу камеру для съемки фотографий</string>
+    <string>Мы используем вашу камеру для AR-визуализации перекрашивания стен и съемки фотографий</string>
     <key>NSMicrophoneUsageDescription</key>
     <string>Мы используем ваш микрофон для записи звука</string>
 	<key>UISupportedInterfaceOrientations~ipad</key>

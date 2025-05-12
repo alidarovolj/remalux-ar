@@ -162,7 +162,10 @@ class _ColorDetailModalState extends ConsumerState<ColorDetailModal> {
                 // Visualize button
                 InkWell(
                   onTap: () {
-                    // TODO: Implement visualization
+                    // Переход на экран AR-перекрашивания стен с выбранным цветом
+                    final colorHex =
+                        widget.color.hex.substring(1); // Без символа #
+                    context.push('/wall-painter?color=$colorHex');
                   },
                   child: Container(
                     height: 52,

@@ -520,11 +520,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                 child: CustomButton(
                                   label: 'home.visualize'.tr(),
                                   onPressed: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) =>
-                                          const DevelopmentNoticeModal(),
-                                    );
+                                    context.push('/wall-painter');
                                   },
                                   type: ButtonType.normal,
                                   isFullWidth: true,
