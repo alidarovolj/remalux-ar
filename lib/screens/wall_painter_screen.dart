@@ -12,6 +12,7 @@ import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:image/image.dart' as img;
 import 'package:flutter/foundation.dart'; // Needed for kIsWeb
 import 'dart:io'; // Needed for Platform
+import 'ar_wall_painter_screen_simple.dart';
 // import 'package:onnxruntime/onnxruntime.dart'; // Not needed if model is out
 // import 'package:path_provider/path_provider.dart'; // Not needed for now
 // import 'package:permission_handler/permission_handler.dart'; // Permissions removed for now
@@ -289,6 +290,11 @@ class _WallPainterScreenState extends State<WallPainterScreen> {
         return;
       }
 
+      // Explicitly resize input tensor before running
+      _interpreter!.resizeInputTensor(0, _inputShape!);
+      _interpreter!
+          .allocateTensors(); // MODIFIED_LINE: Allocate tensors after resizing
+
       var output = <int, Object>{};
       if (_outputType == TensorType.float32) {
         final outputSize = _outputShape!.reduce((a, b) => a * b);
@@ -302,7 +308,7 @@ class _WallPainterScreenState extends State<WallPainterScreen> {
 
       await _isolateInterpreter!.run(input, output);
 
-      // --- Temporarily comment out output processing to test if run succeeds ---
+      // --- Temporarily comment out output processing ---
       // /* // MODIFIED_BLOCK_START - REMOVING COMMENT
 
       // Get the flat output buffer
@@ -312,7 +318,7 @@ class _WallPainterScreenState extends State<WallPainterScreen> {
       final int outputWidth = _outputShape![2]; // 65
       final int numClasses = _outputShape![3]; // 21
       // TODO: IMPORTANT! Verify and update this index for your specific '1.tflite' model!
-      const int wallClassIndex = 1; // Placeholder index
+      const int wallClassIndex = 1; // Placeholder index - UPDATE THIS!
 
       Path newMaskPath = Path();
       // Scaling factors to map model output coordinates to screen coordinates
@@ -430,8 +436,20 @@ class _WallPainterScreenState extends State<WallPainterScreen> {
     print("WallPainterScreen build: Camera ready, showing CameraPreview.");
     return Scaffold(
       appBar: AppBar(
-        title: const Text('AR Wall Painter (Placeholder)'),
+        title: const Text('Wall Painter'),
         actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ARWallPainterScreenSimple(),
+                ),
+              );
+            },
+            icon: const Icon(Icons.view_in_ar),
+            tooltip: 'AR режим',
+          ),
           IconButton(
             icon: const Icon(Icons.color_lens),
             onPressed: _showColorPicker,

@@ -30,6 +30,7 @@ import 'package:remalux_ar/features/checkout/presentation/pages/checkout_page.da
 // import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:remalux_ar/features/auth/presentation/pages/phone_verification_page.dart';
 import 'package:remalux_ar/screens/wall_painter_screen.dart';
+import 'package:remalux_ar/screens/ar_demo_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -248,6 +249,12 @@ class AppRouter {
 
           return WallPainterScreen(initialColor: color);
         },
+      ),
+      // Добавляем маршрут для AR демо экрана
+      GoRoute(
+        path: '/ar-demo',
+        name: 'ar_demo',
+        builder: (context, state) => const ARDemoScreen(),
       ),
     ],
   );

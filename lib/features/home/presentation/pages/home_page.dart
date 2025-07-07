@@ -585,6 +585,16 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          context.push('/ar-demo');
+        },
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.view_in_ar),
+        label: const Text('AR'),
+        tooltip: 'Открыть AR режим',
+      ),
     );
   }
 }
