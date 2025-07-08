@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'wall_painter_screen.dart';
-import 'ar_wall_painter_screen_simple.dart';
+import 'ar_wall_painter_screen.dart';
 
 class ARDemoScreen extends StatelessWidget {
   const ARDemoScreen({Key? key}) : super(key: key);
@@ -195,7 +194,7 @@ class ARDemoScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const ARWallPainterScreenSimple(),
+                  builder: (context) => const ARWallPainterScreen(),
                 ),
               );
             },
@@ -217,7 +216,7 @@ class ARDemoScreen extends StatelessWidget {
 
         const SizedBox(height: 16),
 
-        // Camera Mode кнопка
+        // AR Mode кнопка (основной)
         SizedBox(
           width: double.infinity,
           height: 60,
@@ -226,13 +225,13 @@ class ARDemoScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const WallPainterScreen(),
+                  builder: (context) => const ARWallPainterScreen(),
                 ),
               );
             },
             icon: const Icon(Icons.camera_alt, size: 28),
             label: const Text(
-              'Обычная камера + ИИ',
+              'Камера + ИИ Покраска',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             style: ElevatedButton.styleFrom(

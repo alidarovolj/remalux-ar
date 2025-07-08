@@ -29,7 +29,7 @@ import 'package:remalux_ar/features/cart/presentation/pages/cart_page.dart';
 import 'package:remalux_ar/features/checkout/presentation/pages/checkout_page.dart';
 // import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:remalux_ar/features/auth/presentation/pages/phone_verification_page.dart';
-import 'package:remalux_ar/screens/wall_painter_screen.dart';
+import 'package:remalux_ar/screens/ar_wall_painter_screen.dart';
 import 'package:remalux_ar/screens/ar_demo_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -247,7 +247,7 @@ class AppRouter {
               ? Color(int.parse(colorHex, radix: 16) | 0xFF000000)
               : null;
 
-          return WallPainterScreen(initialColor: color);
+          return ARWallPainterScreen();
         },
       ),
       // Добавляем маршрут для AR демо экрана
