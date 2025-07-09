@@ -40,49 +40,21 @@ class ChangeSelectedColor extends ARWallPainterEvent {
   List<Object?> get props => [color];
 }
 
-/// Изменение размера кисти
-class ChangeBrushSize extends ARWallPainterEvent {
-  final double size;
-
-  const ChangeBrushSize(this.size);
-
-  @override
-  List<Object?> get props => [size];
-}
-
-/// Начало рисования
-class StartPainting extends ARWallPainterEvent {
+/// Закрасить стену в указанной точке
+class PaintWallAtPoint extends ARWallPainterEvent {
   final Offset position;
+  final double screenWidth;
+  final double screenHeight;
 
-  const StartPainting(this.position);
-
-  @override
-  List<Object?> get props => [position];
-}
-
-/// Продолжение рисования
-class ContinuePainting extends ARWallPainterEvent {
-  final Offset position;
-
-  const ContinuePainting(this.position);
+  const PaintWallAtPoint(this.position, this.screenWidth, this.screenHeight);
 
   @override
-  List<Object?> get props => [position];
+  List<Object?> get props => [position, screenWidth, screenHeight];
 }
 
-/// Окончание рисования
-class EndPainting extends ARWallPainterEvent {
-  const EndPainting();
-}
-
-/// Очистка всех мазков
-class ClearPaintStrokes extends ARWallPainterEvent {
-  const ClearPaintStrokes();
-}
-
-/// Отмена последнего мазка
-class UndoLastStroke extends ARWallPainterEvent {
-  const UndoLastStroke();
+/// Очистить закрашенную стену
+class ClearPaintedWall extends ARWallPainterEvent {
+  const ClearPaintedWall();
 }
 
 /// Переключение видимости UI

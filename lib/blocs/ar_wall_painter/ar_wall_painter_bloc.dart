@@ -16,12 +16,8 @@ class ARWallPainterBloc extends Bloc<ARWallPainterEvent, ARWallPainterState> {
     on<InitializeARWallPainter>(_onInitialize);
     on<ProcessCameraFrame>(_onProcessCameraFrame);
     on<ChangeSelectedColor>(_onChangeSelectedColor);
-    on<ChangeBrushSize>(_onChangeBrushSize);
-    on<StartPainting>(_onStartPainting);
-    on<ContinuePainting>(_onContinuePainting);
-    on<EndPainting>(_onEndPainting);
-    on<ClearPaintStrokes>(_onClearPaintStrokes);
-    on<UndoLastStroke>(_onUndoLastStroke);
+    on<PaintWallAtPoint>(_onPaintWallAtPoint);
+    on<ClearPaintedWall>(_onClearPaintedWall);
     on<ToggleUIVisibility>(_onToggleUIVisibility);
     on<ToggleSegmentationOverlay>(_onToggleSegmentationOverlay);
     on<DisposeARWallPainter>(_onDispose);
@@ -48,6 +44,7 @@ class ARWallPainterBloc extends Bloc<ARWallPainterEvent, ARWallPainterState> {
         cameras.first,
         ResolutionPreset.high,
         enableAudio: false,
+        imageFormatGroup: ImageFormatGroup.bgra8888,
       );
 
       await cameraController.initialize();
@@ -59,20 +56,13 @@ class ARWallPainterBloc extends Bloc<ARWallPainterEvent, ARWallPainterState> {
       print('✅ Камера инициализирована');
 
       // 2. Инициализация AI модели (без колбэка)
-      final aiInitialized = await _segmentationService.initialize();
+      await _segmentationService.initialize();
 
-      if (aiInitialized) {
-        emit(state.copyWith(
-          isAIModelLoaded: true,
-        ));
-        print('✅ AI модель загружена');
-      } else {
-        emit(state.copyWith(
-          isAIModelError: true,
-          aiErrorMessage: 'Не удалось загрузить AI модель',
-        ));
-        print('❌ Ошибка загрузки AI модели');
-      }
+      // Если мы дошли до сюда, значит модель загрузилась без ошибок
+      emit(state.copyWith(
+        isAIModelLoaded: true,
+      ));
+      print('✅ AI модель загружена');
 
       // 3. Финальное состояние готовности
       if (state.isCameraInitialized && state.isAIModelLoaded) {
@@ -96,16 +86,16 @@ class ARWallPainterBloc extends Bloc<ARWallPainterEvent, ARWallPainterState> {
 
     try {
       // Получаем результат сегментации напрямую
-      final wallMask = await _segmentationService.processFrameAndGetMask(
+      final result = await _segmentationService.processCameraImage(
         event.cameraImage,
         event.screenWidth,
         event.screenHeight,
       );
 
-      if (wallMask != null && !emit.isDone) {
+      if (result != null && !emit.isDone) {
         emit(state.copyWith(
-          wallMask: wallMask,
-          aiConfidence: 0.85,
+          segmentationResult: result,
+          aiConfidence: 0.85, // Placeholder
         ));
       }
     } catch (e) {
@@ -125,100 +115,28 @@ class ARWallPainterBloc extends Bloc<ARWallPainterEvent, ARWallPainterState> {
     emit(state.copyWith(selectedColor: event.color));
   }
 
-  /// Изменение размера кисти
-  void _onChangeBrushSize(
-    ChangeBrushSize event,
+  /// Закрасить стену по точке касания
+  void _onPaintWallAtPoint(
+    PaintWallAtPoint event,
     Emitter<ARWallPainterState> emit,
   ) {
-    emit(state.copyWith(brushSize: event.size));
-  }
-
-  /// Начало рисования
-  void _onStartPainting(
-    StartPainting event,
-    Emitter<ARWallPainterState> emit,
-  ) {
-    print('🎨 Начало рисования в точке: ${event.position}');
-
-    // Проверяем, находится ли точка на стене
-    if (!_segmentationService.isPointOnWall(event.position, state.wallMask)) {
-      print('❌ Точка не на стене - рисование заблокировано');
-      return; // Не рисуем если точка не на стене
-    }
-
-    print('✅ Точка на стене - создаем новый мазок');
-    final newStroke = PaintStroke(
-      points: [event.position],
-      color: state.selectedColor,
-      size: state.brushSize,
-      timestamp: DateTime.now(),
+    final paintedPath = _segmentationService.getPaintedWallPath(
+      event.position,
+      event.screenWidth,
+      event.screenHeight,
     );
 
-    emit(state.copyWith(
-      currentStroke: newStroke,
-      isPainting: true,
-    ));
-  }
-
-  /// Продолжение рисования
-  void _onContinuePainting(
-    ContinuePainting event,
-    Emitter<ARWallPainterState> emit,
-  ) {
-    if (!state.isPainting || state.currentStroke == null) return;
-
-    // Проверяем, находится ли точка на стене
-    if (!_segmentationService.isPointOnWall(event.position, state.wallMask)) {
-      print('❌ Точка ${event.position} не на стене - пропускаем');
-      return; // Не добавляем точку если она не на стене
+    if (paintedPath != null) {
+      emit(state.copyWith(paintedWallPath: paintedPath));
     }
-
-    print('✅ Добавляем точку ${event.position} к мазку');
-    final updatedStroke = state.currentStroke!.copyWith(
-      points: [...state.currentStroke!.points, event.position],
-    );
-
-    emit(state.copyWith(currentStroke: updatedStroke));
   }
 
-  /// Окончание рисования
-  void _onEndPainting(
-    EndPainting event,
+  /// Очистка закрашенной стены
+  void _onClearPaintedWall(
+    ClearPaintedWall event,
     Emitter<ARWallPainterState> emit,
   ) {
-    if (!state.isPainting || state.currentStroke == null) return;
-
-    final finalStrokes = [...state.paintStrokes, state.currentStroke!];
-
-    emit(state.copyWith(
-      paintStrokes: finalStrokes,
-      currentStroke: null,
-      isPainting: false,
-    ));
-  }
-
-  /// Очистка всех мазков
-  void _onClearPaintStrokes(
-    ClearPaintStrokes event,
-    Emitter<ARWallPainterState> emit,
-  ) {
-    emit(state.copyWith(
-      paintStrokes: [],
-      currentStroke: null,
-      isPainting: false,
-    ));
-  }
-
-  /// Отмена последнего мазка
-  void _onUndoLastStroke(
-    UndoLastStroke event,
-    Emitter<ARWallPainterState> emit,
-  ) {
-    if (state.paintStrokes.isEmpty) return;
-
-    final newStrokes =
-        state.paintStrokes.sublist(0, state.paintStrokes.length - 1);
-    emit(state.copyWith(paintStrokes: newStrokes));
+    emit(state.copyWith(clearPaintedWallPath: true));
   }
 
   /// Переключение видимости UI
@@ -247,7 +165,7 @@ class ARWallPainterBloc extends Bloc<ARWallPainterEvent, ARWallPainterState> {
 
     try {
       await state.cameraController?.dispose();
-      await _segmentationService.dispose();
+      _segmentationService.dispose();
     } catch (e) {
       print('❌ Ошибка при освобождении ресурсов: $e');
     }

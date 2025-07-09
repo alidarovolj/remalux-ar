@@ -87,9 +87,6 @@ flutter:
     - lib/core/assets/images/part_prods/
     - lib/core/assets/icons/cart/
     - assets/ml/
-    - assets/ml/model.onnx
-    - assets/ml/segformer.tflite
-    - assets/ml/deeplabv3_mnv2_ade20k_1.tflite
 
   fonts:
     - family: Ysabeau

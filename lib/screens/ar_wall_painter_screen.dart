@@ -43,6 +43,15 @@ class _ARWallPainterViewState extends State<_ARWallPainterView> {
     const Color(0xFFFFEB3B), // Желтый
   ];
 
+  final GlobalKey _cameraKey = GlobalKey();
+  late final ARWallPainterBloc _bloc;
+
+  @override
+  void initState() {
+    super.initState();
+    _bloc = context.read<ARWallPainterBloc>();
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<ARWallPainterBloc, ARWallPainterState>(
@@ -66,7 +75,7 @@ class _ARWallPainterViewState extends State<_ARWallPainterView> {
               _buildCameraView(state),
 
               // Оверлей для рисования
-              if (state.isReady) _buildPaintingOverlay(state),
+              if (state.isReady) _buildPaintingOverlay(context, state),
 
               // Сегментация (если включена)
               if (state.showSegmentationOverlay && state.wallMask != null)
@@ -97,6 +106,7 @@ class _ARWallPainterViewState extends State<_ARWallPainterView> {
     return Positioned.fill(
       child: CameraPreview(
         state.cameraController!,
+        key: _cameraKey,
         child: LayoutBuilder(
           builder: (context, constraints) {
             // Запускаем обработку кадра только один раз при готовности
@@ -143,26 +153,24 @@ class _ARWallPainterViewState extends State<_ARWallPainterView> {
     });
   }
 
-  Widget _buildPaintingOverlay(ARWallPainterState state) {
+  Widget _buildPaintingOverlay(BuildContext context, ARWallPainterState state) {
     return Positioned.fill(
       child: GestureDetector(
-        onPanStart: (details) {
+        onTapUp: (details) {
+          final RenderBox box =
+              _cameraKey.currentContext!.findRenderObject() as RenderBox;
           context.read<ARWallPainterBloc>().add(
-                StartPainting(details.localPosition),
+                PaintWallAtPoint(
+                  details.localPosition,
+                  box.size.width,
+                  box.size.height,
+                ),
               );
-        },
-        onPanUpdate: (details) {
-          context.read<ARWallPainterBloc>().add(
-                ContinuePainting(details.localPosition),
-              );
-        },
-        onPanEnd: (details) {
-          context.read<ARWallPainterBloc>().add(const EndPainting());
         },
         child: CustomPaint(
-          painter: PaintStrokePainter(
-            strokes: state.paintStrokes,
-            currentStroke: state.currentStroke,
+          painter: WallPainter(
+            paintedPath: state.paintedWallPath,
+            color: state.selectedColor,
           ),
           size: Size.infinite,
         ),
@@ -274,11 +282,6 @@ class _ARWallPainterViewState extends State<_ARWallPainterView> {
 
           const SizedBox(height: 16),
 
-          // Слайдер размера кисти
-          _buildBrushSizeSlider(state),
-
-          const SizedBox(height: 16),
-
           // Кнопки действий
           _buildActionButtons(state),
         ],
@@ -345,61 +348,17 @@ class _ARWallPainterViewState extends State<_ARWallPainterView> {
     );
   }
 
-  Widget _buildBrushSizeSlider(ARWallPainterState state) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.7),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.brush, color: Colors.white, size: 20),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Slider(
-              value: state.brushSize,
-              min: 10.0,
-              max: 100.0,
-              divisions: 18,
-              activeColor: Colors.white,
-              inactiveColor: Colors.grey,
-              onChanged: (value) {
-                context.read<ARWallPainterBloc>().add(
-                      ChangeBrushSize(value),
-                    );
-              },
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            '${state.brushSize.round()}',
-            style: const TextStyle(color: Colors.white, fontSize: 14),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildActionButtons(ARWallPainterState state) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _buildActionButton(
-          icon: Icons.undo,
-          label: 'Отменить',
-          onPressed: state.paintStrokes.isNotEmpty
-              ? () =>
-                  context.read<ARWallPainterBloc>().add(const UndoLastStroke())
-              : null,
-        ),
         _buildActionButton(
           icon: Icons.clear,
           label: 'Очистить',
-          onPressed: state.paintStrokes.isNotEmpty
+          onPressed: state.paintedWallPath != null
               ? () => context
                   .read<ARWallPainterBloc>()
-                  .add(const ClearPaintStrokes())
+                  .add(const ClearPaintedWall())
               : null,
         ),
       ],
@@ -487,68 +446,35 @@ class _ARWallPainterViewState extends State<_ARWallPainterView> {
 
   @override
   void dispose() {
-    // Останавливаем поток камеры перед закрытием
-    final bloc = context.read<ARWallPainterBloc>();
-    if (_isStreamStarted && bloc.state.cameraController != null) {
-      try {
-        bloc.state.cameraController!.stopImageStream();
-      } catch (e) {
-        print('⚠️ Ошибка остановки потока камеры: $e');
-      }
-    }
-    _isStreamStarted = false;
-
-    bloc.add(const DisposeARWallPainter());
+    _bloc.add(const DisposeARWallPainter());
     super.dispose();
   }
 }
 
-/// Painter для отображения мазков краски
-class PaintStrokePainter extends CustomPainter {
-  final List<PaintStroke> strokes;
-  final PaintStroke? currentStroke;
+/// Painter для отображения закрашенной стены
+class WallPainter extends CustomPainter {
+  final ui.Path? paintedPath;
+  final Color color;
 
-  PaintStrokePainter({
-    required this.strokes,
-    this.currentStroke,
+  WallPainter({
+    required this.paintedPath,
+    required this.color,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
-    for (final stroke in strokes) {
-      _drawStroke(canvas, stroke);
-    }
-
-    if (currentStroke != null) {
-      _drawStroke(canvas, currentStroke!);
-    }
-  }
-
-  void _drawStroke(Canvas canvas, PaintStroke stroke) {
-    if (stroke.points.isEmpty) return;
+    if (paintedPath == null) return;
 
     final paint = Paint()
-      ..color = stroke.color
-      ..strokeWidth = stroke.size
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round
-      ..style = PaintingStyle.stroke;
+      ..color = color.withOpacity(0.6)
+      ..style = PaintingStyle.fill;
 
-    final path = Path();
-    path.moveTo(stroke.points.first.dx, stroke.points.first.dy);
-
-    for (int i = 1; i < stroke.points.length; i++) {
-      final point = stroke.points[i];
-      path.lineTo(point.dx, point.dy);
-    }
-
-    canvas.drawPath(path, paint);
+    canvas.drawPath(paintedPath!, paint);
   }
 
   @override
-  bool shouldRepaint(PaintStrokePainter oldDelegate) {
-    return oldDelegate.strokes != strokes ||
-        oldDelegate.currentStroke != currentStroke;
+  bool shouldRepaint(WallPainter oldDelegate) {
+    return oldDelegate.paintedPath != paintedPath || oldDelegate.color != color;
   }
 }
 

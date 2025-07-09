@@ -1,14 +1,30 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:image/image.dart' as img;
+import 'package:remalux_ar/core/utils/image_converter.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 
-/// Упрощенный сервис для AI сегментации стен БЕЗ изолятов
-/// Используется временно для исправления ошибки с UI операциями
+class SegmentationResult {
+  final ui.Path path;
+  final List<List<int>> rawMask;
+  final int maskWidth;
+  final int maskHeight;
+
+  SegmentationResult({
+    required this.path,
+    required this.rawMask,
+    required this.maskWidth,
+    required this.maskHeight,
+  });
+}
+
+/// Упрощенный сервис для AI сегментации стен
 class SegmentationServiceSimple {
   static SegmentationServiceSimple? _instance;
   static SegmentationServiceSimple get instance =>
@@ -21,217 +37,302 @@ class SegmentationServiceSimple {
   bool _isInitialized = false;
 
   // Параметры модели SegFormer
-  List<int>? _inputShape; // [1, 224, 224, 3] для segformer.tflite
-  List<int>? _outputShape; // [1, 224, 224, 1] - бинарная маска стен
-  TensorType? _inputType;
-  TensorType? _outputType;
+  final int _modelWidth = 224;
+  final int _modelHeight = 224;
 
-  // Колбэк для результатов
-  Function(ui.Path wallMask)? _onSegmentationResult;
+  // Последняя рассчитанная сырая маска
+  SegmentationResult? _lastResult;
 
-  /// Инициализация сервиса с загрузкой SegFormer модели
-  Future<bool> initialize({
-    String modelPath = 'assets/ml/segformer.tflite',
-  }) async {
-    if (_isInitialized) return true;
+  // Тензоры ввода/вывода
+  late Tensor _inputTensor;
+  late Tensor _outputTensor;
 
+  Future<void> initialize() async {
+    if (_isInitialized) return;
     try {
-      print("🤖 SegmentationService: Загружаем SegFormer модель $modelPath");
+      debugPrint("🤖 SegmentationService: Загружаем модель segformer.tflite");
+      final options = InterpreterOptions();
 
-      // Создаем основной интерпретер
-      final interpreterOptions = InterpreterOptions();
-
-      // Включаем GPU ускорение для мобильных устройств
-      try {
-        if (Platform.isAndroid || Platform.isIOS) {
-          final gpuDelegate = GpuDelegate();
-          interpreterOptions.addDelegate(gpuDelegate);
-          print(
-              "📱 GPU ускорение включено для ${Platform.isAndroid ? 'Android' : 'iOS'}");
-        }
-      } catch (e) {
-        print("⚠️ GPU ускорение недоступно, используем CPU: $e");
+      // Используем делегат GPU для ускорения, если доступен
+      if (Platform.isAndroid) {
+        options.addDelegate(GpuDelegateV2());
+      } else if (Platform.isIOS) {
+        options.addDelegate(GpuDelegate());
       }
 
-      _interpreter =
-          await Interpreter.fromAsset(modelPath, options: interpreterOptions);
-      _interpreter!.allocateTensors();
+      _interpreter = await Interpreter.fromAsset('assets/ml/segformer.tflite',
+          options: options);
 
-      // Получаем информацию о SegFormer модели
-      final inputTensor = _interpreter!.getInputTensor(0);
-      final outputTensor = _interpreter!.getOutputTensor(0);
-
-      _inputShape = inputTensor.shape;
-      _inputType = inputTensor.type;
-      _outputShape = outputTensor.shape;
-      _outputType = outputTensor.type;
-
-      print('🧠 SegFormer Input: $_inputShape, Type: $_inputType');
-      print('🧠 SegFormer Output: $_outputShape, Type: $_outputType');
-
-      // Проверяем что это правильная SegFormer модель
-      if (_inputShape!.length == 4 &&
-          _inputShape![1] == 224 &&
-          _inputShape![2] == 224 &&
-          _inputShape![3] == 3 &&
-          _outputShape!.length == 4 &&
-          _outputShape![1] == 224 &&
-          _outputShape![2] == 224 &&
-          _outputShape![3] == 1) {
-        print(
-            '✅ SegFormer модель корректна: input 224x224x3 → output 224x224x1');
-      } else {
-        print('⚠️ Неожиданные размеры модели, продолжаем...');
-      }
+      _inputTensor = _interpreter!.getInputTensor(0);
+      _outputTensor = _interpreter!.getOutputTensor(0);
 
       _isInitialized = true;
-      print('✅ SegmentationService с SegFormer инициализован');
-      return true;
+      debugPrint('✅ Модель segformer.tflite загружена успешно.');
+      debugPrint(
+          '🧠 SegFormer Input: ${_inputTensor.shape}, Type: ${_inputTensor.type}');
+      debugPrint(
+          '🧠 SegFormer Output: ${_outputTensor.shape}, Type: ${_outputTensor.type}');
     } catch (e) {
-      print('❌ Ошибка инициализации SegmentationService: $e');
-      return false;
+      debugPrint('❌ Ошибка загрузки AI модели: $e');
+      rethrow;
     }
   }
 
-  /// Обработка кадра с камеры (В ГЛАВНОМ ПОТОКЕ)
-  Future<void> processFrame(
-    CameraImage cameraImage,
-    double screenWidth,
-    double screenHeight,
-  ) async {
-    if (!_isInitialized || _interpreter == null) return;
+  bool get isInitialized => _isInitialized;
 
-    try {
-      // Конвертируем изображение
-      final convertedImage = _convertCameraImage(cameraImage);
-      if (convertedImage == null) return;
-
-      // Создаем простую тестовую маску (пока без реального AI)
-      // TODO: Здесь будет реальный инференс SegFormer
-      final wallMask = _createTestWallMask(screenWidth, screenHeight);
-
-      // Вызываем колбэк с результатом
-      if (_onSegmentationResult != null) {
-        _onSegmentationResult!(wallMask);
-      }
-    } catch (e) {
-      print('❌ Ошибка обработки кадра: $e');
-    }
-  }
-
-  /// Обработка кадра с прямым возвратом результата (для BLoC)
-  Future<ui.Path?> processFrameAndGetMask(
-    CameraImage cameraImage,
-    double screenWidth,
-    double screenHeight,
-  ) async {
+  Future<SegmentationResult?> processCameraImage(
+      CameraImage image, double screenWidth, double screenHeight) async {
     if (!_isInitialized || _interpreter == null) return null;
 
-    try {
-      // Конвертируем изображение
-      final convertedImage = _convertCameraImage(cameraImage);
-      if (convertedImage == null) return null;
+    final preprocessedImage = _preprocessCameraImage(image);
+    if (preprocessedImage == null) return null;
 
-      // Создаем простую тестовую маску (пока без реального AI)
-      // TODO: Здесь будет реальный инференс SegFormer
-      return _createTestWallMask(screenWidth, screenHeight);
-    } catch (e) {
-      print('❌ Ошибка обработки кадра: $e');
-      return null;
-    }
+    // Запуск модели
+    final inputs = [preprocessedImage.reshape(_inputTensor.shape)];
+    final outputBuffer = List.filled(_modelWidth * _modelHeight, 0.0)
+        .reshape(_outputTensor.shape);
+
+    final outputs = <int, Object>{0: outputBuffer};
+
+    _interpreter!.runForMultipleInputs(inputs, outputs);
+
+    final rawMask = _postProcessOutput(outputBuffer);
+
+    final labeledMask = _findAndLabelConnectedComponents(rawMask);
+
+    final path = _convertRawMaskToPath(labeledMask, screenWidth, screenHeight);
+
+    _lastResult = SegmentationResult(
+      path: path,
+      rawMask: labeledMask,
+      maskWidth: _modelWidth,
+      maskHeight: _modelHeight,
+    );
+
+    return _lastResult;
   }
 
-  /// Создание тестовой маски стены
-  ui.Path _createTestWallMask(double screenWidth, double screenHeight) {
-    final wallMask = ui.Path();
+  /// Находит и маркирует связанные компоненты (например, отдельные стены)
+  List<List<int>> _findAndLabelConnectedComponents(List<List<int>> mask) {
+    int height = mask.length;
+    if (height == 0) return mask;
+    int width = mask[0].length;
+    if (width == 0) return mask;
 
-    // Создаем несколько областей как "стены" для более реалистичного тестирования
+    List<List<int>> labeledMask =
+        List.generate(height, (_) => List.generate(width, (_) => 0));
+    int currentLabel = 1;
 
-    // Главная стена (центр)
-    final centerX = screenWidth / 2;
-    final centerY = screenHeight / 2;
-    final mainWallWidth = screenWidth * 0.7;
-    final mainWallHeight = screenHeight * 0.5;
-
-    wallMask.addRect(ui.Rect.fromCenter(
-      center: ui.Offset(centerX, centerY),
-      width: mainWallWidth,
-      height: mainWallHeight,
-    ));
-
-    // Дополнительные области стен (левая и правая)
-    final sideWallWidth = screenWidth * 0.15;
-    final sideWallHeight = screenHeight * 0.8;
-
-    // Левая стена
-    wallMask.addRect(ui.Rect.fromLTWH(
-      20,
-      (screenHeight - sideWallHeight) / 2,
-      sideWallWidth,
-      sideWallHeight,
-    ));
-
-    // Правая стена
-    wallMask.addRect(ui.Rect.fromLTWH(
-      screenWidth - sideWallWidth - 20,
-      (screenHeight - sideWallHeight) / 2,
-      sideWallWidth,
-      sideWallHeight,
-    ));
-
-    print('🎨 Создана тестовая маска стены: ${screenWidth}x${screenHeight}');
-    return wallMask;
-  }
-
-  /// Конвертация CameraImage
-  img.Image? _convertCameraImage(CameraImage cameraImage) {
-    try {
-      if (cameraImage.format.group == ImageFormatGroup.bgra8888) {
-        return img.Image.fromBytes(
-          width: cameraImage.planes[0].width!,
-          height: cameraImage.planes[0].height!,
-          bytes: cameraImage.planes[0].bytes.buffer,
-          order: img.ChannelOrder.bgra,
-        );
-      } else {
-        // YUV420 to RGB конвертация (упрощенная)
-        final int width = cameraImage.width;
-        final int height = cameraImage.height;
-        final image = img.Image(width: width, height: height);
-
-        // Упрощенная конвертация для тестирования
-        for (int y = 0; y < height && y < 100; ++y) {
-          for (int x = 0; x < width && x < 100; ++x) {
-            image.setPixelRgb(x, y, 128, 128, 128); // Серый цвет
-          }
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
+        // Если пиксель - это стена (значение 1) и он еще не был помечен
+        if (mask[y][x] == 1 && labeledMask[y][x] == 0) {
+          _labelComponent(mask, labeledMask, x, y, width, height, currentLabel);
+          currentLabel++;
         }
-        return image;
       }
-    } catch (e) {
-      print('❌ Ошибка конвертации изображения: $e');
+    }
+    return labeledMask;
+  }
+
+  /// Итеративная функция для пометки одной связанной компоненты
+  void _labelComponent(
+      List<List<int>> originalMask,
+      List<List<int>> labeledMask,
+      int x,
+      int y,
+      int width,
+      int height,
+      int label) {
+    final stack = <(int, int)>[];
+    stack.add((x, y));
+
+    while (stack.isNotEmpty) {
+      final (curX, curY) = stack.removeLast();
+
+      if (curX < 0 ||
+          curX >= width ||
+          curY < 0 ||
+          curY >= height ||
+          originalMask[curY][curX] != 1 || // Ищем "1" для segformer
+          labeledMask[curY][curX] != 0) {
+        continue;
+      }
+
+      labeledMask[curY][curX] = label;
+
+      stack.add((curX + 1, curY));
+      stack.add((curX - 1, curY));
+      stack.add((curX, curY + 1));
+      stack.add((curX, curY - 1));
+    }
+  }
+
+  Float32List? _preprocessCameraImage(CameraImage image) {
+    final img.Image? rgbImage = ImageConverter.convertCameraImage(image);
+    if (rgbImage == null) return null;
+
+    // Поворот и обрезка
+    final img.Image rotatedImage = img.copyRotate(rgbImage, angle: 90);
+    final img.Image resizedImage =
+        img.copyResize(rotatedImage, width: _modelWidth, height: _modelHeight);
+
+    // Нормализация пикселей
+    final imageBytes = resizedImage.getBytes(order: img.ChannelOrder.rgb);
+    final floatBytes = Float32List(_modelWidth * _modelHeight * 3);
+    for (int i = 0; i < imageBytes.length; i++) {
+      // Нормализация в диапазон [-1, 1] для Segformer
+      floatBytes[i] = (imageBytes[i] / 127.5) - 1.0;
+    }
+
+    return floatBytes;
+  }
+
+  /// Постобработка вывода модели: преобразование в 2D-массив (маску)
+  List<List<int>> _postProcessOutput(List<dynamic> output) {
+    final maskData = output[0] as List<List<List<double>>>;
+    final rawMask = List.generate(
+        _modelHeight, (y) => List.generate(_modelWidth, (x) => 0));
+
+    for (int y = 0; y < _modelHeight; y++) {
+      for (int x = 0; x < _modelWidth; x++) {
+        // Для segformer, если значение > 0, считаем что это стена
+        if (maskData[y][x][0] > 0.0) {
+          rawMask[y][x] = 1;
+        }
+      }
+    }
+    return rawMask;
+  }
+
+  /// Преобразует сырую маску в объект Path для отрисовки
+  ui.Path _convertRawMaskToPath(
+      List<List<int>> rawMask, double screenWidth, double screenHeight) {
+    final path = ui.Path();
+    final modelHeight = rawMask.length;
+    if (modelHeight == 0) return path;
+    final modelWidth = rawMask[0].length;
+    if (modelWidth == 0) return path;
+
+    final double scaleX = screenWidth / modelWidth;
+    final double scaleY = screenHeight / modelHeight;
+
+    for (int y = 0; y < modelHeight; y++) {
+      for (int x = 0; x < modelWidth; x++) {
+        if (rawMask[y][x] != 0) {
+          // Рисуем прямоугольник для каждого пикселя маски
+          path.addRect(Rect.fromLTWH(
+            x * scaleX,
+            y * scaleY,
+            scaleX,
+            scaleY,
+          ));
+        }
+      }
+    }
+    return path;
+  }
+
+  /// Получает путь для закрашенной стены по точке на экране
+  ui.Path? getPaintedWallPath(
+      ui.Offset screenPoint, double screenWidth, double screenHeight) {
+    if (_lastResult == null) return null;
+
+    final modelPoint =
+        _screenToModelCoordinates(screenPoint, screenWidth, screenHeight);
+    if (modelPoint == null) return null;
+
+    final int x = modelPoint.dx.toInt();
+    final int y = modelPoint.dy.toInt();
+
+    final floodFillMask = _floodFill(
+      _lastResult!.rawMask, // Маска уже с уникальными ID
+      x,
+      y,
+      _lastResult!.maskWidth,
+      _lastResult!.maskHeight,
+    );
+
+    if (floodFillMask == null) return null; // Точка не на стене
+
+    // Конвертируем новую маску залитой области в Path
+    final paintedPath =
+        _convertRawMaskToPath(floodFillMask, screenWidth, screenHeight);
+
+    return paintedPath;
+  }
+
+  /// Алгоритм заливки (Flood Fill) для поиска связанной области
+  List<List<int>>? _floodFill(
+    List<List<int>> mask,
+    int startX,
+    int startY,
+    int width,
+    int height,
+  ) {
+    if (startX < 0 || startX >= width || startY < 0 || startY >= height) {
       return null;
     }
-  }
 
-  /// Проверка, находится ли точка на стене
-  bool isPointOnWall(ui.Offset point, ui.Path? wallMask) {
-    if (wallMask == null) {
-      print('⚠️ Нет маски стены для проверки точки $point');
-      return false;
+    final targetValue = mask[startY][startX];
+    if (targetValue == 0) {
+      return null; // Нельзя залить фон
     }
 
-    final isOnWall = wallMask.contains(point);
-    print('🔍 Проверка точки $point на стене: ${isOnWall ? "✅ ДА" : "❌ НЕТ"}');
-    return isOnWall;
+    final filledMask =
+        List.generate(height, (_) => List.generate(width, (_) => 0));
+
+    // Очередь для итеративной заливки
+    final pointsQueue = Queue<(int, int)>();
+    pointsQueue.add((startX, startY));
+
+    // Множество для отслеживания уже посещенных точек
+    final visited = <(int, int)>{(startX, startY)};
+
+    while (pointsQueue.isNotEmpty) {
+      final (x, y) = pointsQueue.removeFirst();
+      filledMask[y][x] = targetValue;
+
+      // Проверяем 4-х соседей
+      final neighbors = [(x, y - 1), (x, y + 1), (x - 1, y), (x + 1, y)];
+
+      for (final (nx, ny) in neighbors) {
+        if (nx >= 0 &&
+            nx < width &&
+            ny >= 0 &&
+            ny < height &&
+            mask[ny][nx] == targetValue &&
+            !visited.contains((nx, ny))) {
+          visited.add((nx, ny));
+          pointsQueue.add((nx, ny));
+        }
+      }
+    }
+    return filledMask;
   }
 
-  /// Очистка ресурсов
-  Future<void> dispose() async {
-    print('🧹 SegmentationService: Очистка ресурсов');
+  /// Преобразует координаты экрана в координаты на маске модели
+  ui.Offset? _screenToModelCoordinates(
+    ui.Offset screenPoint,
+    double screenWidth,
+    double screenHeight,
+  ) {
+    if (_lastResult == null) return null;
+    final modelWidth = _lastResult!.maskWidth;
+    final modelHeight = _lastResult!.maskHeight;
 
+    final double x = (screenPoint.dx / screenWidth) * modelWidth;
+    final double y = (screenPoint.dy / screenHeight) * modelHeight;
+
+    if (x >= 0 && x < modelWidth && y >= 0 && y < modelHeight) {
+      return ui.Offset(x.floor().toDouble(), y.floor().toDouble());
+    }
+    return null;
+  }
+
+  void dispose() {
     _interpreter?.close();
-    _interpreter = null;
-
     _isInitialized = false;
+    _instance = null;
   }
 }
