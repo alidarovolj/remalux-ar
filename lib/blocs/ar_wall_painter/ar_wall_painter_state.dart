@@ -18,6 +18,10 @@ class ARWallPainterState extends Equatable {
   // Контроллер камеры
   final CameraController? cameraController;
 
+  // Данные кадра для рендеринга
+  final ui.Image? cameraImage;
+  final Size? cameraImageSize;
+
   // Состояние обработки
   final bool isProcessingFrame;
 
@@ -40,6 +44,8 @@ class ARWallPainterState extends Equatable {
     this.isAIModelError = false,
     this.aiErrorMessage,
     this.cameraController,
+    this.cameraImage,
+    this.cameraImageSize,
     this.isProcessingFrame = false,
     this.segmentationResult,
     this.paintedWallPath,
@@ -72,6 +78,8 @@ class ARWallPainterState extends Equatable {
     bool? isAIModelError,
     String? aiErrorMessage,
     CameraController? cameraController,
+    ui.Image? cameraImage,
+    Size? cameraImageSize,
     bool? isProcessingFrame,
     SegmentationResult? segmentationResult,
     ui.Path? paintedWallPath,
@@ -90,6 +98,8 @@ class ARWallPainterState extends Equatable {
       isAIModelError: isAIModelError ?? this.isAIModelError,
       aiErrorMessage: aiErrorMessage ?? this.aiErrorMessage,
       cameraController: cameraController ?? this.cameraController,
+      cameraImage: cameraImage ?? this.cameraImage,
+      cameraImageSize: cameraImageSize ?? this.cameraImageSize,
       isProcessingFrame: isProcessingFrame ?? this.isProcessingFrame,
       segmentationResult: segmentationResult ?? this.segmentationResult,
       paintedWallPath: clearPaintedWallPath == true
@@ -116,6 +126,8 @@ class ARWallPainterState extends Equatable {
         isAIModelError,
         aiErrorMessage,
         cameraController,
+        cameraImage,
+        cameraImageSize,
         isProcessingFrame,
         segmentationResult,
         paintedWallPath,

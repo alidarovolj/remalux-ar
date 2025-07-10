@@ -54,17 +54,13 @@
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Приложению требуется доступ к геолокации для отображения вашего местоположения на карте</string>
+	<string>Приложению требуется доступ к геолокации для отображения вашего местоположения на карте и поиска ближайших объектов.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Приложению требуется доступ к геолокации для отображения вашего местоположения на карте</string>
+	<string>Приложение использует геолокацию в фоновом режиме для отправки уведомлений о ближайших объектах.</string>
 	<key>io.flutter.embedded_views_preview</key>
 	<true/>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Используйте Face ID для быстрого входа в приложение</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app needs access to location when open to show nearby clinics and doctors.</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>This app needs access to location when in the background to show nearby clinics and doctors.</string>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 <true/>
 <key>UIFileSharingEnabled</key>

@@ -85,26 +85,67 @@ class ARWallPainterBloc extends Bloc<ARWallPainterEvent, ARWallPainterState> {
     emit(state.copyWith(isProcessingFrame: true));
 
     try {
-      // Получаем результат сегментации напрямую
-      final result = await _segmentationService.processCameraImage(
+      // Параллельно запускаем сегментацию и конвертацию изображения
+      final segmentationFuture = _segmentationService.processCameraImage(
         event.cameraImage,
         event.screenWidth,
         event.screenHeight,
       );
 
-      if (result != null && !emit.isDone) {
+      final imageFuture = _convertCameraImageToUiImage(event.cameraImage);
+
+      // Ожидаем завершения обеих операций
+      final results = await Future.wait([segmentationFuture, imageFuture]);
+
+      final segmentationResult = results[0] as SegmentationResult?;
+      final cameraImage = results[1] as ui.Image?;
+
+      if (!emit.isDone) {
         emit(state.copyWith(
-          segmentationResult: result,
+          segmentationResult: segmentationResult,
+          cameraImage: cameraImage,
+          cameraImageSize: cameraImage != null
+              ? ui.Size(
+                  cameraImage.width.toDouble(), cameraImage.height.toDouble())
+              : null,
           aiConfidence: 0.85, // Placeholder
+          isProcessingFrame: false, // Сбрасываем флаг после обработки
         ));
       }
     } catch (e) {
       print('❌ Ошибка обработки кадра: $e');
-    } finally {
       if (!emit.isDone) {
         emit(state.copyWith(isProcessingFrame: false));
       }
     }
+  }
+
+  /// Конвертирует [CameraImage] в [ui.Image].
+  ///
+  /// Важно: этот метод ожидает, что формат изображения [ImageFormatGroup.bgra8888],
+  /// который был установлен при инициализации камеры.
+  Future<ui.Image?> _convertCameraImageToUiImage(CameraImage image) async {
+    if (image.format.group != ImageFormatGroup.bgra8888) {
+      debugPrint('Image format is not BGRA8888, conversion might fail.');
+      // Для других форматов (например, YUV420) потребуется более сложная
+      // конвертация с использованием пакета 'image'.
+      return null;
+    }
+
+    final completer = Completer<ui.Image>();
+
+    ui.decodeImageFromPixels(
+      image.planes[0].bytes,
+      image.width,
+      image.height,
+      // Важно указать правильный формат пикселей
+      ui.PixelFormat.bgra8888,
+      (ui.Image img) {
+        completer.complete(img);
+      },
+    );
+
+    return completer.future;
   }
 
   /// Изменение выбранного цвета

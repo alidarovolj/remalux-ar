@@ -1,436 +1,144 @@
-import 'dart:async';
+import 'package:ar_flutter_plugin_2/ar_flutter_plugin.dart';
+import 'package:ar_flutter_plugin_2/datatypes/config_planedetection.dart';
+import 'package:ar_flutter_plugin_2/datatypes/hittest_result_types.dart';
+import 'package:ar_flutter_plugin_2/datatypes/node_types.dart';
+import 'package:ar_flutter_plugin_2/managers/ar_anchor_manager.dart';
+import 'package:ar_flutter_plugin_2/managers/ar_location_manager.dart';
+import 'package:ar_flutter_plugin_2/managers/ar_object_manager.dart';
+import 'package:ar_flutter_plugin_2/managers/ar_session_manager.dart';
+import 'package:ar_flutter_plugin_2/models/ar_anchor.dart';
+import 'package:ar_flutter_plugin_2/models/ar_hittest_result.dart';
+import 'package:ar_flutter_plugin_2/models/ar_node.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:camera/camera.dart';
-import 'dart:ui' as ui;
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:remalux_ar/blocs/ar_wall_painter/ar_wall_painter.dart';
+import 'package:vector_math/vector_math_64.dart' as vector;
 
-enum PaintStrokeType {
-  main, // Основной мазок
-  connecting, // Соединительный мазок
-  drip, // Потек
-}
-
-class ARWallPainterScreen extends StatelessWidget {
+class ARWallPainterScreen extends StatefulWidget {
   const ARWallPainterScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) =>
-          ARWallPainterBloc()..add(const InitializeARWallPainter()),
-      child: const _ARWallPainterView(),
-    );
-  }
+  State<ARWallPainterScreen> createState() => _ARWallPainterScreenState();
 }
 
-class _ARWallPainterView extends StatefulWidget {
-  const _ARWallPainterView();
+class _ARWallPainterScreenState extends State<ARWallPainterScreen> {
+  late ARSessionManager arSessionManager;
+  late ARObjectManager arObjectManager;
+  late ARAnchorManager arAnchorManager;
+
+  List<ARNode> nodes = [];
+  List<ARAnchor> anchors = [];
+
+  Color _selectedColor = const Color(0xFFF44336); // Красный по умолчанию
 
   @override
-  State<_ARWallPainterView> createState() => _ARWallPainterViewState();
-}
-
-class _ARWallPainterViewState extends State<_ARWallPainterView> {
-  // Предустановленные цвета
-  final List<Color> _presetColors = [
-    const Color(0xFF2196F3), // Синий
-    const Color(0xFF4CAF50), // Зеленый
-    const Color(0xFFF44336), // Красный
-    const Color(0xFFFF9800), // Оранжевый
-    const Color(0xFF9C27B0), // Фиолетовый
-    const Color(0xFFFFEB3B), // Желтый
-  ];
-
-  final GlobalKey _cameraKey = GlobalKey();
-  late final ARWallPainterBloc _bloc;
-
-  @override
-  void initState() {
-    super.initState();
-    _bloc = context.read<ARWallPainterBloc>();
+  void dispose() {
+    arSessionManager.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<ARWallPainterBloc, ARWallPainterState>(
-      listener: (context, state) {
-        // Обработка ошибок
-        if (state.errorMessage != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.errorMessage!),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      },
-      builder: (context, state) {
-        return Scaffold(
-          backgroundColor: Colors.black,
-          body: Stack(
-            children: [
-              // Камера или заглушка
-              _buildCameraView(state),
-
-              // Оверлей для рисования
-              if (state.isReady) _buildPaintingOverlay(context, state),
-
-              // Сегментация (если включена)
-              if (state.showSegmentationOverlay && state.wallMask != null)
-                _buildSegmentationOverlay(state),
-
-              // UI контролы
-              if (state.isUIVisible) _buildUIControls(state),
-
-              // Состояние загрузки
-              if (state.isInitializing) _buildLoadingOverlay(),
-            ],
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('AR Wall Painter'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.color_lens),
+            onPressed: _showColorPicker,
           ),
-        );
-      },
-    );
-  }
-
-  Widget _buildCameraView(ARWallPainterState state) {
-    if (!state.isCameraInitialized || state.cameraController == null) {
-      return Container(
-        color: Colors.black,
-        child: const Center(
-          child: CircularProgressIndicator(color: Colors.white),
-        ),
-      );
-    }
-
-    return Positioned.fill(
-      child: CameraPreview(
-        state.cameraController!,
-        key: _cameraKey,
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            // Запускаем обработку кадра только один раз при готовности
-            if (state.isReady &&
-                !state.isProcessingFrame &&
-                !_isStreamStarted) {
-              _startFrameProcessing(
-                  constraints.maxWidth, constraints.maxHeight);
-            }
-            return Container();
-          },
-        ),
-      ),
-    );
-  }
-
-  bool _isStreamStarted = false;
-
-  void _startFrameProcessing(double width, double height) {
-    if (_isStreamStarted) return; // Предотвращаем повторный запуск
-
-    // Сохраняем блок до асинхронного вызова
-    final bloc = context.read<ARWallPainterBloc>();
-
-    // Запускаем обработку кадра с задержкой для избежания перегрузки
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (bloc.state.cameraController != null &&
-          bloc.state.isReady &&
-          !_isStreamStarted) {
-        try {
-          bloc.state.cameraController!.startImageStream((image) {
-            bloc.add(ProcessCameraFrame(
-              cameraImage: image,
-              screenWidth: width,
-              screenHeight: height,
-            ));
-          });
-          _isStreamStarted = true;
-        } catch (e) {
-          // Логируем ошибку, но не падаем
-          print('⚠️ Ошибка запуска камеры: $e');
-        }
-      }
-    });
-  }
-
-  Widget _buildPaintingOverlay(BuildContext context, ARWallPainterState state) {
-    return Positioned.fill(
-      child: GestureDetector(
-        onTapUp: (details) {
-          final RenderBox box =
-              _cameraKey.currentContext!.findRenderObject() as RenderBox;
-          context.read<ARWallPainterBloc>().add(
-                PaintWallAtPoint(
-                  details.localPosition,
-                  box.size.width,
-                  box.size.height,
-                ),
-              );
-        },
-        child: CustomPaint(
-          painter: WallPainter(
-            paintedPath: state.paintedWallPath,
-            color: state.selectedColor,
-          ),
-          size: Size.infinite,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSegmentationOverlay(ARWallPainterState state) {
-    return Positioned.fill(
-      child: CustomPaint(
-        painter: SegmentationPainter(
-          wallMask: state.wallMask!,
-          confidence: state.aiConfidence,
-        ),
-        size: Size.infinite,
-      ),
-    );
-  }
-
-  Widget _buildUIControls(ARWallPainterState state) {
-    return SafeArea(
-      child: Column(
-        children: [
-          // Верхняя панель
-          _buildTopPanel(state),
-
-          const Spacer(),
-
-          // Нижняя панель
-          _buildBottomPanel(state),
+          IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: _clearAll,
+          )
         ],
       ),
-    );
-  }
-
-  Widget _buildTopPanel(ARWallPainterState state) {
-    return Container(
-      margin: const EdgeInsets.all(16),
-      child: Row(
+      body: Stack(
         children: [
-          // Кнопка назад
-          _buildControlButton(
-            icon: Icons.arrow_back,
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-
-          const Spacer(),
-
-          // Индикатор состояния AI
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: state.isAIModelLoaded ? Colors.green : Colors.red,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  state.isAIModelLoaded ? Icons.check_circle : Icons.error,
-                  color: Colors.white,
-                  size: 16,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  state.isAIModelLoaded ? 'AI готов' : 'AI ошибка',
-                  style: const TextStyle(color: Colors.white, fontSize: 12),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(width: 8),
-
-          // Переключатель сегментации
-          _buildControlButton(
-            icon: state.showSegmentationOverlay
-                ? Icons.visibility
-                : Icons.visibility_off,
-            onPressed: () {
-              context.read<ARWallPainterBloc>().add(
-                    const ToggleSegmentationOverlay(),
-                  );
-            },
-          ),
-
-          // Переключатель UI
-          _buildControlButton(
-            icon: Icons.more_vert,
-            onPressed: () {
-              context.read<ARWallPainterBloc>().add(
-                    const ToggleUIVisibility(),
-                  );
-            },
+          ARView(
+            onARViewCreated: onARViewCreated,
+            planeDetectionConfig: PlaneDetectionConfig.vertical,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildBottomPanel(ARWallPainterState state) {
-    return Container(
-      margin: const EdgeInsets.all(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Палитра цветов
-          _buildColorPalette(state),
+  void onARViewCreated(
+    ARSessionManager sessionManager,
+    ARObjectManager objectManager,
+    ARAnchorManager anchorManager,
+    ARLocationManager locationManager,
+  ) {
+    arSessionManager = sessionManager;
+    arObjectManager = objectManager;
+    arAnchorManager = anchorManager;
 
-          const SizedBox(height: 16),
-
-          // Кнопки действий
-          _buildActionButtons(state),
-        ],
-      ),
+    arSessionManager.onInitialize(
+      showFeaturePoints: false,
+      showPlanes: true,
+      customPlaneTexturePath:
+          "assets/ml/triangle.png", // Можно заменить на более подходящую текстуру
+      showWorldOrigin: false,
+      handleTaps: true,
     );
+    arObjectManager.onInitialize();
+
+    arSessionManager.onPlaneOrPointTap = onPlaneOrPointTap;
   }
 
-  Widget _buildColorPalette(ARWallPainterState state) {
-    return Container(
-      height: 60,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.7),
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          ..._presetColors.map((color) => _buildColorButton(color, state)),
-          _buildCustomColorButton(state),
-        ],
-      ),
-    );
+  Future<void> onPlaneOrPointTap(List<ARHitTestResult> hits) async {
+    // TODO: Раскомментировать и исправить после проверки базовой работоспособности
+    // final hit = hits.firstWhere(
+    //   (hit) => hit.type == ARHitTestResultType.plane,
+    //   orElse: () => hits.first,
+    // );
+
+    // final newAnchor = ARPlaneAnchor(transformation: hit.worldTransform);
+    // final bool? didAddAnchor = await arAnchorManager.addAnchor(newAnchor);
+
+    // if (didAddAnchor != null && didAddAnchor) {
+    //   anchors.add(newAnchor);
+
+    //   // Создаем узел с моделью "мазка"
+    //   final newNode = ARNode(
+    //     type: NodeType.webGLB, // Используем webGLB, т.к. localGLTF2 может быть не поддержан
+    //     uri:
+    //         "https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/Sphere/glTF-Binary/Sphere.glb", // Загрузим простую сферу для теста
+    //     scale: vector.Vector3(0.05, 0.05, 0.01), // Делаем мазок плоским
+    //     transformation: newAnchor.transformation,
+    //     data: {
+    //       'color': [
+    //         _selectedColor.red / 255.0,
+    //         _selectedColor.green / 255.0,
+    //         _selectedColor.blue / 255.0,
+    //         _selectedColor.alpha / 255.0,
+    //       ]
+    //     },
+    //   );
+
+    //   final bool? didAddNode = await arObjectManager.addNode(newNode);
+    //   if (didAddNode != null && didAddNode) {
+    //     nodes.add(newNode);
+    //   } else {
+    //     arSessionManager.onError("Adding node failed");
+    //   }
+    // } else {
+    //   arSessionManager.onError("Adding anchor failed");
+    // }
   }
 
-  Widget _buildColorButton(Color color, ARWallPainterState state) {
-    final isSelected = state.selectedColor == color;
-    return GestureDetector(
-      onTap: () {
-        context.read<ARWallPainterBloc>().add(ChangeSelectedColor(color));
-      },
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: isSelected ? Colors.white : Colors.transparent,
-            width: 3,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCustomColorButton(ARWallPainterState state) {
-    return GestureDetector(
-      onTap: () => _showColorPicker(state),
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Colors.red, Colors.green, Colors.blue],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: 2),
-        ),
-        child: const Icon(Icons.palette, color: Colors.white, size: 20),
-      ),
-    );
-  }
-
-  Widget _buildActionButtons(ARWallPainterState state) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _buildActionButton(
-          icon: Icons.clear,
-          label: 'Очистить',
-          onPressed: state.paintedWallPath != null
-              ? () => context
-                  .read<ARWallPainterBloc>()
-                  .add(const ClearPaintedWall())
-              : null,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildActionButton({
-    required IconData icon,
-    required String label,
-    VoidCallback? onPressed,
-  }) {
-    return ElevatedButton.icon(
-      onPressed: onPressed,
-      icon: Icon(icon, size: 20),
-      label: Text(label),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.black.withOpacity(0.7),
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      ),
-    );
-  }
-
-  Widget _buildControlButton({
-    required IconData icon,
-    required VoidCallback onPressed,
-  }) {
-    return Container(
-      width: 48,
-      height: 48,
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.7),
-        shape: BoxShape.circle,
-      ),
-      child: IconButton(
-        onPressed: onPressed,
-        icon: Icon(icon, color: Colors.white),
-      ),
-    );
-  }
-
-  Widget _buildLoadingOverlay() {
-    return Container(
-      color: Colors.black.withOpacity(0.8),
-      child: const Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircularProgressIndicator(color: Colors.white),
-            SizedBox(height: 16),
-            Text(
-              'Инициализация AR...',
-              style: TextStyle(color: Colors.white, fontSize: 16),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showColorPicker(ARWallPainterState state) {
+  void _showColorPicker() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Выберите цвет'),
         content: SingleChildScrollView(
           child: ColorPicker(
-            pickerColor: state.selectedColor,
+            pickerColor: _selectedColor,
             onColorChanged: (color) {
-              context.read<ARWallPainterBloc>().add(ChangeSelectedColor(color));
+              setState(() {
+                _selectedColor = color;
+              });
             },
           ),
         ),
@@ -444,70 +152,14 @@ class _ARWallPainterViewState extends State<_ARWallPainterView> {
     );
   }
 
-  @override
-  void dispose() {
-    _bloc.add(const DisposeARWallPainter());
-    super.dispose();
-  }
-}
-
-/// Painter для отображения закрашенной стены
-class WallPainter extends CustomPainter {
-  final ui.Path? paintedPath;
-  final Color color;
-
-  WallPainter({
-    required this.paintedPath,
-    required this.color,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (paintedPath == null) return;
-
-    final paint = Paint()
-      ..color = color.withOpacity(0.6)
-      ..style = PaintingStyle.fill;
-
-    canvas.drawPath(paintedPath!, paint);
-  }
-
-  @override
-  bool shouldRepaint(WallPainter oldDelegate) {
-    return oldDelegate.paintedPath != paintedPath || oldDelegate.color != color;
-  }
-}
-
-/// Painter для отображения сегментации стен
-class SegmentationPainter extends CustomPainter {
-  final ui.Path wallMask;
-  final double confidence;
-
-  SegmentationPainter({
-    required this.wallMask,
-    required this.confidence,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.green.withOpacity(0.3)
-      ..style = PaintingStyle.fill;
-
-    canvas.drawPath(wallMask, paint);
-
-    // Рамка
-    final borderPaint = Paint()
-      ..color = Colors.green
-      ..strokeWidth = 2
-      ..style = PaintingStyle.stroke;
-
-    canvas.drawPath(wallMask, borderPaint);
-  }
-
-  @override
-  bool shouldRepaint(SegmentationPainter oldDelegate) {
-    return oldDelegate.wallMask != wallMask ||
-        oldDelegate.confidence != confidence;
+  void _clearAll() {
+    for (final node in nodes) {
+      arObjectManager.removeNode(node);
+    }
+    for (final anchor in anchors) {
+      arAnchorManager.removeAnchor(anchor);
+    }
+    nodes.clear();
+    anchors.clear();
   }
 }

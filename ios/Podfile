@@ -54,6 +54,16 @@ target 'Runner' do
 end
 
 post_install do |installer|
+  # https://github.com/firebase/firebase-ios-sdk/issues/9557
+  installer.pods_project.targets.each do |target|
+    if target.name == 'nanopb'
+      target.build_configurations.each do |config|
+          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
+          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'PB_FIELD_32BIT=1'
+      end
+    end
+  end
+  
   # This removes the warning about having a custom config set
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
