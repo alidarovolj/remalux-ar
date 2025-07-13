@@ -29,8 +29,8 @@ import 'package:remalux_ar/features/cart/presentation/pages/cart_page.dart';
 import 'package:remalux_ar/features/checkout/presentation/pages/checkout_page.dart';
 // import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:remalux_ar/features/auth/presentation/pages/phone_verification_page.dart';
-import 'package:remalux_ar/screens/ar_wall_painter_screen.dart';
 import 'package:remalux_ar/screens/ar_demo_screen.dart';
+import 'package:remalux_ar/screens/cv_wall_painter_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -236,25 +236,18 @@ class AppRouter {
         path: '/phone-verification',
         builder: (context, state) => const PhoneVerificationPage(),
       ),
-      // Добавляем маршрут для AR-перекрашивания стен
-      GoRoute(
-        path: '/wall-painter',
-        name: 'wall_painter',
-        builder: (context, state) {
-          // Получаем цвет из параметров, если он был передан
-          final colorHex = state.uri.queryParameters['color'];
-          final color = colorHex != null
-              ? Color(int.parse(colorHex, radix: 16) | 0xFF000000)
-              : null;
 
-          return ARWallPainterScreen();
-        },
-      ),
       // Добавляем маршрут для AR демо экрана
       GoRoute(
         path: '/ar-demo',
         name: 'ar_demo',
         builder: (context, state) => const ARDemoScreen(),
+      ),
+      // Добавляем маршрут для CV Wall Painter экрана
+      GoRoute(
+        path: '/cv-wall-painter',
+        name: 'cv_wall_painter',
+        builder: (context, state) => const CVWallPainterScreen(),
       ),
     ],
   );

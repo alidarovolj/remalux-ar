@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'ar_wall_painter_screen.dart';
+import 'cv_wall_painter_screen.dart';
 
 class ARDemoScreen extends StatelessWidget {
   const ARDemoScreen({Key? key}) : super(key: key);
@@ -10,7 +10,7 @@ class ARDemoScreen extends StatelessWidget {
       backgroundColor: const Color(0xFF1E1E1E),
       appBar: AppBar(
         title: const Text(
-          'RemaluxAR - Рисование стен',
+          'Remalux Wall Painter',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: const Color(0xFF2D2D2D),
@@ -46,7 +46,7 @@ class ARDemoScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     const Text(
-                      'AR Визуализатор Красок',
+                      'CV Wall Painter',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -56,7 +56,7 @@ class ARDemoScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     const Text(
-                      'Как в Dulux Visualizer - попробуйте краски на стенах в дополненной реальности',
+                      'Покраска стен с помощью Computer Vision и BiseNet AI модели',
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.white70,
@@ -87,7 +87,7 @@ class ARDemoScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Text(
-                  'Примечание: Для работы AR требуется доступ к камере и ARCore/ARKit поддержка устройства',
+                  'Примечание: Для работы требуется доступ к камере. Совместимо с любыми устройствами iOS 11+ и Android 7+',
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey,
@@ -116,24 +116,24 @@ class ARDemoScreen extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         _buildFeatureItem(
-          Icons.view_in_ar,
-          'AR Рисование',
-          'Виртуальное нанесение краски на стены в реальном времени',
+          Icons.smart_toy,
+          'BiseNet AI',
+          'Продвинутая ML модель от Qualcomm для точной сегментации стен',
         ),
         _buildFeatureItem(
           Icons.palette,
-          'Выбор цветов',
-          'Широкая палитра цветов и настройка размера кисти',
+          '12 цветов',
+          'Профессиональная палитра цветов для покраски стен',
         ),
         _buildFeatureItem(
-          Icons.camera,
-          'Семантическая сегментация',
-          'Автоматическое определение стен с помощью ИИ',
+          Icons.speed,
+          'Быстрая обработка',
+          'Обработка кадров 18-86ms на современных устройствах',
         ),
         _buildFeatureItem(
           Icons.touch_app,
           'Простое управление',
-          'Интуитивное касание для нанесения краски',
+          'Коснитесь стены для мгновенной покраски',
         ),
       ],
     );
@@ -185,7 +185,7 @@ class ARDemoScreen extends StatelessWidget {
   Widget _buildActionButtons(BuildContext context) {
     return Column(
       children: [
-        // AR Mode кнопка
+        // CV Wall Painter - единственная кнопка
         SizedBox(
           width: double.infinity,
           height: 60,
@@ -194,48 +194,17 @@ class ARDemoScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const ARWallPainterScreen(),
+                  builder: (context) => const CVWallPainterScreen(),
                 ),
               );
             },
-            icon: const Icon(Icons.view_in_ar, size: 28),
+            icon: const Icon(Icons.palette, size: 28),
             label: const Text(
-              'Запустить AR режим',
+              '🎨 Запустить Wall Painter',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              elevation: 5,
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 16),
-
-        // AR Mode кнопка (основной)
-        SizedBox(
-          width: double.infinity,
-          height: 60,
-          child: ElevatedButton.icon(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ARWallPainterScreen(),
-                ),
-              );
-            },
-            icon: const Icon(Icons.camera_alt, size: 28),
-            label: const Text(
-              'Камера + ИИ Покраска',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),

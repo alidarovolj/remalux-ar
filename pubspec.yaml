@@ -93,6 +93,7 @@ flutter:
     - lib/core/assets/images/part_prods/
     - lib/core/assets/icons/cart/
     - assets/ml/
+    - assets/Models/
 
   fonts:
     - family: Ysabeau

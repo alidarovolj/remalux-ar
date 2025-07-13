@@ -13,6 +13,7 @@ dependencies {
     implementation 'org.conscrypt:conscrypt-android:2.5.2'
     implementation 'com.yandex.android:maps.mobile:4.6.1-full'
     implementation 'androidx.multidex:multidex:2.0.1'
+    implementation project(':unityLibrary')
 }
 
 android {
@@ -32,7 +33,7 @@ android {
 
     defaultConfig {
         applicationId = "kz.remalux.remaluxar"
-        minSdk = flutter.minSdkVersion
+        minSdk = 24
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

@@ -891,7 +891,15 @@ class _StorePageState extends ConsumerState<StorePage> {
                                       ),
                                       child: IconButton(
                                         onPressed: () {
-                                          // TODO: Implement favorite toggle
+                                          // ✅ Избранное - показываем уведомление
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                  'Функция избранного будет доступна в следующем обновлении'),
+                                              duration: Duration(seconds: 2),
+                                            ),
+                                          );
                                         },
                                         icon: SvgPicture.asset(
                                           'lib/core/assets/icons/heart.svg',

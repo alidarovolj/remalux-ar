@@ -531,7 +531,14 @@ class _CartPageState extends ConsumerState<CartPage>
                           size: 18,
                         ),
                         onPressed: () {
-                          // TODO: Implement favorite toggle
+                          // ✅ Избранное - показываем уведомление
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                  'Функция избранного будет доступна в следующем обновлении'),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
                         },
                         padding: EdgeInsets.zero,
                       ),

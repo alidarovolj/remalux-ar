@@ -31,9 +31,11 @@ Future<void> _loadGoogleFonts() async {
 }
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Основной код приложения
   try {
     await dotenv.load();
-    WidgetsFlutterBinding.ensureInitialized();
     await EasyLocalization.ensureInitialized();
 
     // Initialize Firebase

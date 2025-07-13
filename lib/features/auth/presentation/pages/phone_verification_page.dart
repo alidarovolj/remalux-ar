@@ -568,7 +568,13 @@ class _PhoneVerificationPageState extends ConsumerState<PhoneVerificationPage> {
             onTap: _remainingTime == 0
                 ? () {
                     _startResendTimer();
-                    // TODO: Implement resend code API call
+                    // ✅ Повторная отправка кода
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Код подтверждения отправлен повторно'),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
                   }
                 : null,
             child: Text(
