@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../core/services/cv_wall_painter_service.dart';
+import 'dart:math' as math;
 
 /// Computer Vision Wall Painter Screen
 /// Использует ML сегментацию с ADE20K датасетом для покраски стен
@@ -28,15 +30,13 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
   bool _isProcessing = false;
 
   // Current painting state
-  ui.Image? _processedImage;
   ui.Image? _segmentationOverlay;
-  ui.Path? _wallMask;
+  ui.Image? _paintedOverlay; // This replaces `_wallMask`
   ui.Offset? _lastTapPoint;
   Color _selectedColor = const Color(0xFF2196F3);
 
   // Performance metrics
   int _lastProcessingTimeMs = 0;
-  double _lastConfidence = 0.0;
   int _frameCount = 0;
 
   // UI State
@@ -99,15 +99,11 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
       _cvService.setResultCallback((result) {
         if (mounted) {
           setState(() {
-            _processedImage = result.paintedImage;
             _segmentationOverlay = result.segmentationOverlay;
-            _wallMask = result.wallMask;
+            _paintedOverlay = result.paintedOverlay; // Use the new overlay
             _lastProcessingTimeMs = result.processingTimeMs;
-            _lastConfidence = result.confidence;
-            _isProcessing = false;
           });
-          debugPrint(
-              '✅ CV результат получен: ${result.processingTimeMs}ms, confidence: ${result.confidence}');
+          debugPrint('✅ CV результат получен: ${result.processingTimeMs}ms');
         }
       });
 
@@ -139,19 +135,25 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
 
   Future<void> _initializeCamera() async {
     try {
-      _cameras = await availableCameras();
-      if (_cameras.isEmpty) {
-        throw Exception('Камера не найдена');
+      final cameras = await availableCameras();
+      if (cameras.isEmpty) {
+        debugPrint('No cameras found');
+        return;
       }
+      final camera = cameras.first;
+
+      final imageFormatGroup =
+          Platform.isIOS ? ImageFormatGroup.bgra8888 : ImageFormatGroup.yuv420;
 
       _cameraController = CameraController(
-        _cameras[0],
-        ResolutionPreset.medium,
+        camera,
+        ResolutionPreset.high,
         enableAudio: false,
-        imageFormatGroup: ImageFormatGroup.yuv420,
+        imageFormatGroup: imageFormatGroup,
       );
 
       await _cameraController!.initialize();
+      if (!mounted) return;
 
       // Start camera stream for CV service
       await _cameraController!.startImageStream((CameraImage image) {
@@ -192,24 +194,24 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
       final stopwatch = Stopwatch()..start();
 
       // Real ML processing with BiseNet
-      debugPrint('🎨 Обрабатываем кадр с BiseNet...');
+      debugPrint('🎨 Обрабатываем кадр с DeepLabV3...');
 
       // Реальная обработка с CV сервисом
       await _cvService.paintWall(details.localPosition, _selectedColor);
 
       stopwatch.stop();
 
-      setState(() {
-        _frameCount++;
-      });
-
       debugPrint(
           '🎨 Кадр отправлен в CV сервис за ${stopwatch.elapsedMilliseconds}ms');
     } catch (e) {
       debugPrint('❌ Ошибка обработки касания: $e');
-      setState(() {
-        _isProcessing = false;
-      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isProcessing = false;
+          _frameCount++;
+        });
+      }
     }
   }
 
@@ -224,8 +226,7 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
   void _clearPainting() {
     HapticFeedback.mediumImpact();
     setState(() {
-      _processedImage = null;
-      _wallMask = null;
+      _paintedOverlay = null; // Clear the overlay
       _lastTapPoint = null;
       _frameCount = 0;
     });
@@ -269,7 +270,8 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
       body: Stack(
         children: [
           // Camera preview
-          if (_isCameraInitialized && _cameraController != null)
+          if (_cameraController != null &&
+              _cameraController!.value.isInitialized)
             Positioned.fill(
               child: AspectRatio(
                 aspectRatio: _cameraController!.value.aspectRatio,
@@ -277,15 +279,37 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
                   onTapDown: _onTapScreen,
                   child: Stack(
                     children: [
-                      // Camera preview
                       CameraPreview(_cameraController!),
 
-                      // Segmentation overlay
-                      if (_showSegmentation && _segmentationOverlay != null)
+                      // Painted wall overlay
+                      if (_paintedOverlay != null &&
+                          _cvService.lastResult != null)
                         Positioned.fill(
                           child: CustomPaint(
-                            painter: SegmentationOverlayPainter(
-                                _segmentationOverlay!),
+                            painter: WallPainter(
+                                imageToPaint: _paintedOverlay!,
+                                originalImageSize: Size(
+                                    _cvService.lastResult!.originalImage.width
+                                        .toDouble(),
+                                    _cvService.lastResult!.originalImage.height
+                                        .toDouble())),
+                          ),
+                        ),
+
+                      // Segmentation overlay
+                      if (_showSegmentation &&
+                          _segmentationOverlay != null &&
+                          _cvService.lastResult != null)
+                        Positioned.fill(
+                          child: CustomPaint(
+                            painter: WallPainter(
+                                imageToPaint: _segmentationOverlay!,
+                                originalImageSize: Size(
+                                    _cvService.lastResult!.originalImage.width
+                                        .toDouble(),
+                                    _cvService.lastResult!.originalImage.height
+                                        .toDouble()),
+                                isSegmentation: true),
                           ),
                         ),
                     ],
@@ -294,11 +318,7 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
               ),
             )
           else
-            const Center(
-              child: CircularProgressIndicator(
-                color: Colors.white,
-              ),
-            ),
+            const Center(child: CircularProgressIndicator()),
 
           // Processing overlay
           if (_isProcessing)
@@ -411,10 +431,6 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
                     SizedBox(height: 4),
                     Text(
                       'Время: ${_lastProcessingTimeMs}ms',
-                      style: TextStyle(color: Colors.white70, fontSize: 12),
-                    ),
-                    Text(
-                      'Точность: ${(_lastConfidence * 100).toStringAsFixed(1)}%',
                       style: TextStyle(color: Colors.white70, fontSize: 12),
                     ),
                     Text(
@@ -580,31 +596,59 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
   }
 }
 
-/// Custom painter for segmentation overlay
-class SegmentationOverlayPainter extends CustomPainter {
-  final ui.Image segmentationImage;
+/// Generic painter for segmentation or painted overlays.
+/// Handles correct scaling and aspect ratio.
+class WallPainter extends CustomPainter {
+  final ui.Image imageToPaint;
+  final Size originalImageSize;
+  final bool isSegmentation;
 
-  SegmentationOverlayPainter(this.segmentationImage);
+  WallPainter({
+    required this.imageToPaint,
+    required this.originalImageSize,
+    this.isSegmentation = false,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Draw the segmentation overlay with blend mode for transparency
+    // This is the size of the widget on the screen.
+    final screenRect = Rect.fromLTWH(0, 0, size.width, size.height);
+
+    // This is the original image from the camera that was processed.
+    final imageSize = originalImageSize;
+
+    // Calculate how the camera image is fitted onto the screen. Flutter's
+    // CameraPreview uses BoxFit.cover.
+    final fittedSizes = applyBoxFit(BoxFit.cover, imageSize, size);
+    final sourceRect = Alignment.center.inscribe(fittedSizes.source,
+        Rect.fromLTWH(0, 0, imageSize.width, imageSize.height));
+    final destinationRect = Alignment.center.inscribe(
+        fittedSizes.destination, Rect.fromLTWH(0, 0, size.width, size.height));
+
+    // This is the mask/overlay we want to paint.
+    final maskRect = Rect.fromLTWH(
+        0, 0, imageToPaint.width.toDouble(), imageToPaint.height.toDouble());
+
     final paint = Paint()
-      ..blendMode = BlendMode.overlay
-      ..filterQuality = FilterQuality.low;
+      ..filterQuality = isSegmentation ? FilterQuality.low : FilterQuality.high;
+
+    if (isSegmentation) {
+      paint.colorFilter =
+          const ColorFilter.mode(Colors.black, BlendMode.dstOut);
+    }
 
     canvas.drawImageRect(
-      segmentationImage,
-      Rect.fromLTWH(0, 0, segmentationImage.width.toDouble(),
-          segmentationImage.height.toDouble()),
-      Rect.fromLTWH(0, 0, size.width, size.height),
+      imageToPaint,
+      maskRect,
+      destinationRect,
       paint,
     );
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return oldDelegate is! SegmentationOverlayPainter ||
-        oldDelegate.segmentationImage != segmentationImage;
+  bool shouldRepaint(covariant WallPainter oldDelegate) {
+    return oldDelegate.imageToPaint != imageToPaint ||
+        oldDelegate.originalImageSize != originalImageSize ||
+        oldDelegate.isSegmentation != isSegmentation;
   }
 }
