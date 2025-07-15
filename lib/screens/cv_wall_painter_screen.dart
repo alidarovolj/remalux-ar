@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
@@ -28,6 +29,7 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
   final CVWallPainterService _cvService = CVWallPainterService.instance;
   bool _isCVInitialized = false;
   bool _isProcessing = false;
+  CVResultDto? _lastCvResult; // Храним последний результат целиком
 
   // Current painting state
   ui.Image? _segmentationOverlay;
@@ -98,9 +100,32 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
       // Set up callbacks for CV service
       _cvService.setResultCallback((result) {
         if (mounted) {
+          // New: Create images from raw masks on the main thread
+          if (result.segmentationMask != null) {
+            _createImageFromMask(result.segmentationMask!, result.maskWidth,
+                    result.maskHeight, const Color.fromARGB(100, 0, 255, 0))
+                .then((image) {
+              if (mounted) {
+                setState(() {
+                  _segmentationOverlay = image;
+                });
+              }
+            });
+          }
+          if (result.paintedMask != null) {
+            _createImageFromMask(result.paintedMask!, result.maskWidth,
+                    result.maskHeight, _selectedColor.withOpacity(0.7))
+                .then((image) {
+              if (mounted) {
+                setState(() {
+                  _paintedOverlay = image;
+                });
+              }
+            });
+          }
+
           setState(() {
-            _segmentationOverlay = result.segmentationOverlay;
-            _paintedOverlay = result.paintedOverlay; // Use the new overlay
+            _lastCvResult = result; // Сохраняем весь результат
             _lastProcessingTimeMs = result.processingTimeMs;
           });
           debugPrint('✅ CV результат получен: ${result.processingTimeMs}ms');
@@ -147,7 +172,7 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
 
       _cameraController = CameraController(
         camera,
-        ResolutionPreset.high,
+        ResolutionPreset.medium, // ОБНОВЛЕНО
         enableAudio: false,
         imageFormatGroup: imageFormatGroup,
       );
@@ -227,9 +252,32 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
     HapticFeedback.mediumImpact();
     setState(() {
       _paintedOverlay = null; // Clear the overlay
+      _segmentationOverlay = null; // Also clear segmentation
       _lastTapPoint = null;
       _frameCount = 0;
     });
+  }
+
+  Future<ui.Image> _createImageFromMask(
+      Uint8List mask, int width, int height, Color color) async {
+    final pixels = Uint32List(mask.length);
+    for (int i = 0; i < mask.length; i++) {
+      if (mask[i] == 1) {
+        pixels[i] = color.value;
+      }
+    }
+
+    final completer = Completer<ui.Image>();
+    ui.decodeImageFromPixels(
+      pixels.buffer.asUint8List(),
+      width,
+      height,
+      ui.PixelFormat.rgba8888,
+      (ui.Image img) {
+        completer.complete(img);
+      },
+    );
+    return completer.future;
   }
 
   void _showErrorDialog(String title, String message) {
@@ -282,33 +330,22 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
                       CameraPreview(_cameraController!),
 
                       // Painted wall overlay
-                      if (_paintedOverlay != null &&
-                          _cvService.lastResult != null)
+                      if (_paintedOverlay != null)
                         Positioned.fill(
                           child: CustomPaint(
                             painter: WallPainter(
                                 imageToPaint: _paintedOverlay!,
-                                originalImageSize: Size(
-                                    _cvService.lastResult!.originalImage.width
-                                        .toDouble(),
-                                    _cvService.lastResult!.originalImage.height
-                                        .toDouble())),
+                                originalImageSize: _getOriginalImageSize()),
                           ),
                         ),
 
                       // Segmentation overlay
-                      if (_showSegmentation &&
-                          _segmentationOverlay != null &&
-                          _cvService.lastResult != null)
+                      if (_showSegmentation && _segmentationOverlay != null)
                         Positioned.fill(
                           child: CustomPaint(
                             painter: WallPainter(
                                 imageToPaint: _segmentationOverlay!,
-                                originalImageSize: Size(
-                                    _cvService.lastResult!.originalImage.width
-                                        .toDouble(),
-                                    _cvService.lastResult!.originalImage.height
-                                        .toDouble()),
+                                originalImageSize: _getOriginalImageSize(),
                                 isSegmentation: true),
                           ),
                         ),
@@ -594,6 +631,19 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
       ),
     );
   }
+
+  Size _getOriginalImageSize() {
+    if (_lastCvResult != null) {
+      // Используем точные размеры из результата CV
+      return Size(_lastCvResult!.imageWidth.toDouble(),
+          _lastCvResult!.imageHeight.toDouble());
+    }
+    if (_cameraController != null && _cameraController!.value.isInitialized) {
+      // Фоллбэк на размер превью, если результата еще нет
+      return _cameraController!.value.previewSize!;
+    }
+    return Size.zero; // Худший случай
+  }
 }
 
 /// Generic painter for segmentation or painted overlays.
@@ -628,6 +678,11 @@ class WallPainter extends CustomPainter {
     // This is the mask/overlay we want to paint.
     final maskRect = Rect.fromLTWH(
         0, 0, imageToPaint.width.toDouble(), imageToPaint.height.toDouble());
+
+    debugPrint("🎨 WallPainter: Canvas size: $size, "
+        "Original image size: $originalImageSize, "
+        "Mask size: ${imageToPaint.width}x${imageToPaint.height}, "
+        "Destination rect: $destinationRect");
 
     final paint = Paint()
       ..filterQuality = isSegmentation ? FilterQuality.low : FilterQuality.high;

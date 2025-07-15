@@ -330,6 +330,7 @@ DEPENDENCIES:
   - google_maps_flutter_ios (from `.symlinks/plugins/google_maps_flutter_ios/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
   - local_auth_darwin (from `.symlinks/plugins/local_auth_darwin/darwin`)
+  - nanopb (= 3.30910.0)
   - onnxruntime (from `.symlinks/plugins/onnxruntime/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
@@ -502,6 +503,6 @@ SPEC CHECKSUMS:
   yandex_mapkit: dbed94b27b44a3945a93209721e92f6b846dafde
   YandexMapsMobile: b5f4dfeb8d1fe324dc18afb33d772b04d04d34f6
 
-PODFILE CHECKSUM: 1e9dda5661b3af5976412209b3719b9d852ae1d8
+PODFILE CHECKSUM: 799fad408671b291b06ef9b01a93e7875b39d287
 
 COCOAPODS: 1.16.2
