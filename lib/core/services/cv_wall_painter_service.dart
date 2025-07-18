@@ -5,6 +5,7 @@ import 'dart:ui' as ui;
 
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:image/image.dart' as img;
 import 'package:tflite_flutter/tflite_flutter.dart';
@@ -51,8 +52,21 @@ class _CameraImageDTO {
 class IsolateInput {
   final _CameraImageDTO cameraImage;
   final ui.Offset? tapPoint;
+  final ui.Size? previewSize; // РАЗМЕР ВИДЖЕТА КАМЕРЫ
   final ui.Color? color;
-  IsolateInput(this.cameraImage, {this.tapPoint, this.color});
+  final Uint8List? wallMask; // Маска стены от сегментации
+  final int? maskWidth; // Ширина маски
+  final int? maskHeight; // Высота маски
+
+  IsolateInput(
+    this.cameraImage, {
+    this.tapPoint,
+    this.previewSize,
+    this.color,
+    this.wallMask,
+    this.maskWidth,
+    this.maskHeight,
+  });
 }
 
 /// DTO для передачи данных для инициализации в изолят
@@ -80,10 +94,11 @@ class CVWallPainterService {
   Isolate? _isolate;
   SendPort? _sendPort;
   List<String> _labels = [];
+  bool _isBusy = false;
 
   // Управление потоком кадров
-  IsolateInput? _lastFrame;
-  Timer? _cameraStreamTimer;
+  // IsolateInput? _lastFrame;
+  // Timer? _cameraStreamTimer;
 
   bool get isInitialized => _isInitialized;
   CVResultDto? get lastResult => _lastResult;
@@ -118,8 +133,10 @@ class CVWallPainterService {
           _isolateReady.complete();
         } else if (message is CVResultDto) {
           _lastResult = message;
+          _isBusy = false;
           _resultCallback?.call(message);
         } else if (message is String) {
+          _isBusy = false;
           _errorCallback?.call(message);
         }
       });
@@ -142,51 +159,56 @@ class CVWallPainterService {
     _errorCallback = callback;
   }
 
-  void startCameraStream() {
-    debugPrint('📹 Обработка камеры управляется `updateCameraFrame`');
-    _cameraStreamTimer?.cancel();
-    _cameraStreamTimer = Timer.periodic(const Duration(milliseconds: 100), (_) {
-      if (_lastFrame != null && _sendPort != null) {
-        _sendPort!.send(_lastFrame);
-        _lastFrame = null;
-      }
-    });
-  }
+  bool processCameraFrame(CameraImage image) {
+    if (!_isInitialized || _isBusy) return false;
 
-  void stopCameraStream() {
-    _cameraStreamTimer?.cancel();
-  }
-
-  void updateCameraFrame(CameraImage image) {
-    if (!_isInitialized) return;
+    _isBusy = true;
     final dto = _createImageDTO(image);
     if (dto != null) {
-      _lastFrame = IsolateInput(dto);
+      _sendPort?.send(IsolateInput(dto));
+      return true;
+    } else {
+      _isBusy = false;
+      return false;
     }
   }
 
-  Future<void> paintWall(ui.Offset tapPoint, ui.Color color) async {
-    if (!_isInitialized || _lastFrame == null) return;
-    _sendPort?.send(IsolateInput(_lastFrame!.cameraImage,
-        tapPoint: tapPoint, color: color));
+  bool paintWall(
+    CameraImage image,
+    ui.Offset tapPoint,
+    ui.Size previewSize,
+    ui.Color color, {
+    Uint8List? wallMask,
+    int? maskWidth,
+    int? maskHeight,
+  }) {
+    if (!_isInitialized || _isBusy) return false;
+
+    _isBusy = true;
+    final dto = _createImageDTO(image);
+    if (dto != null) {
+      _sendPort?.send(IsolateInput(
+        dto,
+        tapPoint: tapPoint,
+        previewSize: previewSize,
+        color: color,
+        wallMask: wallMask,
+        maskWidth: maskWidth,
+        maskHeight: maskHeight,
+      ));
+      return true;
+    } else {
+      _isBusy = false;
+      return false;
+    }
   }
 
   void dispose() {
     _isolate?.kill(priority: Isolate.immediate);
     _isolate = null;
     _isInitialized = false;
-    _cameraStreamTimer?.cancel();
+    _isBusy = false;
     debugPrint('⏹️ CV сервис и изолят остановлены');
-  }
-
-  _CameraImageDTO? _createImageDTO(CameraImage image) {
-    if (image.planes.isEmpty) return null;
-    return _CameraImageDTO(
-      planes: image.planes.map((p) => p.bytes).toList(),
-      height: image.height,
-      width: image.width,
-      imageFormatGroup: image.format.group,
-    );
   }
 
   // --- Isolate Logic ---
@@ -209,7 +231,26 @@ class CVWallPainterService {
     await for (final input in fromIsolate) {
       if (input is IsolateInput) {
         final stopwatch = Stopwatch()..start();
-        final result = _processFrame(input, interpreter, labels);
+
+        // КОНВЕРТАЦИЯ ПЕРЕНЕСЕНА В ИЗОЛЯТ
+        final img.Image? baseImage = _convertCameraImage(input.cameraImage);
+        if (baseImage == null) {
+          initData.toIsolate.send('ERROR: Failed to convert camera image.');
+          continue;
+        }
+
+        final result = _processImage(
+          baseImage,
+          interpreter,
+          labels,
+          input.tapPoint,
+          input.previewSize,
+          input.color,
+          wallMask: input.wallMask,
+          maskWidth: input.maskWidth,
+          maskHeight: input.maskHeight,
+        );
+
         stopwatch.stop();
 
         if (result != null) {
@@ -219,8 +260,8 @@ class CVWallPainterService {
             processingTimeMs: stopwatch.elapsedMilliseconds,
             maskWidth: result['mask_width'],
             maskHeight: result['mask_height'],
-            imageWidth: result['image_width'],
-            imageHeight: result['image_height'],
+            imageWidth: baseImage.width,
+            imageHeight: baseImage.height,
           );
           initData.toIsolate.send(dto);
         }
@@ -228,58 +269,150 @@ class CVWallPainterService {
     }
   }
 
-  static Map<String, dynamic>? _processFrame(
-      IsolateInput input, Interpreter interpreter, List<String> labels) {
+  static Map<String, dynamic>? _processImage(
+    img.Image baseImage,
+    Interpreter interpreter,
+    List<String> labels,
+    ui.Offset? tapPoint,
+    ui.Size? previewSize,
+    ui.Color? color, {
+    Uint8List? wallMask,
+    int? maskWidth,
+    int? maskHeight,
+  }) {
     try {
-      final img.Image? baseImage = _convertCameraImage(input.cameraImage);
-      if (baseImage == null) return null;
+      // Use provided wall mask or create one using the model
+      Uint8List segmentationMask;
+      int effectiveMaskWidth;
+      int effectiveMaskHeight;
 
-      final inputShape = interpreter.getInputTensor(0).shape;
-      final modelInputSize = inputShape[1];
-      final preprocessedImage = _preprocessImage(baseImage, modelInputSize);
+      if (wallMask != null && maskWidth != null && maskHeight != null) {
+        // Проверяем качество переданной маски
+        final wallPixelCount = wallMask.where((p) => p == 1).length;
+        final wallPercentage = wallPixelCount / wallMask.length;
 
-      final inputBytes = _imageToFloat32List(preprocessedImage);
-      final reshapedInput = inputBytes.reshape(inputShape);
+        // Используем переданную маску только если она содержит разумное количество стен (1-80%)
+        if (wallPercentage > 0.05 && wallPercentage < 0.95) {
+          segmentationMask = wallMask;
+          effectiveMaskWidth = maskWidth;
+          effectiveMaskHeight = maskHeight;
+          debugPrint(
+              '🖼️ Isolate: Using provided wall mask (${maskWidth}x${maskHeight}, ${(wallPercentage * 100).toStringAsFixed(1)}% walls)');
+        } else {
+          debugPrint(
+              '⚠️ Isolate: Wall mask quality poor (${(wallPercentage * 100).toStringAsFixed(1)}% walls), falling back to model');
+          // Fallback to model-based segmentation
+          final inputShape = interpreter.getInputTensor(0).shape;
+          final modelInputSize = inputShape[1];
+          final preprocessedImage = _preprocessImage(baseImage, modelInputSize);
 
-      final outputShape = interpreter.getOutputTensor(0).shape;
-      final output = List.filled(outputShape.reduce((a, b) => a * b), 0.0)
-          .reshape(outputShape);
+          final inputBytes = _imageToFloat32List(preprocessedImage);
+          final reshapedInput = inputBytes.reshape(inputShape);
 
-      interpreter.run(reshapedInput, output);
+          final outputShape = interpreter.getOutputTensor(0).shape;
+          final output = List.filled(outputShape.reduce((a, b) => a * b), 0.0)
+              .reshape(outputShape);
 
-      final wallClassIndex = labels.indexOf('wall');
-      if (wallClassIndex == -1) return null;
+          interpreter.run(reshapedInput, output);
 
-      final segmentationMask = _postprocessOutput(
-          output[0], modelInputSize, modelInputSize, wallClassIndex);
+          final wallClassIndex = labels.indexOf('wall');
+          if (wallClassIndex == -1) return null;
+
+          segmentationMask = _postprocessOutput(
+              output[0], modelInputSize, modelInputSize, wallClassIndex);
+          effectiveMaskWidth = modelInputSize;
+          effectiveMaskHeight = modelInputSize;
+        }
+      } else {
+        // Fallback to the original model-based segmentation
+        final inputShape = interpreter.getInputTensor(0).shape;
+        final modelInputSize = inputShape[1];
+        final preprocessedImage = _preprocessImage(baseImage, modelInputSize);
+
+        final inputBytes = _imageToFloat32List(preprocessedImage);
+        final reshapedInput = inputBytes.reshape(inputShape);
+
+        final outputShape = interpreter.getOutputTensor(0).shape;
+        final output = List.filled(outputShape.reduce((a, b) => a * b), 0.0)
+            .reshape(outputShape);
+
+        interpreter.run(reshapedInput, output);
+
+        final wallClassIndex = labels.indexOf('wall');
+        if (wallClassIndex == -1) return null;
+
+        segmentationMask = _postprocessOutput(
+            output[0], modelInputSize, modelInputSize, wallClassIndex);
+        effectiveMaskWidth = modelInputSize;
+        effectiveMaskHeight = modelInputSize;
+      }
 
       final wallPixelCount = segmentationMask.where((p) => p == 1).length;
       debugPrint(
           '🖼️ Isolate: Mask created with $wallPixelCount wall pixels out of ${segmentationMask.length}.');
 
+      // --- Flood Fill ---
       Uint8List? paintedMask;
-      if (input.tapPoint != null && input.color != null) {
-        paintedMask = _floodFill(
-          segmentationMask,
-          modelInputSize,
-          modelInputSize,
-          (input.tapPoint!.dx * (modelInputSize / baseImage.width)).toInt(),
-          (input.tapPoint!.dy * (modelInputSize / baseImage.height)).toInt(),
-        );
+      if (tapPoint != null && previewSize != null) {
+        final transformedPoint = _transformTapPoint(tapPoint, previewSize,
+            Size(baseImage.width.toDouble(), baseImage.height.toDouble()));
+
+        final int tapX =
+            (transformedPoint.dx * (effectiveMaskWidth / baseImage.width))
+                .toInt();
+        final int tapY =
+            (transformedPoint.dy * (effectiveMaskHeight / baseImage.height))
+                .toInt();
+        paintedMask = _floodFill(segmentationMask, effectiveMaskWidth,
+            effectiveMaskHeight, tapX, tapY);
+
+        if (paintedMask != null) {
+          final paintedPixelCount = paintedMask.where((p) => p == 1).length;
+          final paintPercentage =
+              (paintedPixelCount / paintedMask.length * 100).toStringAsFixed(1);
+          debugPrint(
+              '🎨 Paint applied: $paintedPixelCount/${paintedMask.length} pixels ($paintPercentage%)');
+          debugPrint(
+              '📍 Tap coordinates: screen($tapPoint) -> image($tapX, $tapY)');
+        }
       }
 
       return {
         'segmentation_mask': segmentationMask,
         'painted_mask': paintedMask,
-        'mask_width': modelInputSize,
-        'mask_height': modelInputSize,
+        'mask_width': effectiveMaskWidth,
+        'mask_height': effectiveMaskHeight,
         'image_width': baseImage.width,
         'image_height': baseImage.height,
       };
     } catch (e, s) {
-      debugPrint('❌ Ошибка в processFrame: $e\n$s');
+      debugPrint('❌ Isolate: Ошибка обработки кадра: $e\n$s');
       return null;
     }
+  }
+
+  /// Трансформирует координаты касания с экрана в координаты изображения камеры,
+  /// учитывая масштабирование BoxFit.cover
+  static ui.Offset _transformTapPoint(
+      ui.Offset tapPoint, ui.Size previewSize, ui.Size imageSize) {
+    final fittedSizes = applyBoxFit(BoxFit.cover, imageSize, previewSize);
+    final sourceRect = Alignment.center.inscribe(fittedSizes.source,
+        Rect.fromLTWH(0, 0, imageSize.width, imageSize.height));
+    final destinationRect = Alignment.center.inscribe(fittedSizes.destination,
+        Rect.fromLTWH(0, 0, previewSize.width, previewSize.height));
+
+    // Координаты касания относительно destinationRect
+    final double relativeX = tapPoint.dx - destinationRect.left;
+    final double relativeY = tapPoint.dy - destinationRect.top;
+
+    // Масштабируем обратно в систему координат sourceRect
+    final double scaledX =
+        (relativeX / destinationRect.width) * sourceRect.width;
+    final double scaledY =
+        (relativeY / destinationRect.height) * sourceRect.height;
+
+    // Возвращаем абсолютные координаты в исходном изображении
+    return ui.Offset(scaledX + sourceRect.left, scaledY + sourceRect.top);
   }
 
   static Float32List _imageToFloat32List(img.Image image) {
@@ -342,18 +475,24 @@ class CVWallPainterService {
     return filledMask;
   }
 
-  static img.Image? _convertCameraImage(_CameraImageDTO dto) {
-    if (dto.imageFormatGroup == ImageFormatGroup.yuv420) {
-      return _convertYUV420(dto);
-    } else if (dto.imageFormatGroup == ImageFormatGroup.bgra8888) {
-      return img.Image.fromBytes(
-        width: dto.width,
-        height: dto.height,
-        bytes: dto.planes[0].buffer,
-        order: img.ChannelOrder.bgra,
-      );
+  static img.Image? _convertCameraImage(_CameraImageDTO imageDto) {
+    if (imageDto.imageFormatGroup == ImageFormatGroup.yuv420) {
+      return _convertYUV420(imageDto);
+    } else if (imageDto.imageFormatGroup == ImageFormatGroup.bgra8888) {
+      return _convertBGRA8888(imageDto);
+    } else {
+      debugPrint("Unsupported image format: ${imageDto.imageFormatGroup}");
+      return null;
     }
-    return null;
+  }
+
+  static img.Image _convertBGRA8888(_CameraImageDTO image) {
+    return img.Image.fromBytes(
+      width: image.width,
+      height: image.height,
+      bytes: image.planes[0].buffer,
+      order: img.ChannelOrder.bgra,
+    );
   }
 
   static img.Image _convertYUV420(_CameraImageDTO image) {
@@ -361,28 +500,54 @@ class CVWallPainterService {
     final int height = image.height;
     final int uvRowStride = image.planes[1].length ~/ (height / 2);
     final int uvPixelStride = uvRowStride ~/ (width / 2);
+
     final yPlane = image.planes[0];
     final uPlane = image.planes[1];
     final vPlane = image.planes[2];
+
     final out = img.Image(width: width, height: height);
+
     for (int y = 0; y < height; y++) {
+      final int uvRow = uvRowStride * (y ~/ 2);
       for (int x = 0; x < width; x++) {
+        final int uvCol = uvPixelStride * (x ~/ 2);
         final int yIndex = y * width + x;
-        final int uvx = (x / 2).floor();
-        final int uvy = (y / 2).floor();
-        final int uvIndex = uvy * uvRowStride + uvx * uvPixelStride;
+
         final yValue = yPlane[yIndex];
-        final uValue = uPlane[uvIndex];
-        final vValue = vPlane[uvIndex];
-        final r = (yValue + 1.402 * (vValue - 128)).clamp(0, 255).toInt();
-        final g =
-            (yValue - 0.344136 * (uValue - 128) - 0.714136 * (vValue - 128))
-                .clamp(0, 255)
-                .toInt();
-        final b = (yValue + 1.772 * (uValue - 128)).clamp(0, 255).toInt();
-        out.setPixelRgb(x, y, r, g, b);
+        final uValue = uPlane[uvRow + uvCol];
+        final vValue = vPlane[uvRow + uvCol];
+
+        final c = yuvToRgb(yValue, uValue, vValue);
+        out.setPixelRgba(
+            x, y, (c >> 16) & 0xFF, (c >> 8) & 0xFF, c & 0xFF, 255);
       }
     }
     return out;
   }
+}
+
+/// YUV to RGB Conversion
+/// Sourced from https://github.com/flutter/flutter/issues/26348
+int yuvToRgb(int y, int u, int v) {
+  // Convert yuv pixel to rgb
+  int r = (y + (1.370705 * (v - 128))).round();
+  int g = (y - (0.337633 * (u - 128)) - (0.698001 * (v - 128))).round();
+  int b = (y + (1.732446 * (u - 128))).round();
+
+  // Clipping RGB values to be inside bound [0, 255]
+  r = r.clamp(0, 255);
+  g = g.clamp(0, 255);
+  b = b.clamp(0, 255);
+
+  return 0xff000000 | (b << 16) | (g << 8) | r;
+}
+
+_CameraImageDTO? _createImageDTO(CameraImage image) {
+  if (image.planes.isEmpty) return null;
+  return _CameraImageDTO(
+    planes: image.planes.map((p) => p.bytes).toList(),
+    height: image.height,
+    width: image.width,
+    imageFormatGroup: image.format.group,
+  );
 }

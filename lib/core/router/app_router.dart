@@ -27,7 +27,7 @@ import 'package:remalux_ar/features/partnership/presentation/pages/partnership_a
 import 'package:remalux_ar/features/about/presentation/pages/about_page.dart';
 import 'package:remalux_ar/features/cart/presentation/pages/cart_page.dart';
 import 'package:remalux_ar/features/checkout/presentation/pages/checkout_page.dart';
-// import 'package:chucker_flutter/chucker_flutter.dart';
+import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:remalux_ar/features/auth/presentation/pages/phone_verification_page.dart';
 import 'package:remalux_ar/screens/ar_demo_screen.dart';
 import 'package:remalux_ar/screens/cv_wall_painter_screen.dart';
@@ -39,7 +39,7 @@ class AppRouter {
   static final GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/',
-    // observers: [ChuckerFlutter.navigatorObserver],
+    observers: [ChuckerFlutter.navigatorObserver],
     // redirect: (context, state) async {
     //   final hasSeenOnboarding = await StorageService.getHasSeenOnboarding();
     //   if (!hasSeenOnboarding && state.uri.path != '/onboarding') {

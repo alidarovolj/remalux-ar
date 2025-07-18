@@ -1,0 +1,47 @@
+{
+  "model_info": {
+    "name": "wall_segmentation_mobile_optimized",
+    "version": "2.0",
+    "description": "Advanced wall_segmentation_mobile_optimized for wall segmentation",
+    "architecture": "MobileNetV2",
+    "input_size": [
+      256,
+      256,
+      3
+    ],
+    "output_classes": 2,
+    "optimization": "float16"
+  },
+  "processing": {
+    "preprocessing": {
+      "normalize": true,
+      "mean": [
+        0.485,
+        0.456,
+        0.406
+      ],
+      "std": [
+        0.229,
+        0.224,
+        0.225
+      ]
+    },
+    "postprocessing": {
+      "apply_softmax": true,
+      "threshold": 0.5,
+      "filter_small_regions": true,
+      "min_region_size": 50
+    }
+  },
+  "performance": {
+    "expected_fps": "25-35",
+    "memory_usage": "~7.3MB",
+    "accuracy": "88.0%+ for indoor walls",
+    "trained_on": "Synthetic wall data + transfer learning"
+  },
+  "usage": {
+    "input_tensor": "input_1",
+    "output_tensor": "conv2d",
+    "recommended_delegate": "XNNPACK"
+  }
+}

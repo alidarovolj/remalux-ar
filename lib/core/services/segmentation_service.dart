@@ -1,213 +1,111 @@
-/*
-import 'dart:async';
-import 'dart:isolate';
-import 'dart:typed_data';
-import 'dart:ui' as ui;
-
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:image/image.dart' as img;
+import 'package:remalux_ar/core/utils/image_converter.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 
-/// Сервис для AI сегментации стен.
-/// Эта версия была упрощена для устранения ошибок зависимостей.
-/// Исполнение модели происходит в основном потоке.
 class SegmentationService {
-  static SegmentationService? _instance;
-  static SegmentationService get instance =>
-      _instance ??= SegmentationService._internal();
+  late Interpreter _interpreter;
+  late List<String> _labels;
+  late List<int> _inputShape;
+  late List<int> _outputShape;
 
-  SegmentationService._internal();
+  static const String modelPath = 'assets/ml/1.tflite';
+  static const String labelsPath = 'assets/ml/ade20k_labels.txt';
 
-  // Модель сегментации
-  Interpreter? _interpreter;
-  bool _isInitialized = false;
+  // Public getters for mask dimensions
+  int? get maskWidth => _outputShape.isNotEmpty ? _outputShape[2] : null;
+  int? get maskHeight => _outputShape.isNotEmpty ? _outputShape[1] : null;
 
-  // Параметры модели
-  List<int>? _inputShape;
-  List<int>? _outputShape;
-  TfLiteType? _inputType;
-  TfLiteType? _outputType;
+  Future<void> loadModel() async {
+    final options = InterpreterOptions();
 
-  // Callback для результатов
-  Function(ui.Image? overlayImage)? _onSegmentationResult;
-
-  // Отслеживание состояния обработки, чтобы избежать одновременных запусков
-  bool _isProcessing = false;
-
-  Future<bool> initialize({
-    String modelPath = 'assets/ml/segformer.tflite',
-    Function(ui.Image? overlayImage)? onSegmentationResult,
-  }) async {
-    if (_isInitialized) return true;
-
+    // Use XNNPACK delegate for better performance
     try {
-      debugPrint("🤖 SegmentationService: Загрузка модели $modelPath");
-
-      _onSegmentationResult = onSegmentationResult;
-
-      final interpreterOptions = InterpreterOptions();
-      _interpreter =
-          await Interpreter.fromAsset(modelPath, options: interpreterOptions);
-      _interpreter!.allocateTensors();
-
-      final inputTensor = _interpreter!.getInputTensor(0);
-      final outputTensor = _interpreter!.getOutputTensor(0);
-
-      _inputShape = inputTensor.shape;
-      _inputType = inputTensor.type;
-      _outputShape = outputTensor.shape;
-      _outputType = outputTensor.type;
-
-      debugPrint('✅ SegmentationService инициализирован');
-      debugPrint('   - Input Shape: $_inputShape, Type: $_inputType');
-      debugPrint('   - Output Shape: $_outputShape, Type: $_outputType');
-
-      _isInitialized = true;
-      return true;
+      final delegate = XNNPackDelegate();
+      options.addDelegate(delegate);
     } catch (e) {
-      debugPrint('❌ Ошибка инициализации SegmentationService: $e');
-      return false;
+      debugPrint('XNNPACK delegate not available: $e');
     }
+
+    _interpreter = await Interpreter.fromAsset(modelPath, options: options);
+    await _loadLabels();
+
+    _inputShape = _interpreter.getInputTensor(0).shape;
+    _outputShape = _interpreter.getOutputTensor(0).shape;
+
+    debugPrint('Interpreter and labels loaded successfully');
+    debugPrint('Input shape: $_inputShape');
+    debugPrint('Output shape: $_outputShape');
+    debugPrint('Labels loaded: ${_labels.length} classes');
+    debugPrint(
+        'Wall class index: ${_labels.indexWhere((label) => label.contains("wall"))}');
   }
 
-  Future<void> processFrame(CameraImage cameraImage) async {
-    if (!_isInitialized || _isProcessing) return;
-
-    _isProcessing = true;
-
-    try {
-      final stopwatch = Stopwatch()..start();
-
-      // 1. Конвертация изображения с камеры
-      final inputImage = _convertCameraImage(cameraImage);
-      if (inputImage == null) return;
-
-      // 2. Предобработка изображения и подготовка входного тензора
-      // Предполагается, что модель Segformer принимает на вход 224x224
-      final inputTensor =
-          _preprocessImage(inputImage, _inputShape![1], _inputShape![2]);
-
-      // 3. Подготовка выходного тензора
-      final outputBuffer =
-          List.filled(_outputShape!.reduce((a, b) => a * b), 0.0)
-              .reshape(_outputShape!);
-      final outputs = <int, Object>{0: outputBuffer};
-
-      // 4. Запуск модели
-      _interpreter!.runForMultipleInputs([inputTensor], outputs);
-
-      // 5. Постобработка результата для получения маски сегментации
-      final segmentationMask = _postProcessOutput(outputBuffer);
-
-      stopwatch.stop();
-      debugPrint(
-          "⏱️ Время выполнения сегментации: ${stopwatch.elapsedMilliseconds}ms");
-
-      // 6. Создание визуального оверлея из маски
-      if (_onSegmentationResult != null) {
-        final overlay = await _createOverlayFromMask(
-            segmentationMask, _outputShape![2], _outputShape![1]);
-        _onSegmentationResult!(overlay);
-      }
-    } catch (e) {
-      debugPrint('❌ Ошибка при обработке кадра в сегментации: $e');
-      _onSegmentationResult?.call(null);
-    } finally {
-      _isProcessing = false;
-    }
+  Future<void> _loadLabels() async {
+    final labelsRaw = await rootBundle.loadString(labelsPath);
+    _labels = labelsRaw.split('\n');
   }
 
-  /// Подготавливает изображение для модели.
-  Float32List _preprocessImage(
-      img.Image image, int targetWidth, int targetHeight) {
+  Uint8List? processCameraImage(CameraImage cameraImage) {
+    final image = ImageConverter.convertCameraImage(cameraImage);
+    if (image == null) {
+      return null;
+    }
+
     final resizedImage = img.copyResize(
       image,
-      width: targetWidth,
-      height: targetHeight,
-      interpolation: img.Interpolation.cubic,
+      width: _inputShape[2],
+      height: _inputShape[1],
+      interpolation: img.Interpolation.linear,
     );
 
-    // Нормализация значений пикселей в диапазон [-1, 1], как ожидает SegFormer
-    final imageBytes = resizedImage.getBytes(order: img.ChannelOrder.rgb);
-    final floatBytes = Float32List(targetWidth * targetHeight * 3);
-    for (int i = 0; i < imageBytes.length; i++) {
-      floatBytes[i] = (imageBytes[i] / 127.5) - 1.0;
+    final inputBytes = resizedImage.getBytes(order: img.ChannelOrder.rgb);
+    final inputBuffer = Float32List(_inputShape.reduce((a, b) => a * b));
+    for (int i = 0; i < inputBytes.length; i++) {
+      inputBuffer[i] = inputBytes[i] / 255.0;
     }
 
-    return floatBytes;
-  }
+    final reshapedInput = inputBuffer.reshape(_inputShape);
 
-  /// Конвертирует выходные данные модели в 2D маску сегментации.
-  Uint8List _postProcessOutput(List<dynamic> output) {
-    // Предполагается, что выход имеет форму [1, высота, ширина, 1]
-    // и содержит оценки классов.
-    final reshapedOutput = output[0] as List<List<List<double>>>;
-    final height = reshapedOutput.length;
-    final width = reshapedOutput[0].length;
+    final outputBuffer = List.filled(
+      _outputShape.reduce((a, b) => a * b),
+      0,
+    ).reshape(_outputShape);
 
-    final mask = Uint8List(width * height);
-    for (int y = 0; y < height; y++) {
-      for (int x = 0; x < width; x++) {
-        // Для Segformer значение > 0 часто указывает на целевой класс (стена)
-        if (reshapedOutput[y][x][0] > 0.0) {
-          mask[y * width + x] = 1; // Класс 1 для Стены
+    _interpreter.run(reshapedInput, outputBuffer);
+
+    final segmentationMap = outputBuffer[0];
+    final wallClassIndex =
+        _labels.indexWhere((label) => label.contains('wall'));
+
+    if (wallClassIndex == -1) {
+      debugPrint("Warning: 'wall' class not found in labels.");
+      return null;
+    }
+
+    final mask = Uint8List(_outputShape[1] * _outputShape[2]);
+    int wallPixelCount = 0;
+    int totalPixels = 0;
+
+    for (int i = 0; i < segmentationMap.length; i++) {
+      for (int j = 0; j < segmentationMap[i].length; j++) {
+        totalPixels++;
+        if (segmentationMap[i][j] == wallClassIndex) {
+          mask[i * _outputShape[2] + j] = 1;
+          wallPixelCount++;
         } else {
-          mask[y * width + x] = 0; // Класс 0 для Фона
+          mask[i * _outputShape[2] + j] = 0;
         }
       }
     }
+
+    final wallPercentage =
+        (wallPixelCount / totalPixels * 100).toStringAsFixed(1);
+    debugPrint(
+        '🏠 Wall detection: $wallPixelCount/$totalPixels pixels ($wallPercentage%)');
+
     return mask;
   }
-
-  Future<ui.Image> _createOverlayFromMask(
-      Uint8List mask, int width, int height) async {
-    final completer = Completer<ui.Image>();
-    final color =
-        ui.Color.fromARGB(128, 255, 0, 0); // Полупрозрачный красный для стен
-
-    // Используем Isolate.run для ресурсоемкой операции создания изображения
-    final pngBytes = await Isolate.run(() {
-      final image = img.Image(width: width, height: height, numChannels: 4);
-      for (int i = 0; i < mask.length; i++) {
-        if (mask[i] == 1) {
-          // Если пиксель - это стена
-          final index = i;
-          final x = index % width;
-          final y = index ~/ width;
-          image.setPixelRgba(x, y, color.red, color.green, color.blue, color.alpha);
-        }
-      }
-      return img.encodePng(image);
-    });
-
-    ui.instantiateImageCodec(Uint8List.fromList(pngBytes)).then((codec) {
-      codec.getNextFrame().then((frame) => completer.complete(frame.image));
-    });
-
-    return completer.future;
-  }
-
-  img.Image? _convertCameraImage(CameraImage cameraImage) {
-    // Эта логика конвертации должна быть надежной.
-    // Для простоты предполагаем формат BGRA на iOS/macOS.
-    if (cameraImage.format.group == ImageFormatGroup.bgra8888) {
-      return img.Image.fromBytes(
-        width: cameraImage.width,
-        height: cameraImage.height,
-        bytes: cameraImage.planes[0].bytes.buffer,
-        order: img.ChannelOrder.bgra,
-      );
-    }
-    // TODO: Добавить конвертацию из YUV420 для Android, если потребуется.
-    debugPrint("Неподдерживаемый формат изображения: ${cameraImage.format.group}");
-    return null; // При необходимости обработать другие форматы
-  }
-
-  void dispose() {
-    _interpreter?.close();
-    _isInitialized = false;
-    debugPrint("🤖 SegmentationService выгружен.");
-  }
 }
-*/

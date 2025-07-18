@@ -7,6 +7,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../core/services/cv_wall_painter_service.dart';
+import '../core/services/segmentation_service.dart';
+import '../core/services/wall_segmentation_service.dart';
 import 'dart:math' as math;
 
 /// Computer Vision Wall Painter Screen
@@ -24,28 +26,53 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
   CameraController? _cameraController;
   bool _isCameraInitialized = false;
   List<CameraDescription> _cameras = [];
+  CameraImage? _lastCameraImage;
+
+  // Key for camera preview widget
+  final GlobalKey _cameraPreviewKey = GlobalKey();
 
   // CV Service
   final CVWallPainterService _cvService = CVWallPainterService.instance;
   bool _isCVInitialized = false;
-  bool _isProcessing = false;
+  bool _isServiceBusy = false;
   CVResultDto? _lastCvResult; // Храним последний результат целиком
+
+  // Segmentation Services
+  final SegmentationService _segmentationService = SegmentationService();
+  final WallSegmentationService _wallSegmentationService =
+      WallSegmentationService();
+  bool _isSegmentationInitialized = false;
+  bool _isWallSegmentationInitialized = false;
+  Uint8List? _currentWallMask; // Маска стены от модели сегментации
+
+  // Модели сегментации
+  int _currentModelIndex =
+      2; // 0 - standard, 1 - specialized, 2 - mobile optimized
+  final List<String> _modelNames = [
+    'Стандартная (ADE20K)',
+    'Специализированная',
+    'Мобильная оптимизация'
+  ];
+  final List<Color> _modelColors = [Colors.orange, Colors.blue, Colors.green];
 
   // Current painting state
   ui.Image? _segmentationOverlay;
-  ui.Image? _paintedOverlay; // This replaces `_wallMask`
+  ui.Image?
+      _combinedPaintedOverlay; // Единое изображение для всех покрашенных областей
   ui.Offset? _lastTapPoint;
   Color _selectedColor = const Color(0xFF2196F3);
 
   // Performance metrics
   int _lastProcessingTimeMs = 0;
   int _frameCount = 0;
+  int _segmentationFrameCount = 0; // Счётчик для периодической сегментации
 
   // UI State
   bool _showColorPalette = false;
   bool _showInstructions = true;
   bool _showDebugInfo = false;
-  bool _showSegmentation = true; // Новый переключатель для сегментации
+  bool _showSegmentation = true; // Включено для визуальной обратной связи
+  bool _showPaintLoader = false;
 
   // Color palette
   static const List<Color> _colorPalette = [
@@ -73,9 +100,15 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _cvService.stopCameraStream();
+    _cameraController?.stopImageStream();
     _cameraController?.dispose();
     _cvService.dispose();
+
+    // Dispose segmentation services
+    if (_isWallSegmentationInitialized) {
+      _wallSegmentationService.dispose();
+    }
+
     super.dispose();
   }
 
@@ -86,6 +119,7 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
     }
 
     if (state == AppLifecycleState.inactive) {
+      _cameraController?.stopImageStream();
       _cameraController?.dispose();
     } else if (state == AppLifecycleState.resumed) {
       _initializeCamera();
@@ -97,48 +131,77 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
       // Initialize CV service
       await _cvService.initialize();
 
+      // Initialize Segmentation services
+      try {
+        if (_currentModelIndex == 0) {
+          // Standard ADE20K model
+          await _segmentationService.loadModel();
+          _isSegmentationInitialized = true;
+          debugPrint('✅ Standard segmentation service initialized');
+        } else {
+          // Specialized or Mobile models
+          await _wallSegmentationService.loadModel(
+              modelIndex: _currentModelIndex);
+          _isWallSegmentationInitialized = true;
+          debugPrint(
+              '✅ ${_modelNames[_currentModelIndex]} segmentation service initialized');
+        }
+      } catch (e) {
+        debugPrint(
+            '⚠️ Failed to load ${_modelNames[_currentModelIndex]} model, falling back to standard: $e');
+        _currentModelIndex = 0;
+        await _segmentationService.loadModel();
+        _isSegmentationInitialized = true;
+        debugPrint('✅ Fallback segmentation service initialized');
+      }
+
       // Set up callbacks for CV service
       _cvService.setResultCallback((result) {
-        if (mounted) {
-          // New: Create images from raw masks on the main thread
-          if (result.segmentationMask != null) {
-            _createImageFromMask(result.segmentationMask!, result.maskWidth,
-                    result.maskHeight, const Color.fromARGB(100, 0, 255, 0))
-                .then((image) {
-              if (mounted) {
-                setState(() {
-                  _segmentationOverlay = image;
-                });
-              }
-            });
-          }
-          if (result.paintedMask != null) {
-            _createImageFromMask(result.paintedMask!, result.maskWidth,
-                    result.maskHeight, _selectedColor.withOpacity(0.7))
-                .then((image) {
-              if (mounted) {
-                setState(() {
-                  _paintedOverlay = image;
-                });
-              }
-            });
-          }
-
-          setState(() {
-            _lastCvResult = result; // Сохраняем весь результат
-            _lastProcessingTimeMs = result.processingTimeMs;
-          });
-          debugPrint('✅ CV результат получен: ${result.processingTimeMs}ms');
+        if (!mounted) {
+          _isServiceBusy = false;
+          return;
         }
+
+        _prepareImagesFromCvResult(result).then((images) async {
+          final (segmentationOverlay, paintedOverlay) = images;
+
+          if (mounted) {
+            // Merge the new painted overlay onto the combined one
+            if (paintedOverlay != null) {
+              final newCombinedOverlay = await _mergeOverlays(
+                baseImage: _combinedPaintedOverlay,
+                newOverlay: paintedOverlay,
+              );
+              setState(() {
+                _combinedPaintedOverlay = newCombinedOverlay;
+              });
+            }
+
+            setState(() {
+              if (segmentationOverlay != null) {
+                _segmentationOverlay = segmentationOverlay;
+              }
+              // Не сбрасываем предыдущий segmentationOverlay если новый пустой
+              _showPaintLoader = false;
+              _lastCvResult = result;
+              _lastProcessingTimeMs = result.processingTimeMs;
+            });
+            debugPrint(
+                '✅ CV результат получен и UI обновлен: ${result.processingTimeMs}ms');
+          }
+        }).whenComplete(() {
+          _isServiceBusy = false;
+        });
       });
 
       _cvService.setErrorCallback((error) {
         if (mounted) {
           setState(() {
-            _isProcessing = false;
+            _showPaintLoader = false;
           });
           debugPrint('❌ CV ошибка: $error');
         }
+        _isServiceBusy = false;
       });
 
       if (mounted) {
@@ -158,21 +221,68 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
     }
   }
 
+  Future<(ui.Image?, ui.Image?)> _prepareImagesFromCvResult(
+      CVResultDto result) async {
+    ui.Image? segmentationOverlay;
+    ui.Image? paintedOverlay;
+
+    // Проверяем качество segmentation маски перед созданием overlay
+    bool shouldCreateSegmentationOverlay = false;
+    if (result.segmentationMask != null) {
+      final wallPixelCount =
+          result.segmentationMask!.where((p) => p == 1).length;
+      final wallPercentage = wallPixelCount / result.segmentationMask!.length;
+      shouldCreateSegmentationOverlay =
+          wallPercentage > 0.05 && wallPercentage < 0.95;
+
+      if (!shouldCreateSegmentationOverlay) {
+        debugPrint(
+            '⚠️ Skipping segmentation overlay: ${(wallPercentage * 100).toStringAsFixed(1)}% walls');
+      }
+    }
+
+    // Use Future.wait to create images in parallel for better performance
+    await Future.wait([
+      if (shouldCreateSegmentationOverlay && result.segmentationMask != null)
+        _createImageFromMask(result.segmentationMask!, result.maskWidth,
+                result.maskHeight, const Color.fromARGB(128, 33, 150, 243))
+            .then((img) => segmentationOverlay = img),
+      if (result.paintedMask != null)
+        _createImageFromMask(result.paintedMask!, result.maskWidth,
+                result.maskHeight, _selectedColor.withOpacity(0.7))
+            .then((img) => paintedOverlay = img),
+    ]);
+
+    return (segmentationOverlay, paintedOverlay);
+  }
+
   Future<void> _initializeCamera() async {
     try {
-      final cameras = await availableCameras();
-      if (cameras.isEmpty) {
-        debugPrint('No cameras found');
+      _cameras = await availableCameras();
+      if (_cameras.isEmpty) {
+        debugPrint('❌ No cameras found on this device.');
+        if (mounted) {
+          _showErrorDialog(
+              'Нет камеры', 'На этом устройстве не найдено доступных камер.');
+        }
         return;
       }
-      final camera = cameras.first;
+
+      final camera = _cameras.firstWhere(
+          (cam) => cam.lensDirection == CameraLensDirection.back,
+          orElse: () => _cameras.first);
+
+      // Dispose existing controller before creating a new one
+      if (_cameraController != null) {
+        await _cameraController!.dispose();
+      }
 
       final imageFormatGroup =
           Platform.isIOS ? ImageFormatGroup.bgra8888 : ImageFormatGroup.yuv420;
 
       _cameraController = CameraController(
         camera,
-        ResolutionPreset.medium, // ОБНОВЛЕНО
+        ResolutionPreset.low, // ОБНОВЛЕНО
         enableAudio: false,
         imageFormatGroup: imageFormatGroup,
       );
@@ -180,63 +290,113 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
       await _cameraController!.initialize();
       if (!mounted) return;
 
-      // Start camera stream for CV service
+      // Ensure the widget is still mounted before starting the stream
+      if (!mounted) return;
       await _cameraController!.startImageStream((CameraImage image) {
-        if (_isCVInitialized && !_isProcessing) {
-          _cvService.updateCameraFrame(image);
+        if (!mounted) return;
+        _lastCameraImage = image;
+
+        // Process CV for paint detection
+        if (_isCVInitialized && !_isServiceBusy) {
+          final didStart = _cvService.processCameraFrame(image);
+          if (didStart) {
+            _isServiceBusy = true;
+          }
         }
+
+        // Временно отключаем новую сегментацию - используем только старую модель в изоляте
+        // Process segmentation every 30 frames to get wall mask (было 10)
+        // _segmentationFrameCount++;
+        // if (_isSegmentationInitialized && _segmentationFrameCount % 30 == 0) {
+        //   _updateWallMask(image);
+        // }
       });
 
       if (mounted) {
         setState(() {
           _isCameraInitialized = true;
         });
-
-        // Start CV processing stream for real-time segmentation visualization
-        if (_isCVInitialized) {
-          _cvService.startCameraStream();
-        }
       }
     } catch (e) {
       debugPrint('❌ Ошибка инициализации камеры: $e');
-      rethrow;
+      if (mounted) {
+        _showErrorDialog(
+            'Ошибка камеры', 'Не удалось инициализировать камеру: $e');
+      }
+    }
+  }
+
+  /// Обновляет маску стены с помощью модели сегментации
+  void _updateWallMask(CameraImage image) {
+    try {
+      Uint8List? mask;
+
+      // Используем текущую выбранную модель
+      if (_currentModelIndex == 0 && _isSegmentationInitialized) {
+        mask = _segmentationService.processCameraImage(image);
+      } else if (_currentModelIndex > 0 && _isWallSegmentationInitialized) {
+        mask = _wallSegmentationService.processCameraImage(image);
+      }
+
+      if (mask != null && mounted) {
+        // Проверяем качество маски перед использованием
+        final wallPixelCount = mask.where((p) => p == 1).length;
+        final wallPercentage = wallPixelCount / mask.length;
+
+        if (wallPercentage > 0.05 && wallPercentage < 0.95) {
+          // Используем маску только если она содержит разумное количество стен
+          setState(() {
+            _currentWallMask = mask;
+          });
+          final modelType = _modelNames[_currentModelIndex];
+          debugPrint(
+              '✅ Wall mask updated using $modelType model (${mask.length} pixels, ${(wallPercentage * 100).toStringAsFixed(1)}% walls)');
+        } else {
+          // Не используем плохую маску, оставляем null для fallback
+          setState(() {
+            _currentWallMask = null;
+          });
+          debugPrint(
+              '⚠️ Wall mask quality poor (${(wallPercentage * 100).toStringAsFixed(1)}% walls), skipping update');
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ Error updating wall mask: $e');
     }
   }
 
   Future<void> _onTapScreen(TapDownDetails details) async {
-    if (!_isCVInitialized || _isProcessing || _cameraController == null) {
+    if (!_isCVInitialized ||
+        _isServiceBusy ||
+        _cameraController == null ||
+        _lastCameraImage == null) {
       return;
     }
 
-    try {
-      HapticFeedback.lightImpact();
+    HapticFeedback.lightImpact();
 
+    // Get the size of the CameraPreview widget
+    final RenderBox? previewBox =
+        _cameraPreviewKey.currentContext?.findRenderObject() as RenderBox?;
+    if (previewBox == null || !previewBox.hasSize) return;
+    final previewSize = previewBox.size;
+
+    final didStart = _cvService.paintWall(
+      _lastCameraImage!,
+      details.localPosition,
+      previewSize,
+      _selectedColor,
+      wallMask: null, // Временно отключаем новую сегментацию
+      maskWidth: null,
+      maskHeight: null,
+    );
+
+    if (didStart) {
+      _isServiceBusy = true;
       setState(() {
-        _isProcessing = true;
+        _showPaintLoader = true;
         _lastTapPoint = details.localPosition;
       });
-
-      final stopwatch = Stopwatch()..start();
-
-      // Real ML processing with BiseNet
-      debugPrint('🎨 Обрабатываем кадр с DeepLabV3...');
-
-      // Реальная обработка с CV сервисом
-      await _cvService.paintWall(details.localPosition, _selectedColor);
-
-      stopwatch.stop();
-
-      debugPrint(
-          '🎨 Кадр отправлен в CV сервис за ${stopwatch.elapsedMilliseconds}ms');
-    } catch (e) {
-      debugPrint('❌ Ошибка обработки касания: $e');
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isProcessing = false;
-          _frameCount++;
-        });
-      }
     }
   }
 
@@ -251,11 +411,37 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
   void _clearPainting() {
     HapticFeedback.mediumImpact();
     setState(() {
-      _paintedOverlay = null; // Clear the overlay
+      _combinedPaintedOverlay = null; // Очищаем единый холст
       _segmentationOverlay = null; // Also clear segmentation
       _lastTapPoint = null;
       _frameCount = 0;
     });
+  }
+
+  Future<ui.Image> _mergeOverlays(
+      {ui.Image? baseImage, required ui.Image newOverlay}) async {
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+
+    // Используем размеры нового оверлея для результирующего изображения
+    final targetWidth = newOverlay.width;
+    final targetHeight = newOverlay.height;
+
+    // If there's a base image, draw it first scaled to target size
+    if (baseImage != null) {
+      final srcRect = Rect.fromLTWH(
+          0, 0, baseImage.width.toDouble(), baseImage.height.toDouble());
+      final dstRect =
+          Rect.fromLTWH(0, 0, targetWidth.toDouble(), targetHeight.toDouble());
+      canvas.drawImageRect(baseImage, srcRect, dstRect, Paint());
+    }
+
+    // Draw the new overlay on top.
+    canvas.drawImage(newOverlay, Offset.zero, Paint());
+
+    // End recording and return the new combined image.
+    final picture = recorder.endRecording();
+    return await picture.toImage(targetWidth, targetHeight);
   }
 
   Future<ui.Image> _createImageFromMask(
@@ -264,6 +450,9 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
     for (int i = 0; i < mask.length; i++) {
       if (mask[i] == 1) {
         pixels[i] = color.value;
+      } else {
+        // Делаем пиксель полностью прозрачным вместо черного
+        pixels[i] = 0x00000000; // Прозрачный черный (ARGB)
       }
     }
 
@@ -273,14 +462,13 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
       width,
       height,
       ui.PixelFormat.rgba8888,
-      (ui.Image img) {
-        completer.complete(img);
-      },
+      completer.complete,
     );
     return completer.future;
   }
 
   void _showErrorDialog(String title, String message) {
+    if (!mounted) return;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -324,18 +512,19 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
               child: AspectRatio(
                 aspectRatio: _cameraController!.value.aspectRatio,
                 child: GestureDetector(
+                  key: _cameraPreviewKey,
                   onTapDown: _onTapScreen,
                   child: Stack(
                     children: [
                       CameraPreview(_cameraController!),
 
-                      // Painted wall overlay
-                      if (_paintedOverlay != null)
+                      // Combined painted wall overlay
+                      if (_combinedPaintedOverlay != null)
                         Positioned.fill(
                           child: CustomPaint(
                             painter: WallPainter(
-                                imageToPaint: _paintedOverlay!,
-                                originalImageSize: _getOriginalImageSize()),
+                              imageToPaint: _combinedPaintedOverlay!,
+                            ),
                           ),
                         ),
 
@@ -344,9 +533,8 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
                         Positioned.fill(
                           child: CustomPaint(
                             painter: WallPainter(
-                                imageToPaint: _segmentationOverlay!,
-                                originalImageSize: _getOriginalImageSize(),
-                                isSegmentation: true),
+                              imageToPaint: _segmentationOverlay!,
+                            ),
                           ),
                         ),
                     ],
@@ -358,7 +546,7 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
             const Center(child: CircularProgressIndicator()),
 
           // Processing overlay
-          if (_isProcessing)
+          if (_showPaintLoader)
             Positioned.fill(
               child: Container(
                 color: Colors.black.withOpacity(0.3),
@@ -473,6 +661,14 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
                     Text(
                       'Кадры: $_frameCount',
                       style: TextStyle(color: Colors.white70, fontSize: 12),
+                    ),
+                    Text(
+                      'Модель: ${_modelNames[_currentModelIndex]}',
+                      style: TextStyle(
+                        color: _modelColors[_currentModelIndex],
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
@@ -622,6 +818,52 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
                         size: 32,
                       ),
                     ),
+
+                    // Model switch button
+                    IconButton(
+                      onPressed: () async {
+                        if (_isServiceBusy)
+                          return; // Не переключаем во время обработки
+
+                        setState(() {
+                          _currentModelIndex =
+                              (_currentModelIndex + 1) % _modelNames.length;
+                        });
+
+                        // Перезагружаем модель
+                        try {
+                          if (_currentModelIndex == 0) {
+                            await _segmentationService.loadModel();
+                            _isSegmentationInitialized = true;
+                            debugPrint(
+                                '✅ Switched to ${_modelNames[_currentModelIndex]} model');
+                          } else {
+                            await _wallSegmentationService.loadModel(
+                                modelIndex: _currentModelIndex);
+                            _isWallSegmentationInitialized = true;
+                            debugPrint(
+                                '✅ Switched to ${_modelNames[_currentModelIndex]} model');
+                          }
+                        } catch (e) {
+                          debugPrint('❌ Failed to switch model: $e');
+                          // Возвращаем назад при ошибке
+                          setState(() {
+                            _currentModelIndex =
+                                (_currentModelIndex - 1 + _modelNames.length) %
+                                    _modelNames.length;
+                          });
+                        }
+                      },
+                      icon: Icon(
+                        _currentModelIndex == 0
+                            ? Icons.tune
+                            : _currentModelIndex == 1
+                                ? Icons.auto_awesome
+                                : Icons.speed,
+                        color: _modelColors[_currentModelIndex],
+                        size: 32,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -650,60 +892,23 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
 /// Handles correct scaling and aspect ratio.
 class WallPainter extends CustomPainter {
   final ui.Image imageToPaint;
-  final Size originalImageSize;
-  final bool isSegmentation;
 
   WallPainter({
     required this.imageToPaint,
-    required this.originalImageSize,
-    this.isSegmentation = false,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
-    // This is the size of the widget on the screen.
-    final screenRect = Rect.fromLTWH(0, 0, size.width, size.height);
-
-    // This is the original image from the camera that was processed.
-    final imageSize = originalImageSize;
-
-    // Calculate how the camera image is fitted onto the screen. Flutter's
-    // CameraPreview uses BoxFit.cover.
-    final fittedSizes = applyBoxFit(BoxFit.cover, imageSize, size);
-    final sourceRect = Alignment.center.inscribe(fittedSizes.source,
-        Rect.fromLTWH(0, 0, imageSize.width, imageSize.height));
-    final destinationRect = Alignment.center.inscribe(
-        fittedSizes.destination, Rect.fromLTWH(0, 0, size.width, size.height));
-
-    // This is the mask/overlay we want to paint.
-    final maskRect = Rect.fromLTWH(
+    final paint = Paint();
+    final srcRect = Rect.fromLTWH(
         0, 0, imageToPaint.width.toDouble(), imageToPaint.height.toDouble());
+    final dstRect = Rect.fromLTWH(0, 0, size.width, size.height);
 
-    debugPrint("🎨 WallPainter: Canvas size: $size, "
-        "Original image size: $originalImageSize, "
-        "Mask size: ${imageToPaint.width}x${imageToPaint.height}, "
-        "Destination rect: $destinationRect");
-
-    final paint = Paint()
-      ..filterQuality = isSegmentation ? FilterQuality.low : FilterQuality.high;
-
-    if (isSegmentation) {
-      paint.colorFilter =
-          const ColorFilter.mode(Colors.black, BlendMode.dstOut);
-    }
-
-    canvas.drawImageRect(
-      imageToPaint,
-      maskRect,
-      destinationRect,
-      paint,
-    );
+    canvas.drawImageRect(imageToPaint, srcRect, dstRect, paint);
   }
 
   @override
   bool shouldRepaint(covariant WallPainter oldDelegate) {
-    return oldDelegate.imageToPaint != imageToPaint ||
-        oldDelegate.originalImageSize != originalImageSize ||
-        oldDelegate.isSegmentation != isSegmentation;
+    return oldDelegate.imageToPaint != imageToPaint;
   }
 }
