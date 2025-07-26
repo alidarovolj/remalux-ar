@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'cv_wall_painter_screen.dart';
+import 'camera_test_screen.dart';
 
 class ARDemoScreen extends StatelessWidget {
   const ARDemoScreen({Key? key}) : super(key: key);
@@ -185,7 +186,38 @@ class ARDemoScreen extends StatelessWidget {
   Widget _buildActionButtons(BuildContext context) {
     return Column(
       children: [
-        // CV Wall Painter - единственная кнопка
+        // Тест камеры
+        SizedBox(
+          width: double.infinity,
+          height: 60,
+          child: ElevatedButton.icon(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const CameraTestScreen(),
+                ),
+              );
+            },
+            icon: const Icon(Icons.camera, size: 28),
+            label: const Text(
+              '📷 ТЕСТ КАМЕРЫ',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 5,
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 16),
+
+        // CV Wall Painter
         SizedBox(
           width: double.infinity,
           height: 60,
@@ -200,7 +232,7 @@ class ARDemoScreen extends StatelessWidget {
             },
             icon: const Icon(Icons.palette, size: 28),
             label: const Text(
-              '🎨 Запустить Wall Painter',
+              '🎨 Wall Painter + Сегментация',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             style: ElevatedButton.styleFrom(

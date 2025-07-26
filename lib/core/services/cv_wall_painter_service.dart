@@ -9,6 +9,9 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:image/image.dart' as img;
 import 'package:tflite_flutter/tflite_flutter.dart';
+import 'performance_profiler.dart';
+import 'device_capability_detector.dart';
+import 'model_manager.dart';
 
 // --- Data Transfer Objects (DTOs) ---
 
@@ -90,11 +93,30 @@ class CVWallPainterService {
   // Состояние
   bool _isInitialized = false;
   CVResultDto? _lastResult;
-  final Completer<void> _isolateReady = Completer<void>();
+  Completer<void>? _isolateReady;
   Isolate? _isolate;
   SendPort? _sendPort;
   List<String> _labels = [];
   bool _isBusy = false;
+
+  // Добавляем буферизацию для неблокирующей обработки
+  bool _allowFrameSkipping =
+      true; // Разрешить пропуск кадров для увеличения FPS
+  DateTime _lastProcessTime = DateTime.now();
+  static const Duration _minProcessInterval =
+      Duration(milliseconds: 33); // Примерно 30 FPS
+
+  // Агрессивные оптимизации для достижения 30ms
+  static const int _targetProcessingTimeMs = 30;
+  static const int _fastModelInputSize =
+      128; // Уменьшено с 513 до 128 для скорости
+  CVResultDto? _cachedResult; // Кэш последнего результата
+  Uint8List? _lastImageHash; // Хэш последнего обработанного изображения
+  int _frameSkipCounter = 0;
+  static const int _maxFramesToSkip = 2; // Максимум пропускаем 2 кадра подряд
+
+  // Профилирование производительности
+  final PerformanceProfiler _profiler = PerformanceProfiler();
 
   // Управление потоком кадров
   // IsolateInput? _lastFrame;
@@ -103,6 +125,7 @@ class CVWallPainterService {
   bool get isInitialized => _isInitialized;
   CVResultDto? get lastResult => _lastResult;
 
+  // Callbacks
   Function(CVResultDto)? _resultCallback;
   Function(String)? _errorCallback;
 
@@ -111,9 +134,12 @@ class CVWallPainterService {
     debugPrint('🎨 Инициализация CV Wall Painter Service (с изолятом)');
 
     try {
-      // 1. Загрузка модели и меток в основном потоке
-      final modelData =
-          await rootBundle.load('assets/ml/deeplabv3_ade20k_fp16.tflite');
+      // Создаем новый Completer для каждой инициализации
+      _isolateReady = Completer<void>();
+
+      // 1. Возвращаем стабильную модель DeepLabV3 (исправлено)
+      final modelData = await rootBundle.load(
+          'assets/ml/deeplabv3_ade20k_fp16.tflite'); // Вернул стабильную модель
       final labelsData =
           await rootBundle.loadString('assets/ml/ade20k_labels.txt');
       _labels =
@@ -130,9 +156,10 @@ class CVWallPainterService {
       fromIsolate.listen((message) {
         if (message is SendPort) {
           _sendPort = message;
-          _isolateReady.complete();
+          _isolateReady?.complete();
         } else if (message is CVResultDto) {
           _lastResult = message;
+          _cachedResult = message; // Кэшируем результат
           _isBusy = false;
           _resultCallback?.call(message);
         } else if (message is String) {
@@ -141,9 +168,9 @@ class CVWallPainterService {
         }
       });
 
-      await _isolateReady.future;
+      await _isolateReady!.future;
       _isInitialized = true;
-      debugPrint('✅ CV Wall Painter Service и изолят готовы');
+      debugPrint('✅ CV Wall Painter Service стабильная модель готова');
     } catch (e, s) {
       debugPrint('❌ Ошибка инициализации CV сервиса: $e\n$s');
       _errorCallback?.call('Ошибка инициализации: $e');
@@ -160,17 +187,57 @@ class CVWallPainterService {
   }
 
   bool processCameraFrame(CameraImage image) {
-    if (!_isInitialized || _isBusy) return false;
+    if (!_isInitialized) return false;
 
-    _isBusy = true;
-    final dto = _createImageDTO(image);
-    if (dto != null) {
-      _sendPort?.send(IsolateInput(dto));
+    final now = DateTime.now();
+
+    // Агрессивная оптимизация: используем кэш если недавно обрабатывали
+    if (_cachedResult != null &&
+        now.difference(_lastProcessTime) < Duration(milliseconds: 50)) {
+      // Используем кэшированный результат для ускорения
+      _resultCallback?.call(_cachedResult!);
       return true;
-    } else {
-      _isBusy = false;
-      return false;
     }
+
+    // Пропускаем кадры при высокой нагрузке
+    if (_isBusy && _allowFrameSkipping) {
+      _frameSkipCounter++;
+      if (_frameSkipCounter < _maxFramesToSkip) {
+        return false; // Пропускаем кадр
+      }
+      // Форсируем обработку после максимального пропуска
+      _frameSkipCounter = 0;
+      _isBusy = false;
+    }
+
+    // Проверяем похожесть кадра для пропуска обработки
+    final imageHash = _computeSimpleImageHash(image);
+    if (_lastImageHash != null &&
+        _areImagesSimilar(_lastImageHash!, imageHash)) {
+      // Изображения похожи, используем кэш
+      if (_cachedResult != null) {
+        _resultCallback?.call(_cachedResult!);
+        return true;
+      }
+    }
+
+    if (_isBusy) return false;
+
+    return _profiler.profileOperationSync('processCameraFrame', () {
+      _profiler.recordFrame(); // Записываем кадр для FPS
+      _isBusy = true;
+      _lastProcessTime = now;
+      _lastImageHash = imageHash;
+
+      final dto = _createImageDTO(image);
+      if (dto != null) {
+        _sendPort?.send(IsolateInput(dto));
+        return true;
+      } else {
+        _isBusy = false;
+        return false;
+      }
+    });
   }
 
   bool paintWall(
@@ -184,28 +251,59 @@ class CVWallPainterService {
   }) {
     if (!_isInitialized || _isBusy) return false;
 
-    _isBusy = true;
-    final dto = _createImageDTO(image);
-    if (dto != null) {
-      _sendPort?.send(IsolateInput(
-        dto,
-        tapPoint: tapPoint,
-        previewSize: previewSize,
-        color: color,
-        wallMask: wallMask,
-        maskWidth: maskWidth,
-        maskHeight: maskHeight,
-      ));
-      return true;
-    } else {
-      _isBusy = false;
-      return false;
-    }
+    return _profiler.profileOperationSync('paintWall', () {
+      _profiler.recordFrame(); // Записываем кадр для FPS
+      _isBusy = true;
+      final dto = _createImageDTO(image);
+      if (dto != null) {
+        _sendPort?.send(IsolateInput(
+          dto,
+          tapPoint: tapPoint,
+          previewSize: previewSize,
+          color: color,
+          wallMask: wallMask,
+          maskWidth: maskWidth,
+          maskHeight: maskHeight,
+        ));
+        return true;
+      } else {
+        _isBusy = false;
+        return false;
+      }
+    });
+  }
+
+  /// Включить профилирование производительности
+  void enableProfiling() {
+    _profiler.enable();
+    debugPrint('🔍 Профилирование CV сервиса включено');
+  }
+
+  /// Выключить профилирование производительности
+  void disableProfiling() {
+    _profiler.disable();
+    debugPrint('🔍 Профилирование CV сервиса выключено');
+  }
+
+  /// Получить метрики производительности
+  Map<String, dynamic> getPerformanceMetrics() {
+    return _profiler.exportMetrics();
+  }
+
+  /// Получить текущий FPS
+  int get currentFPS => _profiler.currentFPS;
+
+  /// Получить средние системные метрики
+  SystemPerformanceMetrics? getAverageSystemMetrics() {
+    return _profiler.getAverageSystemMetrics();
   }
 
   void dispose() {
+    _profiler.disable();
     _isolate?.kill(priority: Isolate.immediate);
     _isolate = null;
+    _sendPort = null;
+    _isolateReady = null;
     _isInitialized = false;
     _isBusy = false;
     debugPrint('⏹️ CV сервис и изолят остановлены');
@@ -431,6 +529,7 @@ class CVWallPainterService {
   }
 
   static img.Image _preprocessImage(img.Image baseImage, int targetSize) {
+    // Используем стандартный размер модели для избежания ошибок тензора
     return img.copyResizeCropSquare(baseImage, size: targetSize);
   }
 
@@ -523,6 +622,40 @@ class CVWallPainterService {
       }
     }
     return out;
+  }
+
+  /// Вычисляет простой хэш изображения для сравнения
+  Uint8List _computeSimpleImageHash(CameraImage image) {
+    // Берем каждый 100-й пиксель для быстрого хэширования
+    final stride = 100;
+    final hashSize = (image.planes[0].bytes.length / stride).ceil();
+    final hash = Uint8List(hashSize);
+
+    for (int i = 0;
+        i < hashSize && i * stride < image.planes[0].bytes.length;
+        i++) {
+      hash[i] = image.planes[0].bytes[i * stride];
+    }
+
+    return hash;
+  }
+
+  /// Проверяет похожесть двух изображений по хэшу
+  bool _areImagesSimilar(Uint8List hash1, Uint8List hash2) {
+    if (hash1.length != hash2.length) return false;
+
+    int differences = 0;
+    const maxDifferences = 10; // Максимум 10 различий для считания похожими
+
+    for (int i = 0; i < hash1.length; i++) {
+      if ((hash1[i] - hash2[i]).abs() > 30) {
+        // Порог различия
+        differences++;
+        if (differences > maxDifferences) return false;
+      }
+    }
+
+    return true;
   }
 }
 

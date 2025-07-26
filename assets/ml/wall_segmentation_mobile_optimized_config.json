@@ -1,47 +1,45 @@
 {
   "model_info": {
-    "name": "wall_segmentation_mobile_optimized",
-    "version": "2.0",
-    "description": "Advanced wall_segmentation_mobile_optimized for wall segmentation",
-    "architecture": "MobileNetV2",
-    "input_size": [
-      256,
-      256,
-      3
-    ],
+    "name": "wall_segmentation_mobile_ultra_fast",
+    "version": "3.0",
+    "description": "Ультра-быстрая модель для мобильных устройств с целевым временем <30ms",
+    "input_size": [128, 128],
     "output_classes": 2,
-    "optimization": "float16"
+    "architecture": "MobileNetV3-Small + DeepLabV3Lite",
+    "target_fps": 60,
+    "target_latency_ms": 25
+  },
+  "performance": {
+    "use_xnnpack": true,
+    "use_gpu_delegate": true,
+    "preferred_threads": 2,
+    "optimization_level": "ULTRA_FAST",
+    "memory_optimization": true,
+    "quantization": "INT8"
   },
   "processing": {
     "preprocessing": {
-      "normalize": true,
-      "mean": [
-        0.485,
-        0.456,
-        0.406
-      ],
-      "std": [
-        0.229,
-        0.224,
-        0.225
-      ]
+      "normalize": false,
+      "resize_method": "nearest",
+      "input_range": [0, 1]
     },
     "postprocessing": {
-      "apply_softmax": true,
-      "threshold": 0.5,
-      "filter_small_regions": true,
-      "min_region_size": 50
+      "apply_morphology": false,
+      "confidence_threshold": 0.3,
+      "min_area_threshold": 50,
+      "max_area_threshold": 0.9,
+      "use_connected_components": false
     }
   },
-  "performance": {
-    "expected_fps": "25-35",
-    "memory_usage": "~7.3MB",
-    "accuracy": "88.0%+ for indoor walls",
-    "trained_on": "Synthetic wall data + transfer learning"
+  "quality_thresholds": {
+    "min_wall_percentage": 0.01,
+    "max_wall_percentage": 0.99,
+    "confidence_threshold": 0.2
   },
-  "usage": {
-    "input_tensor": "input_1",
-    "output_tensor": "conv2d",
-    "recommended_delegate": "XNNPACK"
+  "optimization_flags": {
+    "skip_similar_frames": true,
+    "cache_results": true,
+    "use_fast_resize": true,
+    "aggressive_memory_management": true
   }
 }

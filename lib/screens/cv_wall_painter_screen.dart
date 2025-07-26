@@ -9,6 +9,10 @@ import 'package:flutter/services.dart';
 import '../core/services/cv_wall_painter_service.dart';
 import '../core/services/segmentation_service.dart';
 import '../core/services/wall_segmentation_service.dart';
+import '../core/widgets/performance_overlay.dart';
+import '../core/widgets/memory_stats_overlay.dart';
+import '../core/widgets/device_info_overlay.dart';
+import '../core/widgets/segmentation_mode_overlay.dart';
 import 'dart:math' as math;
 
 /// Computer Vision Wall Painter Screen
@@ -21,7 +25,12 @@ class CVWallPainterScreen extends StatefulWidget {
 }
 
 class _CVWallPainterScreenState extends State<CVWallPainterScreen>
-    with WidgetsBindingObserver {
+    with
+        WidgetsBindingObserver,
+        PerformanceOverlayMixin,
+        MemoryStatsOverlayMixin,
+        DeviceInfoOverlayMixin,
+        SegmentationModeOverlayMixin {
   // Camera
   CameraController? _cameraController;
   bool _isCameraInitialized = false;
@@ -36,6 +45,9 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
   bool _isCVInitialized = false;
   bool _isServiceBusy = false;
   CVResultDto? _lastCvResult; // Храним последний результат целиком
+
+  // ОТКЛЮЧАЕМ медленный CV изолят - используем только быструю сегментацию
+  bool _enableCVProcessing = false; // ВЫКЛЮЧЕНО для скорости
 
   // Segmentation Services
   final SegmentationService _segmentationService = SegmentationService();
@@ -66,6 +78,19 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
   int _lastProcessingTimeMs = 0;
   int _frameCount = 0;
   int _segmentationFrameCount = 0; // Счётчик для периодической сегментации
+
+  // Настройки производительности для ускорения
+  static const int _targetFPS = 30; // Целевой FPS
+  int _segmentationEveryNFrames =
+      2; // УСКОРЕНО: каждые 2 кадра для баланса скорости и качества
+  DateTime _lastSegmentationTime = DateTime.now();
+  static const Duration _minSegmentationInterval =
+      Duration(milliseconds: 66); // УСКОРЕНО: 15 FPS для сегментации
+
+  // Быстрые настройки
+  bool _useFastMode = true; // ВКЛЮЧЕН по умолчанию
+  static const Duration _fastModeInterval =
+      Duration(milliseconds: 33); // 30 FPS в турбо режиме
 
   // UI State
   bool _showColorPalette = false;
@@ -100,14 +125,25 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _cameraController?.stopImageStream();
-    _cameraController?.dispose();
+
+    // Безопасно останавливаем камеру
+    if (_cameraController != null) {
+      try {
+        _cameraController!.stopImageStream();
+        _cameraController!.dispose();
+        debugPrint('📷 Camera controller disposed safely');
+      } catch (e) {
+        debugPrint('⚠️ Error disposing camera controller: $e');
+      }
+    }
+
     _cvService.dispose();
 
     // Dispose segmentation services
     if (_isWallSegmentationInitialized) {
       _wallSegmentationService.dispose();
     }
+    // SegmentationService не имеет метода dispose(), пропускаем
 
     super.dispose();
   }
@@ -118,11 +154,30 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
       return;
     }
 
-    if (state == AppLifecycleState.inactive) {
+    if (state == AppLifecycleState.paused) {
+      // Останавливаем стрим, но НЕ освобождаем контроллер
       _cameraController?.stopImageStream();
-      _cameraController?.dispose();
+      debugPrint('📷 Camera stream stopped (app paused)');
     } else if (state == AppLifecycleState.resumed) {
-      _initializeCamera();
+      // Возобновляем стрим если контроллер еще живой
+      if (_cameraController != null && _cameraController!.value.isInitialized) {
+        _cameraController!.startImageStream((CameraImage image) {
+          if (!mounted) return;
+          _lastCameraImage = image;
+
+          // Process CV for paint detection
+          if (_isCVInitialized && !_isServiceBusy) {
+            final didStart = _cvService.processCameraFrame(image);
+            if (didStart) {
+              _isServiceBusy = true;
+            }
+          }
+        });
+        debugPrint('📷 Camera stream resumed');
+      } else {
+        // Если контроллер был освобожден, реинициализируем
+        _initializeCamera();
+      }
     }
   }
 
@@ -131,24 +186,16 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
       // Initialize CV service
       await _cvService.initialize();
 
-      // Initialize Segmentation services
+      // Initialize Segmentation services - БАЛАНС СКОРОСТИ И СТАБИЛЬНОСТИ
       try {
-        if (_currentModelIndex == 0) {
-          // Standard ADE20K model
-          await _segmentationService.loadModel();
-          _isSegmentationInitialized = true;
-          debugPrint('✅ Standard segmentation service initialized');
-        } else {
-          // Specialized or Mobile models
-          await _wallSegmentationService.loadModel(
-              modelIndex: _currentModelIndex);
-          _isWallSegmentationInitialized = true;
-          debugPrint(
-              '✅ ${_modelNames[_currentModelIndex]} segmentation service initialized');
-        }
+        // Используем стандартную модель для стабильности
+        _currentModelIndex = 0; // Стандартная модель ADE20K
+        await _segmentationService.loadModel();
+        _isSegmentationInitialized = true;
+        debugPrint('✅ Стандартная стабильная модель инициализирована');
       } catch (e) {
-        debugPrint(
-            '⚠️ Failed to load ${_modelNames[_currentModelIndex]} model, falling back to standard: $e');
+        debugPrint('⚠️ Failed to load standard model: $e');
+        // Fallback остается тот же
         _currentModelIndex = 0;
         await _segmentationService.loadModel();
         _isSegmentationInitialized = true;
@@ -258,6 +305,7 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
 
   Future<void> _initializeCamera() async {
     try {
+      debugPrint('📷 Initializing camera...');
       _cameras = await availableCameras();
       if (_cameras.isEmpty) {
         debugPrint('❌ No cameras found on this device.');
@@ -267,6 +315,7 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
         }
         return;
       }
+      debugPrint('📷 Found ${_cameras.length} cameras');
 
       final camera = _cameras.firstWhere(
           (cam) => cam.lensDirection == CameraLensDirection.back,
@@ -282,40 +331,57 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
 
       _cameraController = CameraController(
         camera,
-        ResolutionPreset.low, // ОБНОВЛЕНО
+        ResolutionPreset
+            .medium, // ОБНОВЛЕНО с low на medium для лучшего качества
         enableAudio: false,
         imageFormatGroup: imageFormatGroup,
       );
 
       await _cameraController!.initialize();
+      debugPrint('📷 Camera controller initialized');
       if (!mounted) return;
 
       // Ensure the widget is still mounted before starting the stream
       if (!mounted) return;
+      debugPrint('📷 Starting image stream...');
       await _cameraController!.startImageStream((CameraImage image) {
         if (!mounted) return;
         _lastCameraImage = image;
+        _frameCount++;
 
-        // Process CV for paint detection
-        if (_isCVInitialized && !_isServiceBusy) {
-          final didStart = _cvService.processCameraFrame(image);
-          if (didStart) {
-            _isServiceBusy = true;
-          }
+        // ОТКЛЮЧАЕМ медленный CV изолят
+        if (_enableCVProcessing && _isCVInitialized && !_isServiceBusy) {
+          _processFrameAsync(image);
         }
 
-        // Временно отключаем новую сегментацию - используем только старую модель в изоляте
-        // Process segmentation every 30 frames to get wall mask (было 10)
-        // _segmentationFrameCount++;
-        // if (_isSegmentationInitialized && _segmentationFrameCount % 30 == 0) {
-        //   _updateWallMask(image);
-        // }
+        // ТОЛЬКО быстрая сегментация - основной источник масок
+        _segmentationFrameCount++;
+        final now = DateTime.now();
+        final targetInterval =
+            _useFastMode ? _fastModeInterval : _minSegmentationInterval;
+
+        if (_isSegmentationInitialized &&
+            _segmentationFrameCount % _segmentationEveryNFrames == 0 &&
+            now.difference(_lastSegmentationTime) >= targetInterval) {
+          // Быстро без блокировок
+          Future.microtask(() => _updateWallMaskFast(image));
+          _lastSegmentationTime = now;
+        }
       });
 
       if (mounted) {
         setState(() {
           _isCameraInitialized = true;
         });
+        debugPrint('✅ Camera initialization completed');
+        debugPrint(
+            '📊 Camera status: ${_cameraController!.value.isInitialized}');
+        debugPrint(
+            '📊 Camera aspect ratio: ${_cameraController!.value.aspectRatio}');
+        debugPrint('🔄 Triggering rebuild after camera init...');
+
+        // Force rebuild to update UI
+        setState(() {});
       }
     } catch (e) {
       debugPrint('❌ Ошибка инициализации камеры: $e');
@@ -326,42 +392,78 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
     }
   }
 
-  /// Обновляет маску стены с помощью модели сегментации
-  void _updateWallMask(CameraImage image) {
+  /// Асинхронная обработка кадра для неблокирующей работы
+  void _processFrameAsync(CameraImage image) {
+    final didStart = _cvService.processCameraFrame(image);
+    if (didStart) {
+      _isServiceBusy = true;
+    }
+  }
+
+  // Защита от одновременных вызовов сегментации
+  bool _isSegmentationProcessing = false;
+
+  /// БЫСТРОЕ обновление маски стены (основной метод)
+  void _updateWallMaskFast(CameraImage image) async {
+    if (_isSegmentationProcessing) return;
+
+    _isSegmentationProcessing = true;
+    final stopwatch = Stopwatch()..start();
+
     try {
       Uint8List? mask;
 
-      // Используем текущую выбранную модель
-      if (_currentModelIndex == 0 && _isSegmentationInitialized) {
+      // Используем только стандартную быструю модель
+      if (_isSegmentationInitialized) {
         mask = _segmentationService.processCameraImage(image);
-      } else if (_currentModelIndex > 0 && _isWallSegmentationInitialized) {
-        mask = _wallSegmentationService.processCameraImage(image);
       }
 
+      stopwatch.stop();
+      final processingTime = stopwatch.elapsedMilliseconds;
+
       if (mask != null && mounted) {
-        // Проверяем качество маски перед использованием
         final wallPixelCount = mask.where((p) => p == 1).length;
         final wallPercentage = wallPixelCount / mask.length;
 
-        if (wallPercentage > 0.05 && wallPercentage < 0.95) {
-          // Используем маску только если она содержит разумное количество стен
-          setState(() {
-            _currentWallMask = mask;
-          });
-          final modelType = _modelNames[_currentModelIndex];
+        // Более агрессивные пороги для показа результата
+        if (wallPercentage > 0.005 && wallPercentage < 0.995) {
+          if (mounted) {
+            setState(() {
+              _currentWallMask = mask;
+              _lastProcessingTimeMs =
+                  processingTime; // Показываем реальное время
+            });
+
+            // Создаем overlay для отображения
+            _createSegmentationOverlay(mask, wallPercentage);
+          }
           debugPrint(
-              '✅ Wall mask updated using $modelType model (${mask.length} pixels, ${(wallPercentage * 100).toStringAsFixed(1)}% walls)');
-        } else {
-          // Не используем плохую маску, оставляем null для fallback
-          setState(() {
-            _currentWallMask = null;
-          });
-          debugPrint(
-              '⚠️ Wall mask quality poor (${(wallPercentage * 100).toStringAsFixed(1)}% walls), skipping update');
+              '⚡ FAST segmentation: ${wallPixelCount}/${mask.length} pixels (${(wallPercentage * 100).toStringAsFixed(1)}%) in ${processingTime}ms');
         }
       }
     } catch (e) {
-      debugPrint('❌ Error updating wall mask: $e');
+      debugPrint('❌ Fast segmentation error: $e');
+    } finally {
+      _isSegmentationProcessing = false;
+    }
+  }
+
+  /// Создает overlay для отображения сегментации
+  void _createSegmentationOverlay(Uint8List mask, double wallPercentage) async {
+    try {
+      final overlay = await _createImageFromMask(
+          mask,
+          _segmentationService.maskWidth ?? 65,
+          _segmentationService.maskHeight ?? 65,
+          const Color.fromARGB(128, 33, 150, 243));
+
+      if (mounted) {
+        setState(() {
+          _segmentationOverlay = overlay;
+        });
+      }
+    } catch (e) {
+      debugPrint('❌ Error creating overlay: $e');
     }
   }
 
@@ -505,130 +607,43 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
       ),
       body: Stack(
         children: [
-          // Camera preview
+          // Camera preview with segmentation
           if (_cameraController != null &&
               _cameraController!.value.isInitialized)
             Positioned.fill(
               child: AspectRatio(
                 aspectRatio: _cameraController!.value.aspectRatio,
-                child: GestureDetector(
-                  key: _cameraPreviewKey,
-                  onTapDown: _onTapScreen,
-                  child: Stack(
-                    children: [
-                      CameraPreview(_cameraController!),
+                child: Stack(
+                  children: [
+                    // Camera preview
+                    CameraPreview(_cameraController!),
 
-                      // Combined painted wall overlay
-                      if (_combinedPaintedOverlay != null)
-                        Positioned.fill(
-                          child: CustomPaint(
-                            painter: WallPainter(
-                              imageToPaint: _combinedPaintedOverlay!,
-                            ),
+                    // Segmentation overlay
+                    if (_showSegmentation && _segmentationOverlay != null)
+                      Positioned.fill(
+                        child: CustomPaint(
+                          painter: WallPainter(
+                            imageToPaint: _segmentationOverlay!,
                           ),
                         ),
-
-                      // Segmentation overlay
-                      if (_showSegmentation && _segmentationOverlay != null)
-                        Positioned.fill(
-                          child: CustomPaint(
-                            painter: WallPainter(
-                              imageToPaint: _segmentationOverlay!,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
+                      ),
+                  ],
                 ),
               ),
             )
           else
-            const Center(child: CircularProgressIndicator()),
-
-          // Processing overlay
-          if (_showPaintLoader)
-            Positioned.fill(
-              child: Container(
-                color: Colors.black.withOpacity(0.3),
-                child: const Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      CircularProgressIndicator(
-                        color: Colors.white,
-                      ),
-                      SizedBox(height: 16),
-                      Text(
-                        'Обработка кадра...',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
+            // Loading screen
+            const Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(color: Colors.white),
+                  SizedBox(height: 16),
+                  Text(
+                    'Инициализация камеры...',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
                   ),
-                ),
-              ),
-            ),
-
-          // Instructions
-          if (_showInstructions)
-            Positioned(
-              top: 16,
-              left: 16,
-              right: 16,
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.8),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Инструкции:',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      '• Наведите камеру на стену\n• Коснитесь стены для покраски\n• Выберите цвет из палитры',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'CV: ${_isCVInitialized ? "Готов" : "Загрузка..."}',
-                          style: TextStyle(
-                            color:
-                                _isCVInitialized ? Colors.green : Colors.orange,
-                            fontSize: 12,
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            setState(() {
-                              _showInstructions = false;
-                            });
-                          },
-                          child: const Text(
-                            'Закрыть',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                ],
               ),
             ),
 
@@ -646,21 +661,48 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'Отладка:',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
-                      'Время: ${_lastProcessingTimeMs}ms',
-                      style: TextStyle(color: Colors.white70, fontSize: 12),
+                      'Время: ${_lastProcessingTimeMs}ms (FAST)',
+                      style:
+                          const TextStyle(color: Colors.white70, fontSize: 12),
                     ),
                     Text(
                       'Кадры: $_frameCount',
-                      style: TextStyle(color: Colors.white70, fontSize: 12),
+                      style:
+                          const TextStyle(color: Colors.white70, fontSize: 12),
+                    ),
+                    Text(
+                      'Сегментация: ${_segmentationFrameCount} (каждые $_segmentationEveryNFrames)',
+                      style:
+                          const TextStyle(color: Colors.white70, fontSize: 10),
+                    ),
+                    Text(
+                      'FPS: ${_frameCount > 0 ? (_frameCount / (DateTime.now().difference(_lastSegmentationTime).inSeconds + 1)).toStringAsFixed(1) : "0"}',
+                      style: const TextStyle(color: Colors.green, fontSize: 12),
+                    ),
+                    Text(
+                      'CV изолят: ${_enableCVProcessing ? "ВКЛ" : "ВЫКЛ"}',
+                      style: TextStyle(
+                        color: _enableCVProcessing ? Colors.red : Colors.green,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      'Быстрый режим: ${_useFastMode ? "ВКЛ" : "ВЫКЛ"}',
+                      style: TextStyle(
+                        color: _useFastMode ? Colors.green : Colors.orange,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     Text(
                       'Модель: ${_modelNames[_currentModelIndex]}',
@@ -670,69 +712,61 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ),
-
-          // Color palette
-          if (_showColorPalette)
-            Positioned(
-              bottom: 160,
-              left: 16,
-              right: 16,
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.9),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Выберите цвет:',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                    const SizedBox(height: 8),
+                    // Переключатель CV изолята
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _enableCVProcessing = !_enableCVProcessing;
+                        });
+                        debugPrint(
+                            '🔄 CV изолят: ${_enableCVProcessing ? "включен" : "выключен"}');
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: _enableCVProcessing
+                              ? Colors.red.withOpacity(0.8)
+                              : Colors.green.withOpacity(0.8),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                            _enableCVProcessing ? '🐌 CV ON' : '⚡ FAST ONLY',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold)),
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 4,
-                        mainAxisSpacing: 8,
-                        crossAxisSpacing: 8,
-                        childAspectRatio: 1,
-                      ),
-                      itemCount: _colorPalette.length,
-                      itemBuilder: (context, index) {
-                        final color = _colorPalette[index];
-                        final isSelected = color == _selectedColor;
-
-                        return GestureDetector(
-                          onTap: () => _onColorSelected(color),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: color,
-                              borderRadius: BorderRadius.circular(8),
-                              border: isSelected
-                                  ? Border.all(color: Colors.white, width: 3)
-                                  : null,
-                            ),
-                            child: isSelected
-                                ? const Icon(
-                                    Icons.check,
-                                    color: Colors.white,
-                                  )
-                                : null,
-                          ),
-                        );
+                    const SizedBox(height: 4),
+                    // Переключатель быстрого режима
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _useFastMode = !_useFastMode;
+                          if (_useFastMode) {
+                            _segmentationEveryNFrames = 1; // Каждый кадр
+                          } else {
+                            _segmentationEveryNFrames = 3; // Каждые 3 кадра
+                          }
+                        });
+                        debugPrint(
+                            '⚡ Быстрый режим: ${_useFastMode ? "включен" : "выключен"}');
                       },
+                      child: Container(
+                        padding: EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: _useFastMode
+                              ? Colors.green.withOpacity(0.8)
+                              : Colors.orange.withOpacity(0.8),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(_useFastMode ? '⚡ ТУРБО' : '🐢 НОРМА',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold)),
+                      ),
                     ),
                   ],
                 ),
@@ -757,52 +791,6 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    // Color button
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _showColorPalette = !_showColorPalette;
-                        });
-                      },
-                      child: Container(
-                        width: 56,
-                        height: 56,
-                        decoration: BoxDecoration(
-                          color: _selectedColor,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2),
-                        ),
-                        child: const Icon(
-                          Icons.palette,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-
-                    // Clear button
-                    IconButton(
-                      onPressed: _clearPainting,
-                      icon: const Icon(
-                        Icons.clear,
-                        color: Colors.white,
-                        size: 32,
-                      ),
-                    ),
-
-                    // Info button
-                    IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _showInstructions = !_showInstructions;
-                        });
-                      },
-                      icon: const Icon(
-                        Icons.help_outline,
-                        color: Colors.white,
-                        size: 32,
-                      ),
-                    ),
-
                     // Segmentation toggle button
                     IconButton(
                       onPressed: () {
@@ -861,6 +849,20 @@ class _CVWallPainterScreenState extends State<CVWallPainterScreen>
                                 ? Icons.auto_awesome
                                 : Icons.speed,
                         color: _modelColors[_currentModelIndex],
+                        size: 32,
+                      ),
+                    ),
+
+                    // Debug info toggle
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _showDebugInfo = !_showDebugInfo;
+                        });
+                      },
+                      icon: Icon(
+                        _showDebugInfo ? Icons.info : Icons.info_outline,
+                        color: _showDebugInfo ? Colors.green : Colors.white,
                         size: 32,
                       ),
                     ),
