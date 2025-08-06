@@ -30,6 +30,7 @@ import 'package:remalux_ar/features/checkout/presentation/pages/checkout_page.da
 // import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:remalux_ar/features/auth/presentation/pages/phone_verification_page.dart';
 import 'package:remalux_ar/screens/wall_painter_screen.dart';
+import 'package:remalux_ar/features/ar/presentation/pages/ar_page.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -117,6 +118,27 @@ class AppRouter {
             path: '/profile',
             name: 'profile',
             builder: (context, state) => const ProfilePage(),
+          ),
+          GoRoute(
+            path: '/ar',
+            name: 'ar',
+            builder: (context, state) {
+              final colorParam = state.uri.queryParameters['color'];
+              Color? initialColor;
+              if (colorParam != null) {
+                try {
+                  // Преобразуем HEX строку в Color
+                  final colorValue = colorParam.startsWith('#')
+                      ? colorParam.substring(1)
+                      : colorParam;
+                  initialColor = Color(int.parse('FF$colorValue', radix: 16));
+                } catch (e) {
+                  // Если цвет не удалось парсить, используем дефолтный
+                  initialColor = null;
+                }
+              }
+              return ArPage(initialColor: initialColor);
+            },
           ),
           GoRoute(
             path: '/addresses',
