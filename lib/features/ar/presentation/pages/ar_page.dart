@@ -233,20 +233,26 @@ class _ArPageState extends ConsumerState<ArPage> {
   }
 
   void _handleUnityMessage(dynamic message, ArNotifier arNotifier) {
-    print('Message from Unity: $message');
+    print('📨 Сообщение от Unity: $message');
 
     try {
       // Обработка сообщений от Unity
       if (message is String) {
         if (message.contains('error')) {
+          print('❌ Unity сообщает об ошибке: $message');
           arNotifier.setError('Ошибка в Unity: $message');
-        } else if (message.contains('ready') || message.contains('loaded')) {
-          // Unity сообщает что готов к работе
-          print('Unity готов к работе');
+        } else if (message.contains('ready') || message.contains('loaded') || message.contains('onUnityReady')) {
+          print('✅ Unity готов к работе, сообщение: $message');
+          // Убеждаемся что Unity помечен как загруженный
+          arNotifier.setLoading(false);
+        } else if (message.contains('colorChanged')) {
+          print('🎨 Unity подтверждает изменение цвета: $message');
+        } else {
+          print('ℹ️ Неизвестное сообщение от Unity: $message');
         }
       }
     } catch (e) {
-      print('Ошибка обработки сообщения от Unity: $e');
+      print('❌ Ошибка обработки сообщения от Unity: $e');
     }
   }
 

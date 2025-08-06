@@ -69,6 +69,9 @@ class ArNotifier extends StateNotifier<ArState> {
           isUnityLoaded: true,
           isLoading: false,
         );
+        // Отправляем текущий цвет после инициализации Unity
+        _sendColorToUnity(state.selectedColor);
+        print('Unity инициализирован, отправлен начальный цвет: ${state.selectedColor}');
       }
     });
   }
@@ -96,7 +99,7 @@ class ArNotifier extends StateNotifier<ArState> {
 
   void _sendColorToUnity(Color color) {
     if (!state.isUnityLoaded) {
-      print('Unity еще не загружен, отложена отправка цвета');
+      print('🔴 Unity еще не загружен, отложена отправка цвета');
       return;
     }
 
@@ -104,15 +107,17 @@ class ArNotifier extends StateNotifier<ArState> {
         '#${color.red.toRadixString(16).padLeft(2, '0')}${color.green.toRadixString(16).padLeft(2, '0')}${color.blue.toRadixString(16).padLeft(2, '0')}';
 
     try {
+      print('🎨 Отправляем цвет в Unity: $colorHex (RGB: ${color.red}, ${color.green}, ${color.blue})');
+      
       // Используем новый API для отправки сообщений
       sendToUnity(
         'FlutterUnityManager',
-        'SetWallColor',
+        'SetPaintColor',
         colorHex,
       );
-      print('Отправлен цвет в Unity: $colorHex');
+      print('✅ Цвет успешно отправлен в Unity: $colorHex');
     } catch (e) {
-      print('Ошибка отправки цвета в Unity: $e');
+      print('❌ Ошибка отправки цвета в Unity: $e');
       setError('Не удалось отправить цвет в Unity');
     }
   }

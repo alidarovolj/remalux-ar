@@ -38,7 +38,10 @@ class ColorPaletteWidget extends ConsumerWidget {
                     return _buildColorItem(
                       color: color,
                       isSelected: isSelected,
-                      onTap: () => arNotifier.selectColor(color),
+                      onTap: () {
+                        print('🎨 Пользователь выбрал цвет: $color');
+                        arNotifier.selectColor(color);
+                      },
                     );
                   },
                 ),
@@ -185,6 +188,7 @@ class ColorPaletteWidget extends ConsumerWidget {
           ),
           ElevatedButton(
             onPressed: () {
+              print('🎨 Пользователь выбрал кастомный цвет: $pickerColor');
               arNotifier.selectColor(pickerColor);
               Navigator.pop(context);
             },
