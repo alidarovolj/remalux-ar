@@ -94,3 +94,8 @@ app.*.map.json
 *.iml
 *.iws
 .DS_Store
+
+# Exported project folders
+/[Ii][Oo][Ss]/
+/[Aa][Nn][Dd][Rr][Oo][Ii][Dd]/
+/Builds/
