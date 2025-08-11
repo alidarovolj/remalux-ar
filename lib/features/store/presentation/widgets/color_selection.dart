@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:remalux_ar/core/theme/colors.dart';
 import 'package:remalux_ar/features/home/domain/providers/selected_color_provider.dart';
@@ -26,67 +25,63 @@ class ColorSelection extends ConsumerWidget {
     if (selectedColor != null) {
       return Column(
         children: [
-          Container(
-            child: Row(
-              children: [
-                Container(
-                  width: 96,
-                  height: 96,
-                  decoration: BoxDecoration(
-                    color: Color(
-                        int.parse('0xFF${selectedColor.hex.substring(1)}')),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+          Row(
+            children: [
+              Container(
+                width: 96,
+                height: 96,
+                decoration: BoxDecoration(
+                  color:
+                      Color(int.parse('0xFF${selectedColor.hex.substring(1)}')),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        selectedColor.title[currentLocale] ??
-                            selectedColor.title['ru'] ??
-                            '',
-                        style: const TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
-                        ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      selectedColor.title[currentLocale] ??
+                          selectedColor.title['ru'] ??
+                          '',
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
                       ),
-                      Text(
-                        selectedColor.ral,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFF8F8F8),
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    icon: Icon(
-                      selectedColor.isFavourite
-                          ? Icons.favorite
-                          : Icons.favorite_border,
-                      color: selectedColor.isFavourite
-                          ? AppColors.primary
-                          : AppColors.textSecondary,
-                      size: 20,
                     ),
-                    onPressed: () {
-                      // TODO: Implement favorite toggle
-                    },
-                  ),
+                    Text(
+                      selectedColor.ral,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              Container(
+                width: 44,
+                height: 44,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFF8F8F8),
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  icon: Icon(
+                    selectedColor.isFavourite
+                        ? Icons.favorite
+                        : Icons.favorite_border,
+                    color: selectedColor.isFavourite
+                        ? AppColors.primary
+                        : AppColors.textSecondary,
+                    size: 20,
+                  ),
+                  onPressed: () {},
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           Material(
@@ -104,11 +99,9 @@ class ColorSelection extends ConsumerWidget {
                       'productId': product.id,
                       'fromProductDetail': true,
                     });
-                  } else {
-                    print('Context is not mounted');
                   }
                 } catch (e) {
-                  print('Stack trace: ${StackTrace.current}');
+                  debugPrint('Stack trace: ${StackTrace.current}');
                 }
               },
               child: Container(
@@ -155,11 +148,9 @@ class ColorSelection extends ConsumerWidget {
                 'productId': product.id,
                 'fromProductDetail': true,
               });
-            } else {
-              print('Context is not mounted');
             }
           } catch (e) {
-            print('Stack trace: ${StackTrace.current}');
+            debugPrint('Stack trace: ${StackTrace.current}');
           }
         },
         child: Container(

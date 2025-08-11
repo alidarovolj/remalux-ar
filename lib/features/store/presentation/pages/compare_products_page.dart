@@ -11,28 +11,6 @@ import 'package:go_router/go_router.dart';
 class CompareProductsPage extends ConsumerWidget {
   const CompareProductsPage({super.key});
 
-  String _getFilterValue(
-      ProductDetail product, String key, String currentLocale) {
-    final filter = product.filterData.firstWhere(
-      (filter) => filter['key'] == key,
-      orElse: () => {
-        'value': {currentLocale: '-', 'ru': '-'}
-      },
-    );
-
-    final value = (filter['value'] as Map<String, dynamic>)[currentLocale] ??
-        (filter['value'] as Map<String, dynamic>)['ru'] ??
-        '-';
-
-    final measure = filter['measure'] as Map<String, dynamic>?;
-    if (measure != null) {
-      final measureText = measure[currentLocale] ?? measure['ru'] ?? '';
-      return '$value $measureText';
-    }
-
-    return value;
-  }
-
   String _getDescription(ProductDetail product, String currentLocale) {
     return product.description[currentLocale] ??
         product.description['ru'] ??
@@ -142,9 +120,7 @@ class CompareProductsPage extends ConsumerWidget {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () {
-                            // TODO: Add to cart
-                          },
+                          onPressed: () {},
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
                             foregroundColor: Colors.white,
@@ -246,9 +222,7 @@ class CompareProductsPage extends ConsumerWidget {
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
-                              onPressed: () {
-                                // TODO: Add to cart
-                              },
+                              onPressed: () {},
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.primary,
                                 foregroundColor: Colors.white,

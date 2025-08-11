@@ -5750,13 +5750,13 @@ struct _ThreadPoolWaitCallback_t45FCDF538D93A6F6B71058ABCD12E5BDE2474EB7  : publ
 struct __Error_t858F8633B2BB18A0B92EB904D4CD8FAB9DF5F2CF  : public RuntimeObject
 {
 };
-struct __JobReflectionRegistrationOutput__1863756536_tE3F87F55C29527FF641296372B039CEBC1139C8F  : public RuntimeObject
+struct __JobReflectionRegistrationOutput__3176848621_t87472817E2AA7D43EAABC0BFBCF722E9F65F17C0  : public RuntimeObject
 {
 };
-struct __JobReflectionRegistrationOutput__310644295_tBED213BD50F381C74C96752090EF70FF63D90E9C  : public RuntimeObject
+struct __JobReflectionRegistrationOutput__3321417669_tB1BC9C218B5FC337934BF3699F6A6CE483744B65  : public RuntimeObject
 {
 };
-struct __JobReflectionRegistrationOutput__3878082772_tC6BE750C3444F7199411F99C6B480DD5A7503E96  : public RuntimeObject
+struct __JobReflectionRegistrationOutput__4010674173_tF9E446247F3577A3E4ABA91B66886EE9CFEC7C6D  : public RuntimeObject
 {
 };
 struct iOSSupport_t2892133C4BB18918CE6A413EF3E8621315415AB1  : public RuntimeObject
@@ -61139,7 +61139,7 @@ const Il2CppTypeDefinitionSizes g_typeDefinitionSize3058 = { sizeof(Float4TweenJ
 extern const Il2CppTypeDefinitionSizes g_typeDefinitionSize3059;
 const Il2CppTypeDefinitionSizes g_typeDefinitionSize3059 = { 0, 0, 0, 0 };
 extern const Il2CppTypeDefinitionSizes g_typeDefinitionSize3060;
-const Il2CppTypeDefinitionSizes g_typeDefinitionSize3060 = { sizeof(__JobReflectionRegistrationOutput__3878082772_tC6BE750C3444F7199411F99C6B480DD5A7503E96), -1, 0, 0 };
+const Il2CppTypeDefinitionSizes g_typeDefinitionSize3060 = { sizeof(__JobReflectionRegistrationOutput__3176848621_t87472817E2AA7D43EAABC0BFBCF722E9F65F17C0), -1, 0, 0 };
 extern const Il2CppTypeDefinitionSizes g_typeDefinitionSize3061;
 const Il2CppTypeDefinitionSizes g_typeDefinitionSize3061 = { sizeof(U24BurstDirectCallInitializer_t8E8281487A6BF852C1620B9A7488840F0BF82F87), -1, 0, 0 };
 extern const Il2CppTypeDefinitionSizes g_typeDefinitionSize3062;
@@ -62287,7 +62287,7 @@ const Il2CppTypeDefinitionSizes g_typeDefinitionSize3632 = { sizeof(__StaticArra
 extern const Il2CppTypeDefinitionSizes g_typeDefinitionSize3633;
 const Il2CppTypeDefinitionSizes g_typeDefinitionSize3633 = { sizeof(U3CPrivateImplementationDetailsU3E_t99B3D637EEB52ECA4F618E9E12F4BDE4B221E1EC), -1, sizeof(U3CPrivateImplementationDetailsU3E_t99B3D637EEB52ECA4F618E9E12F4BDE4B221E1EC_StaticFields), 0 };
 extern const Il2CppTypeDefinitionSizes g_typeDefinitionSize3634;
-const Il2CppTypeDefinitionSizes g_typeDefinitionSize3634 = { sizeof(__JobReflectionRegistrationOutput__1863756536_tE3F87F55C29527FF641296372B039CEBC1139C8F), -1, 0, 0 };
+const Il2CppTypeDefinitionSizes g_typeDefinitionSize3634 = { sizeof(__JobReflectionRegistrationOutput__4010674173_tF9E446247F3577A3E4ABA91B66886EE9CFEC7C6D), -1, 0, 0 };
 extern const Il2CppTypeDefinitionSizes g_typeDefinitionSize3635;
 const Il2CppTypeDefinitionSizes g_typeDefinitionSize3635 = { sizeof(U24BurstDirectCallInitializer_t4DE1330F5853E3B67F8C58449C2E043A13BDECE5), -1, 0, 0 };
 extern const Il2CppTypeDefinitionSizes g_typeDefinitionSize3636;
@@ -64511,7 +64511,7 @@ const Il2CppTypeDefinitionSizes g_typeDefinitionSize4744 = { sizeof(__StaticArra
 extern const Il2CppTypeDefinitionSizes g_typeDefinitionSize4745;
 const Il2CppTypeDefinitionSizes g_typeDefinitionSize4745 = { sizeof(U3CPrivateImplementationDetailsU3E_t16CE31F4DEE6BA0AEFEB3FA0105D58630695B339), -1, sizeof(U3CPrivateImplementationDetailsU3E_t16CE31F4DEE6BA0AEFEB3FA0105D58630695B339_StaticFields), 0 };
 extern const Il2CppTypeDefinitionSizes g_typeDefinitionSize4746;
-const Il2CppTypeDefinitionSizes g_typeDefinitionSize4746 = { sizeof(__JobReflectionRegistrationOutput__310644295_tBED213BD50F381C74C96752090EF70FF63D90E9C), -1, 0, 0 };
+const Il2CppTypeDefinitionSizes g_typeDefinitionSize4746 = { sizeof(__JobReflectionRegistrationOutput__3321417669_tB1BC9C218B5FC337934BF3699F6A6CE483744B65), -1, 0, 0 };
 extern const Il2CppTypeDefinitionSizes g_typeDefinitionSize4747;
 const Il2CppTypeDefinitionSizes g_typeDefinitionSize4747 = { sizeof(U3CModuleU3E_tA3942657997767549ED3B944EB77AFA183BBF4B9), -1, 0, 0 };
 extern const Il2CppTypeDefinitionSizes g_typeDefinitionSize4748;

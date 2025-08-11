@@ -28,7 +28,6 @@ class RequestCodeService {
       );
       return response;
     } catch (e) {
-      print('Ошибка при запросе кода: $e');
       return null;
     }
   }
@@ -51,7 +50,6 @@ class RequestCodeService {
       );
       return response;
     } catch (e) {
-      print('Ошибка при запросе кода: $e');
       return null;
     }
   }
@@ -71,7 +69,6 @@ class RequestCodeService {
       );
       return response;
     } catch (e) {
-      print('Ошибка при запросе кода: $e');
       return null;
     }
   }
@@ -87,7 +84,6 @@ class RequestCodeService {
       );
       return response;
     } catch (e) {
-      print('Error fetching user profile: $e');
       return null;
     }
   }

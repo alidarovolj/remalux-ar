@@ -10,7 +10,7 @@ import 'package:remalux_ar/features/ar/presentation/widgets/ar_loading_widget.da
 class ArPage extends ConsumerStatefulWidget {
   final Color? initialColor;
 
-  const ArPage({Key? key, this.initialColor}) : super(key: key);
+  const ArPage({super.key, this.initialColor});
 
   @override
   ConsumerState<ArPage> createState() => _ArPageState();
@@ -40,7 +40,7 @@ class _ArPageState extends ConsumerState<ArPage> {
         children: [
           // Unity AR Widget
           if (arState.errorMessage == null)
-            Container(
+            SizedBox(
               child: EmbedUnity(
                 onMessageFromUnity: (message) {
                   _handleUnityMessage(message, arNotifier);
@@ -99,7 +99,7 @@ class _ArPageState extends ConsumerState<ArPage> {
 
           // UI Controls
           if (arState.isUnityLoaded && arState.errorMessage == null)
-            Positioned(
+            const Positioned(
               top: 0,
               left: 0,
               right: 0,
@@ -108,7 +108,7 @@ class _ArPageState extends ConsumerState<ArPage> {
 
           // Color Palette
           if (arState.isUnityLoaded && arState.errorMessage == null)
-            Positioned(
+            const Positioned(
               bottom: 120,
               left: 0,
               right: 0,
@@ -137,7 +137,7 @@ class _ArPageState extends ConsumerState<ArPage> {
       leading: Container(
         margin: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.3),
+          color: Colors.black.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(8),
         ),
         child: IconButton(
@@ -148,7 +148,7 @@ class _ArPageState extends ConsumerState<ArPage> {
       title: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.3),
+          color: Colors.black.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
@@ -164,7 +164,7 @@ class _ArPageState extends ConsumerState<ArPage> {
         Container(
           margin: const EdgeInsets.only(right: 8),
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(8),
           ),
           child: IconButton(
@@ -181,7 +181,7 @@ class _ArPageState extends ConsumerState<ArPage> {
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -200,7 +200,10 @@ class _ArPageState extends ConsumerState<ArPage> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: arState.isPainting
-                    ? [AppColors.primary, AppColors.primary.withOpacity(0.8)]
+                    ? [
+                        AppColors.primary,
+                        AppColors.primary.withValues(alpha: 0.8)
+                      ]
                     : [Colors.grey.shade700, Colors.grey.shade600],
               ),
               borderRadius: BorderRadius.circular(30),
@@ -233,26 +236,20 @@ class _ArPageState extends ConsumerState<ArPage> {
   }
 
   void _handleUnityMessage(dynamic message, ArNotifier arNotifier) {
-    print('📨 Сообщение от Unity: $message');
-
     try {
       // Обработка сообщений от Unity
       if (message is String) {
         if (message.contains('error')) {
-          print('❌ Unity сообщает об ошибке: $message');
           arNotifier.setError('Ошибка в Unity: $message');
-        } else if (message.contains('ready') || message.contains('loaded') || message.contains('onUnityReady')) {
-          print('✅ Unity готов к работе, сообщение: $message');
+        } else if (message.contains('ready') ||
+            message.contains('loaded') ||
+            message.contains('onUnityReady')) {
           // Убеждаемся что Unity помечен как загруженный
           arNotifier.setLoading(false);
-        } else if (message.contains('colorChanged')) {
-          print('🎨 Unity подтверждает изменение цвета: $message');
-        } else {
-          print('ℹ️ Неизвестное сообщение от Unity: $message');
         }
       }
     } catch (e) {
-      print('❌ Ошибка обработки сообщения от Unity: $e');
+      debugPrint('❌ Ошибка обработки сообщения от Unity: $e');
     }
   }
 

@@ -96,7 +96,7 @@ class _ReviewCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF3B4D8B).withOpacity(0.1),
+            color: const Color(0xFF3B4D8B).withValues(alpha: 0.1),
             offset: const Offset(0, 1),
             blurRadius: 5,
             spreadRadius: 0,
@@ -122,7 +122,7 @@ class _ReviewCard extends StatelessWidget {
                 formattedDate,
                 style: TextStyle(
                   fontSize: 14,
-                  color: AppColors.textPrimary.withOpacity(0.6),
+                  color: AppColors.textPrimary.withValues(alpha: 0.6),
                 ),
               ),
             ],

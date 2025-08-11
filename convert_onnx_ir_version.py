@@ -14,7 +14,6 @@ def convert_model_ir(input_path, output_path, target_ir_version=9):
     try:
         # Load the ONNX model
         model = onnx.load(input_path)
-        print(f"Original model IR version: {model.ir_version}")
 
         # Change the IR version
         # Check current opset version. If it's too high for IR version 9, this might be an issue.
@@ -30,7 +29,6 @@ def convert_model_ir(input_path, output_path, target_ir_version=9):
 
         original_ir_version = model.ir_version
         model.ir_version = target_ir_version
-        print(f"Attempting to set model IR version to: {target_ir_version}")
 
         # Optional: You might want to also adjust opset imports if they are too high
         # for the target IR version, but this is more involved.
@@ -38,21 +36,16 @@ def convert_model_ir(input_path, output_path, target_ir_version=9):
         # Example:
         # for opset_import in model.opset_import:
         #     if opset_import.version > 14: # Example: downgrade opset if it's > 14 for IR v7
-        #         print(f"Warning: Model uses opset {opset_import.domain} version {opset_import.version}, which might be too high for IR version {target_ir_version}")
         #         # opset_import.version = 14 # Be careful with this, can break the model
 
         # Save the modified model
         onnx.save(model, output_path)
-        print(f"Model saved to {output_path} with IR version set to {target_ir_version}")
 
         # Verify the new model (optional, but good practice)
         reloaded_model = onnx.load(output_path)
-        print(f"Reloaded model IR version: {reloaded_model.ir_version}")
         onnx.checker.check_model(reloaded_model)
-        print("Reloaded model is valid.")
 
     except Exception as e:
-        print(f"An error occurred: {e}")
         sys.exit(1)
 
 if __name__ == "__main__":
@@ -65,4 +58,3 @@ if __name__ == "__main__":
     # Let's try 9 first, directly addressing the error message.
     target_ir = 9
     convert_model_ir(input_model_path, output_model_path, target_ir_version=target_ir)
-    print(f"--- Conversion script finished. Check {output_model_path} ---") 

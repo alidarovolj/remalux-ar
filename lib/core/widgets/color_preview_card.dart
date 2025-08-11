@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/features/favorites/domain/models/favorite_color.dart';
 
 class ColorPreviewCard extends StatelessWidget {

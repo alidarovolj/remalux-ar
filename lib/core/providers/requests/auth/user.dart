@@ -16,7 +16,6 @@ class RequestCodeService {
       final response = await _dio.get('/auth/me');
       return response;
     } catch (e) {
-      print('Ошибка при запросе кода: $e');
       return null;
     }
   }
@@ -29,7 +28,6 @@ class RequestCodeService {
       );
       return response;
     } catch (e) {
-      print('Ошибка при запросе кода: $e');
       return null;
     }
   }
@@ -48,15 +46,12 @@ class RequestCodeService {
       );
       return response;
     } catch (e) {
-      print('Ошибка при запросе кода: $e');
       return null;
     }
   }
 
   Future<Response?> sendOTP(String phoneNumber, String code) async {
     try {
-      print('Отправка OTP запроса: телефон=$phoneNumber, код=$code');
-
       final response = await _dio.post(
         '/login',
         data: {
@@ -74,22 +69,10 @@ class RequestCodeService {
         ),
       );
 
-      print('Ответ от сервера (полный): ${response.toString()}');
-      print('Данные ответа: ${response.data}');
-      print('Тип данных ответа: ${response.data.runtimeType}');
-      if (response.data is Map) {
-        print('Токен в ответе: ${response.data['access_token']}');
-      }
-      print('Статус код: ${response.statusCode}');
-
       return response;
     } on DioException catch (e) {
-      print('DioError при отправке OTP: ${e.message}');
-      print('Тип ошибки: ${e.type}');
-      print('Ответ: ${e.response}');
       return e.response;
     } catch (e) {
-      print('Общая ошибка при отправке OTP: $e');
       return null;
     }
   }

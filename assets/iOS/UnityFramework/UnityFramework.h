@@ -1,15 +1,20 @@
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
 
-// These are the necessary headers for UnityFramework to work correctly.
 #import <UnityFramework/UnityAppController.h>
-#import <UnityFramework/LifeCycleListener.h>
-#import <UnityFramework/RenderPluginDelegate.h>
 
-// Solves "RedefinePlatforms.h can only be used after UndefinePlatforms.h"
-#import <UnityFramework/UndefinePlatforms.h>
-#import <UnityFramework/RedefinePlatforms.h>
+// this is coming from mach-o/ldsyms.h
+// we were including this header header here directly
 
+// alas we were including <mach-o/ldsyms.h> directly in UnityFramework.h (for mach_header definition)
+//   instead of doing forward declaration and using, say, void pointers in unity c-interface
+// and this resulted in code in the wild that uses _mh_execute_header directly without this include
+// now, with C++/ObjC++ modules support we end up in a funny situation,
+// where we need to include UndefinePlatforms/RedefinePlatforms quoted which gives a warning
+// thankfully, we can easily provide the definition of _mh_execute_header ourselves
+
+typedef struct mach_header_64 MachHeader;
+extern const struct mach_header_64 _mh_execute_header;
 
 //! Project version number for UnityFramework.
 FOUNDATION_EXPORT double UnityFrameworkVersionNumber;
@@ -17,7 +22,11 @@ FOUNDATION_EXPORT double UnityFrameworkVersionNumber;
 //! Project version string for UnityFramework.
 FOUNDATION_EXPORT const unsigned char UnityFrameworkVersionString[];
 
-// Unity Framework Listener Protocol
+// In this header, you should import all the public headers of your framework using statements like #import <UnityFramework/PublicHeader.h>
+
+#pragma once
+
+// important app life-cycle events
 __attribute__ ((visibility("default")))
 @protocol UnityFrameworkListener<NSObject>
 @optional
@@ -25,11 +34,13 @@ __attribute__ ((visibility("default")))
 - (void)unityDidQuit:(NSNotification*)notification;
 @end
 
-// Main Unity Framework Interface
 __attribute__ ((visibility("default")))
 @interface UnityFramework : NSObject
+{
+}
 
 - (UnityAppController*)appController;
+
 - (UITextField*)keyboardTextField;
 
 + (UnityFramework*)getInstance;
@@ -49,6 +60,8 @@ __attribute__ ((visibility("default")))
 - (void)pause:(bool)pause;
 
 - (void)setAbsoluteURL:(const char *)url;
+
+- (void)setExecuteHeader:(const MachHeader*)header;
 - (void)sendMessageToGOWithName:(const char*)goName functionName:(const char*)name message:(const char*)msg;
 
 @end

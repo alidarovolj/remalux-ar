@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -26,13 +25,10 @@ class _AddAddressSheetState extends ConsumerState<AddAddressSheet> {
   YandexMapController? _mapController;
   Timer? _debounce;
   List<SearchItem> _searchResults = [];
-  bool _isSearching = false;
   bool _isSaving = false;
   Point? _selectedPoint;
   List<MapObject> mapObjects = [];
   final _mapKey = UniqueKey();
-  final String _uniqueMapId =
-      'yandex_map_${DateTime.now().millisecondsSinceEpoch}';
 
   @override
   void dispose() {
@@ -70,45 +66,6 @@ class _AddAddressSheetState extends ConsumerState<AddAddressSheet> {
         ),
       ),
     );
-  }
-
-  void _onAddressChanged(String value) {
-    if (_debounce?.isActive ?? false) _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 500), () {
-      _searchAddress(value);
-    });
-  }
-
-  Future<void> _searchAddress(String query) async {
-    if (query.isEmpty) {
-      setState(() {
-        _searchResults = [];
-        _isSearching = false;
-      });
-      return;
-    }
-
-    setState(() => _isSearching = true);
-
-    final searchResult = await YandexSearch.searchByText(
-      searchText: query,
-      geometry: Geometry.fromBoundingBox(
-        const BoundingBox(
-          southWest: Point(latitude: 43.138949, longitude: 76.789709),
-          northEast: Point(latitude: 43.338949, longitude: 76.989709),
-        ),
-      ),
-      searchOptions: const SearchOptions(
-        searchType: SearchType.geo,
-        geometry: true,
-      ),
-    );
-
-    final results = await (searchResult).$2;
-    setState(() {
-      _searchResults = results.items ?? [];
-      _isSearching = false;
-    });
   }
 
   void _onAddressSelected(SearchItem result) async {
@@ -201,8 +158,12 @@ class _AddAddressSheetState extends ConsumerState<AddAddressSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _handlePop,
+    return PopScope(
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) {
+          await _handlePop();
+        }
+      },
       child: Container(
         padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
         decoration: const BoxDecoration(
@@ -291,7 +252,7 @@ class _AddAddressSheetState extends ConsumerState<AddAddressSheet> {
                             borderRadius: BorderRadius.circular(8),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
+                                color: Colors.black.withValues(alpha: 0.05),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
@@ -342,7 +303,7 @@ class _AddAddressSheetState extends ConsumerState<AddAddressSheet> {
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
+                              color: Colors.black.withValues(alpha: 0.05),
                               blurRadius: 8,
                               offset: const Offset(0, 2),
                             ),
@@ -380,7 +341,7 @@ class _AddAddressSheetState extends ConsumerState<AddAddressSheet> {
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 8,
                     offset: const Offset(0, -2),
                   ),
@@ -458,14 +419,10 @@ class _AddAddressSheetState extends ConsumerState<AddAddressSheet> {
     );
   }
 
-  Future<bool> _handlePop() async {
+  Future<void> _handlePop() async {
     if (_mapController != null) {
       _mapController!.dispose();
       _mapController = null;
     }
-    if (mounted) {
-      Navigator.pop(context);
-    }
-    return true;
   }
 }

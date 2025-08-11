@@ -1,9 +1,4 @@
 #include "RegisterFeatures.h"
-#import <mach-o/dyld.h>
-
-// Define MachHeader as an alias for the actual struct. This solves the unknown type issue.
-typedef struct mach_header MachHeader;
-
 #include <csignal>
 #include "UnityInterface.h"
 #import <UnityFramework/UnityFramework.h>

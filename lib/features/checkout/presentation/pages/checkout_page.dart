@@ -218,7 +218,7 @@ class CheckoutPage extends ConsumerWidget {
                                   ? [
                                       BoxShadow(
                                         color: const Color(0xFF3B4D8B)
-                                            .withOpacity(0.1),
+                                            .withValues(alpha: 0.1),
                                         blurRadius: 5,
                                         offset: const Offset(0, 1),
                                       ),
@@ -271,7 +271,7 @@ class CheckoutPage extends ConsumerWidget {
                                   ? [
                                       BoxShadow(
                                         color: const Color(0xFF3B4D8B)
-                                            .withOpacity(0.1),
+                                            .withValues(alpha: 0.1),
                                         blurRadius: 5,
                                         offset: const Offset(0, 1),
                                       ),
@@ -322,10 +322,10 @@ class CheckoutPage extends ConsumerWidget {
                           width: 24,
                           height: 24,
                           alignment: Alignment.center,
-                          child: Icon(
+                          child: const Icon(
                             Icons.info_outline,
                             size: 16,
-                            color: const Color(0xFFBF7200),
+                            color: Color(0xFFBF7200),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -333,7 +333,7 @@ class CheckoutPage extends ConsumerWidget {
                           'checkout.delivery.free_delivery_notice'.tr(),
                           style: const TextStyle(
                             fontSize: 13,
-                            color: const Color(0xFFBF7200),
+                            color: Color(0xFFBF7200),
                           ),
                         ),
                       ],
@@ -343,183 +343,33 @@ class CheckoutPage extends ConsumerWidget {
 
                 // Delivery Address Section
                 if (selectedDeliveryType?.id == 1) ...[
-                  Container(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            SvgPicture.asset(
-                              'lib/core/assets/icons/cart/truck.svg',
-                              width: 20,
-                              height: 20,
-                              color: AppColors.textPrimary,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'checkout.delivery_address.title'.tr(),
-                              style: const TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        if (selectedAddress != null)
-                          Text(
-                            selectedAddress.address,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: AppColors.textSecondary,
-                            ),
-                          )
-                        else
-                          Text(
-                            'checkout.delivery_address.hint'.tr(),
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                        const SizedBox(height: 12),
-                        GestureDetector(
-                          onTap: () => _showAddressSelectionModal(context),
-                          child: Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF5F7FF),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.add,
-                                  size: 18,
-                                  color: Color(0xFF2E7CF6),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'checkout.delivery_address.add_button'.tr(),
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color(0xFF2E7CF6),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-
-                  // Delivery Time Section
-                  Container(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            SvgPicture.asset(
-                              'lib/core/assets/icons/cart/calendar.svg',
-                              width: 20,
-                              height: 20,
-                              color: AppColors.textPrimary,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'checkout.delivery_time.title'.tr(),
-                              style: const TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        if (selectedDeliveryTime != null)
-                          Text(
-                            DateFormat('EEEE, d MMMM, HH:mm',
-                                    context.locale.languageCode)
-                                .format(selectedDeliveryTime),
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        const SizedBox(height: 12),
-                        GestureDetector(
-                          onTap: () => _showDeliveryTimeModal(context, ref),
-                          child: Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF5F7FF),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.add,
-                                  size: 18,
-                                  color: Color(0xFF2E7CF6),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  selectedDeliveryTime != null
-                                      ? 'checkout.delivery_time.change_button'
-                                          .tr()
-                                      : 'checkout.delivery_time.select_button'
-                                          .tr(),
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color(0xFF2E7CF6),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                ],
-
-                // Recipient Section
-                Container(
-                  child: Column(
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
-                          const Icon(
-                            Icons.person_outline,
-                            size: 20,
-                            color: AppColors.textPrimary,
+                          SvgPicture.asset(
+                            'lib/core/assets/icons/cart/truck.svg',
+                            width: 20,
+                            height: 20,
+                            colorFilter: const ColorFilter.mode(
+                                AppColors.textPrimary, BlendMode.srcIn),
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'checkout.recipient.title'.tr(),
+                            'checkout.delivery_address.title'.tr(),
                             style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary,
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 8),
-                      if (selectedRecipient != null)
+                      if (selectedAddress != null)
                         Text(
-                          '${selectedRecipient.name}, ${selectedRecipient.phoneNumber}',
+                          selectedAddress.address,
                           style: const TextStyle(
                             fontSize: 14,
                             color: AppColors.textSecondary,
@@ -527,7 +377,7 @@ class CheckoutPage extends ConsumerWidget {
                         )
                       else
                         Text(
-                          'checkout.recipient.hint'.tr(),
+                          'checkout.delivery_address.hint'.tr(),
                           style: const TextStyle(
                             fontSize: 14,
                             color: AppColors.primary,
@@ -535,7 +385,7 @@ class CheckoutPage extends ConsumerWidget {
                         ),
                       const SizedBox(height: 12),
                       GestureDetector(
-                        onTap: () => _showRecipientSelectionModal(context),
+                        onTap: () => _showAddressSelectionModal(context),
                         child: Container(
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(vertical: 16),
@@ -553,7 +403,7 @@ class CheckoutPage extends ConsumerWidget {
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                'checkout.recipient.add_button'.tr(),
+                                'checkout.delivery_address.add_button'.tr(),
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
@@ -566,6 +416,151 @@ class CheckoutPage extends ConsumerWidget {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 32),
+
+                  // Delivery Time Section
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          SvgPicture.asset(
+                            'lib/core/assets/icons/cart/calendar.svg',
+                            width: 20,
+                            height: 20,
+                            color: AppColors.textPrimary,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'checkout.delivery_time.title'.tr(),
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      if (selectedDeliveryTime != null)
+                        Text(
+                          DateFormat('EEEE, d MMMM, HH:mm',
+                                  context.locale.languageCode)
+                              .format(selectedDeliveryTime),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      const SizedBox(height: 12),
+                      GestureDetector(
+                        onTap: () => _showDeliveryTimeModal(context, ref),
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF5F7FF),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.add,
+                                size: 18,
+                                color: Color(0xFF2E7CF6),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                selectedDeliveryTime != null
+                                    ? 'checkout.delivery_time.change_button'
+                                        .tr()
+                                    : 'checkout.delivery_time.select_button'
+                                        .tr(),
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color(0xFF2E7CF6),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 32),
+                ],
+
+                // Recipient Section
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.person_outline,
+                          size: 20,
+                          color: AppColors.textPrimary,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'checkout.recipient.title'.tr(),
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    if (selectedRecipient != null)
+                      Text(
+                        '${selectedRecipient.name}, ${selectedRecipient.phoneNumber}',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: AppColors.textSecondary,
+                        ),
+                      )
+                    else
+                      Text(
+                        'checkout.recipient.hint'.tr(),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    const SizedBox(height: 12),
+                    GestureDetector(
+                      onTap: () => _showRecipientSelectionModal(context),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF5F7FF),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.add,
+                              size: 18,
+                              color: Color(0xFF2E7CF6),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'checkout.recipient.add_button'.tr(),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xFF2E7CF6),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
 
@@ -606,7 +601,7 @@ class CheckoutPage extends ConsumerWidget {
                                   ? [
                                       BoxShadow(
                                         color: const Color(0xFF3B4D8B)
-                                            .withOpacity(0.1),
+                                            .withValues(alpha: 0.1),
                                         blurRadius: 5,
                                         offset: const Offset(0, 1),
                                       ),
@@ -658,7 +653,7 @@ class CheckoutPage extends ConsumerWidget {
                                   ? [
                                       BoxShadow(
                                         color: const Color(0xFF3B4D8B)
-                                            .withOpacity(0.1),
+                                            .withValues(alpha: 0.1),
                                         blurRadius: 5,
                                         offset: const Offset(0, 1),
                                       ),
@@ -700,19 +695,13 @@ class CheckoutPage extends ConsumerWidget {
                   Column(
                     children: [
                       GestureDetector(
-                        onTap: () {
-                          // TODO: Handle Kaspi selection
-                        },
+                        onTap: () {},
                         child: Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color:
-                                true ? AppColors.buttonSecondary : Colors.white,
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: true
-                                  ? AppColors.primary
-                                  : const Color(0xFFE0E0E0),
+                              color: AppColors.primary,
                               width: 1,
                             ),
                           ),
@@ -747,20 +736,14 @@ class CheckoutPage extends ConsumerWidget {
                       ),
                       const SizedBox(height: 8),
                       GestureDetector(
-                        onTap: () {
-                          // TODO: Handle Halyk selection
-                        },
+                        onTap: () {},
                         child: Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: false
-                                ? AppColors.buttonSecondary
-                                : Colors.white,
+                            color: Colors.white,
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: false
-                                  ? AppColors.primary
-                                  : const Color(0xFFE0E0E0),
+                              color: AppColors.primary,
                               width: 1,
                             ),
                           ),
@@ -782,13 +765,6 @@ class CheckoutPage extends ConsumerWidget {
                                       : FontWeight.normal,
                                 ),
                               ),
-                              const Spacer(),
-                              if (false)
-                                const Icon(
-                                  Icons.check_circle,
-                                  color: AppColors.primary,
-                                  size: 24,
-                                ),
                             ],
                           ),
                         ),

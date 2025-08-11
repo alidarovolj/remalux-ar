@@ -1,6 +1,7 @@
 import 'package:remalux_ar/core/api/api_client.dart';
 import 'package:remalux_ar/features/store/domain/models/product.dart';
 import 'package:remalux_ar/features/store/presentation/providers/store_providers.dart';
+import 'package:flutter/foundation.dart';
 
 class ProductsRepository {
   final ApiClient _apiClient = ApiClient();
@@ -35,8 +36,6 @@ class ProductsRepository {
         params.addAll(queryParameters);
       }
 
-      print('Final query parameters: $params'); // Debug print
-
       final response = await _apiClient.get(
         '/product-variants',
         queryParameters: params,
@@ -58,7 +57,7 @@ class ProductsRepository {
           final variant = ProductVariant.fromJson(item);
           variants.add(variant);
         } catch (e) {
-          print('Error: $e');
+          debugPrint('Error: $e');
         }
       }
 

@@ -19,7 +19,6 @@ class _RecipientsPageState extends ConsumerState<RecipientsPage> {
   @override
   void initState() {
     super.initState();
-    print('📱 RecipientsPage initState');
     // Force refresh recipients on page visit
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -29,13 +28,9 @@ class _RecipientsPageState extends ConsumerState<RecipientsPage> {
   }
 
   Future<void> _refreshRecipients() async {
-    print('🔄 Force refreshing recipients');
     try {
-      print('📱 Starting recipients refresh');
       await ref.read(recipientsProvider.notifier).refreshRecipients();
-      print('✅ Recipients refresh completed successfully');
     } catch (error) {
-      print('❌ Recipients refresh failed: $error');
       if (mounted) {
         CustomSnackBar.show(
           context,

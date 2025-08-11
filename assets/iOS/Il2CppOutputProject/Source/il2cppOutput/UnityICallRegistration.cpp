@@ -2626,10 +2626,6 @@ void RegisterAllStrippedInternalCalls()
 		void Register_UnityEngine_MaterialPropertyBlock_CreateImpl();
 		Register_UnityEngine_MaterialPropertyBlock_CreateImpl();
 
-		//System.Single UnityEngine.MaterialPropertyBlock::GetFloatImpl(System.Int32)
-		void Register_UnityEngine_MaterialPropertyBlock_GetFloatImpl();
-		Register_UnityEngine_MaterialPropertyBlock_GetFloatImpl();
-
 		//System.Void UnityEngine.MaterialPropertyBlock::Clear(System.Boolean)
 		void Register_UnityEngine_MaterialPropertyBlock_Clear();
 		Register_UnityEngine_MaterialPropertyBlock_Clear();
@@ -2637,10 +2633,6 @@ void RegisterAllStrippedInternalCalls()
 		//System.Void UnityEngine.MaterialPropertyBlock::DestroyImpl(System.IntPtr)
 		void Register_UnityEngine_MaterialPropertyBlock_DestroyImpl();
 		Register_UnityEngine_MaterialPropertyBlock_DestroyImpl();
-
-		//System.Void UnityEngine.MaterialPropertyBlock::GetColorImpl_Injected(System.Int32,UnityEngine.Color&)
-		void Register_UnityEngine_MaterialPropertyBlock_GetColorImpl_Injected();
-		Register_UnityEngine_MaterialPropertyBlock_GetColorImpl_Injected();
 
 		//System.Void UnityEngine.MaterialPropertyBlock::SetColorImpl_Injected(System.Int32,UnityEngine.Color&)
 		void Register_UnityEngine_MaterialPropertyBlock_SetColorImpl_Injected();
@@ -4358,6 +4350,10 @@ void RegisterAllStrippedInternalCalls()
 		void Register_UnityEngine_RenderTexture_Create();
 		Register_UnityEngine_RenderTexture_Create();
 
+		//System.Boolean UnityEngine.RenderTexture::IsCreated()
+		void Register_UnityEngine_RenderTexture_IsCreated();
+		Register_UnityEngine_RenderTexture_IsCreated();
+
 		//System.Boolean UnityEngine.RenderTexture::get_sRGB()
 		void Register_UnityEngine_RenderTexture_get_sRGB();
 		Register_UnityEngine_RenderTexture_get_sRGB();
@@ -5022,6 +5018,10 @@ void RegisterAllStrippedInternalCalls()
 		void Register_UnityEngine_SystemInfo_GetPhysicalMemoryMB();
 		Register_UnityEngine_SystemInfo_GetPhysicalMemoryMB();
 
+		//System.Int32 UnityEngine.SystemInfo::GetProcessorCount()
+		void Register_UnityEngine_SystemInfo_GetProcessorCount();
+		Register_UnityEngine_SystemInfo_GetProcessorCount();
+
 		//System.Int32 UnityEngine.SystemInfo::GetRenderTextureSupportedMSAASampleCount_Injected(UnityEngine.RenderTextureDescriptor&)
 		void Register_UnityEngine_SystemInfo_GetRenderTextureSupportedMSAASampleCount_Injected();
 		Register_UnityEngine_SystemInfo_GetRenderTextureSupportedMSAASampleCount_Injected();
@@ -5334,6 +5334,10 @@ void RegisterAllStrippedInternalCalls()
 		void Register_UnityEngine_Texture2D_GetPixelBilinearImpl_Injected();
 		Register_UnityEngine_Texture2D_GetPixelBilinearImpl_Injected();
 
+		//System.Void UnityEngine.Texture2D::GetPixelImpl_Injected(System.Int32,System.Int32,System.Int32,System.Int32,UnityEngine.Color&)
+		void Register_UnityEngine_Texture2D_GetPixelImpl_Injected();
+		Register_UnityEngine_Texture2D_GetPixelImpl_Injected();
+
 		//System.Void UnityEngine.Texture2D::ReadPixelsImpl_Injected(UnityEngine.Rect&,System.Int32,System.Int32,System.Boolean)
 		void Register_UnityEngine_Texture2D_ReadPixelsImpl_Injected();
 		Register_UnityEngine_Texture2D_ReadPixelsImpl_Injected();
@@ -5353,6 +5357,10 @@ void RegisterAllStrippedInternalCalls()
 		//System.Void UnityEngine.Texture2D::UpdateExternalTexture(System.IntPtr)
 		void Register_UnityEngine_Texture2D_UpdateExternalTexture();
 		Register_UnityEngine_Texture2D_UpdateExternalTexture();
+
+		//UnityEngine.Color[] UnityEngine.Texture2D::GetPixels(System.Int32,System.Int32,System.Int32,System.Int32,System.Int32)
+		void Register_UnityEngine_Texture2D_GetPixels();
+		Register_UnityEngine_Texture2D_GetPixels();
 
 		//UnityEngine.Texture2D UnityEngine.Texture2D::get_blackTexture()
 		void Register_UnityEngine_Texture2D_get_blackTexture();

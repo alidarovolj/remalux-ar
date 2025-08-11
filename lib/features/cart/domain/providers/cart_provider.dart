@@ -67,7 +67,7 @@ class CartNotifier extends StateNotifier<AsyncValue<List<CartItem>>> {
           }
           return item;
         }).toList();
-        _setState(AsyncValue.data(updatedItems ?? []));
+        _setState(AsyncValue.data(updatedItems));
       });
 
       // Отправляем запрос на сервер
@@ -80,7 +80,6 @@ class CartNotifier extends StateNotifier<AsyncValue<List<CartItem>>> {
         _setState(AsyncValue.error(error, StackTrace.current));
         return;
       }
-      print('Error updating quantity: $error');
       // При ошибке обновляем данные с сервера
       await getCart();
     }
@@ -99,7 +98,6 @@ class CartNotifier extends StateNotifier<AsyncValue<List<CartItem>>> {
         _setState(AsyncValue.error(error, StackTrace.current));
         return;
       }
-      print('Error removing item: $error');
     }
   }
 
@@ -125,7 +123,6 @@ class CartNotifier extends StateNotifier<AsyncValue<List<CartItem>>> {
         _setState(AsyncValue.error(error, StackTrace.current));
         return;
       }
-      print('Error adding to cart: $error');
       rethrow; // Прокидываем ошибку дальше для обработки в UI
     }
   }

@@ -260,7 +260,7 @@ class _ReviewModalState extends ConsumerState<ReviewModal> {
                       decoration: InputDecoration(
                         hintText: 'Напишите ваш отзыв о продукте',
                         hintStyle: TextStyle(
-                          color: AppColors.textPrimary.withOpacity(0.5),
+                          color: AppColors.textPrimary.withValues(alpha: 0.5),
                         ),
                         filled: true,
                         fillColor: const Color(0xFFF8F8F8),
@@ -296,7 +296,6 @@ class _ReviewModalState extends ConsumerState<ReviewModal> {
               child: CustomButton(
                 label: 'Оставить отзыв',
                 onPressed: () {
-                  // TODO: Implement review submission
                   Navigator.pop(context);
                 },
                 type: ButtonType.normal,

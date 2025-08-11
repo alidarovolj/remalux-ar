@@ -78,9 +78,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         );
       }
 
-      // Get user info
-      final user = await auth.getCurrentUser();
-
       if (mounted) {
         // Show success message
         CustomSnackBar.show(
@@ -134,7 +131,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         leading: Container(
           margin: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withValues(alpha: 0.7),
             borderRadius: BorderRadius.circular(100),
           ),
           clipBehavior: Clip.antiAlias,
@@ -221,7 +218,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                         hintText: 'auth.phone_hint'.tr(),
                                         hintStyle: TextStyle(
                                           color: AppColors.textSecondary
-                                              .withOpacity(0.5),
+                                              .withValues(alpha: 0.5),
                                         ),
                                         filled: true,
                                         fillColor: const Color(0xFFF8F8F8),
@@ -260,7 +257,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                         hintText: 'auth.password_hint'.tr(),
                                         hintStyle: TextStyle(
                                           color: AppColors.textSecondary
-                                              .withOpacity(0.5),
+                                              .withValues(alpha: 0.5),
                                         ),
                                         filled: true,
                                         fillColor: const Color(0xFFF8F8F8),

@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
 import 'package:remalux_ar/core/widgets/custom_button.dart';
-import 'package:remalux_ar/core/widgets/development_notice_modal.dart';
 import 'package:remalux_ar/features/home/presentation/widgets/categories_grid.dart';
 import 'package:remalux_ar/features/home/presentation/widgets/products_grid.dart';
 import 'package:remalux_ar/features/home/presentation/widgets/news_grid.dart';
@@ -43,7 +42,6 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-  final int _selectedIndex = 0;
   late ScrollController _scrollController;
   bool _showSafeArea = false;
   Color _currentColor = Colors.white;
@@ -90,11 +88,11 @@ class _HomePageState extends ConsumerState<HomePage> {
               });
             }
           } catch (e) {
-            print('Error processing color: $e');
+            debugPrint('Error processing color: $e');
           }
         });
       } catch (e) {
-        print('Error in color animation timer: $e');
+        debugPrint('Error in color animation timer: $e');
       }
     });
   }
@@ -183,10 +181,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                               padding: const EdgeInsets.fromLTRB(
                                   4.6, 4.6, 4.6, 9.21),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
+                                color: Colors.white.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(6.91),
                                 border: Border.all(
-                                  color: Colors.white.withOpacity(0.8),
+                                  color: Colors.white.withValues(alpha: 0.8),
                                   width: 0.93,
                                 ),
                               ),
@@ -323,7 +321,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                                     borderRadius: BorderRadius.circular(12),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
+                                        color:
+                                            Colors.black.withValues(alpha: 0.1),
                                         blurRadius: 10,
                                         spreadRadius: 2,
                                       ),
@@ -362,7 +361,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                             height: 180,
                             width: 48,
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(24),
                             ),
                           ),
@@ -383,10 +382,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                                 width: 48,
                                 padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.2),
+                                  color: Colors.white.withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(24),
                                   border: Border.all(
-                                    color: Colors.white.withOpacity(0.8),
+                                    color: Colors.white.withValues(alpha: 0.8),
                                     width: 0.59,
                                   ),
                                 ),
@@ -406,7 +405,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                               color: color,
                                               border: Border.all(
                                                 color: Colors.white
-                                                    .withOpacity(0.6),
+                                                    .withValues(alpha: 0.6),
                                                 width: 2,
                                               ),
                                             ),
@@ -483,8 +482,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
-                                color:
-                                    const Color(0xFF3B4D8B).withOpacity(0.09),
+                                color: const Color(0xFF3B4D8B)
+                                    .withValues(alpha: 0.09),
                                 spreadRadius: -0.9,
                                 blurRadius: 4,
                                 offset: const Offset(0, 2),
@@ -520,7 +519,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                 child: CustomButton(
                                   label: 'home.visualize'.tr(),
                                   onPressed: () {
-                                    context.push('/ar');
+                                    context.push('/unity-ar');
                                   },
                                   type: ButtonType.normal,
                                   isFullWidth: true,
@@ -580,7 +579,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           AnimatedContainer(
             duration: const Duration(milliseconds: 300),
             height: _showSafeArea ? MediaQuery.of(context).padding.top : 0,
-            color: Colors.white.withOpacity(_showSafeArea ? 1.0 : 0.0),
+            color: Colors.white.withValues(alpha: _showSafeArea ? 1.0 : 0.0),
             width: double.infinity,
           ),
         ],

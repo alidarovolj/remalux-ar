@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:remalux_ar/core/widgets/section_widget.dart';
 import 'package:remalux_ar/features/home/domain/providers/colors_provider.dart';
-import 'package:remalux_ar/features/home/domain/providers/detailed_colors_provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:easy_localization/easy_localization.dart';
 
@@ -41,7 +40,6 @@ class ColorsGrid extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorsAsync = ref.watch(colorsProvider);
-    final currentLocale = context.locale.languageCode;
 
     return SectionWidget(
       title: 'home.colors.title'.tr(),

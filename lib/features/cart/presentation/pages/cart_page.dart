@@ -9,12 +9,8 @@ import 'package:remalux_ar/core/widgets/custom_app_bar.dart';
 import 'package:remalux_ar/core/widgets/custom_button.dart';
 import 'package:remalux_ar/features/cart/domain/providers/cart_provider.dart';
 import 'package:remalux_ar/features/cart/domain/models/cart_item.dart';
-import 'package:remalux_ar/features/cart/presentation/widgets/delete_confirmation_dialog.dart';
 import 'package:remalux_ar/features/cart/presentation/widgets/delete_confirmation_modal.dart';
 import 'package:remalux_ar/features/cart/presentation/widgets/cart_skeleton.dart';
-import 'package:remalux_ar/core/providers/auth/auth_state.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:remalux_ar/core/api/api_client.dart';
 
 class CartPage extends ConsumerStatefulWidget {
   const CartPage({super.key});
@@ -27,12 +23,10 @@ class _CartPageState extends ConsumerState<CartPage>
     with WidgetsBindingObserver {
   String currentLocale = 'ru';
   Set<int> selectedItems = {};
-  bool _isAuthenticated = false;
 
   @override
   void initState() {
     super.initState();
-    print('📱 CartPage initState');
     // Register observer for app lifecycle events
     WidgetsBinding.instance.addObserver(this);
 
@@ -86,24 +80,13 @@ class _CartPageState extends ConsumerState<CartPage>
   }
 
   void _refreshCart() {
-    print('🔄 Attempting to refresh cart...');
-
-    // Всегда пытаемся загрузить корзину, независимо от состояния _isAuthenticated
+    // Всегда пытаемся загрузить корзину
     ref.read(cartProvider.notifier).getCart().then((_) {
-      print('✅ Cart refresh completed successfully');
-
-      // Если мы успешно получили данные, значит пользователь аутентифицирован
-      setState(() {
-        _isAuthenticated = true;
-      });
+      // Корзина успешно загружена
     }).catchError((error) {
-      print('❌ Cart refresh failed: $error');
-
-      // Если получили ошибку 401, значит пользователь не аутентифицирован
+      // Обработка ошибок загрузки корзины
       if (error is DioException && error.response?.statusCode == 401) {
-        setState(() {
-          _isAuthenticated = false;
-        });
+        // Пользователь не аутентифицирован
       }
     });
   }
@@ -227,7 +210,6 @@ class _CartPageState extends ConsumerState<CartPage>
   @override
   Widget build(BuildContext context) {
     final cartAsync = ref.watch(cartProvider);
-    print('🎨 CartPage building with state: ${cartAsync.toString()}');
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -317,8 +299,6 @@ class _CartPageState extends ConsumerState<CartPage>
         },
         loading: () => const CartSkeleton(),
         error: (error, stackTrace) {
-          print('❌ Cart error: $error');
-
           // Если ошибка 401 - показываем экран необходимости авторизации
           if (error is DioException && error.response?.statusCode == 401) {
             return _buildAuthRequiredView(context);
@@ -443,7 +423,6 @@ class _CartPageState extends ConsumerState<CartPage>
                   height: 80,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
-                    print('❌ Error loading image: $error');
                     return Container(
                       width: 80,
                       height: 80,
@@ -531,7 +510,7 @@ class _CartPageState extends ConsumerState<CartPage>
                           size: 18,
                         ),
                         onPressed: () {
-                          // TODO: Implement favorite toggle
+                          debugPrint('Favorite button pressed');
                         },
                         padding: EdgeInsets.zero,
                       ),
@@ -738,7 +717,7 @@ class _CartPageState extends ConsumerState<CartPage>
               const SizedBox(width: 12),
               TextButton(
                 onPressed: () {
-                  // TODO: Apply promo code
+                  debugPrint('Promo code applied');
                 },
                 style: TextButton.styleFrom(
                   foregroundColor: AppColors.links,

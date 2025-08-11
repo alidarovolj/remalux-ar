@@ -169,7 +169,7 @@ class _ColorsPageState extends ConsumerState<ColorsPage> {
                       decoration: InputDecoration(
                         hintText: 'home.colors.search_placeholder'.tr(),
                         hintStyle: TextStyle(
-                          color: AppColors.textPrimary.withOpacity(0.5),
+                          color: AppColors.textPrimary.withValues(alpha: 0.5),
                           fontSize: 15,
                         ),
                         prefixIcon: Padding(

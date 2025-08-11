@@ -58,11 +58,6 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
     filter: {"#": RegExp(r'[0-9]')},
   );
 
-  final _codeMaskFormatter = MaskTextInputFormatter(
-    mask: '# # # #',
-    filter: {"#": RegExp(r'[0-9]')},
-  );
-
   bool get _isStep1Valid {
     return _emailError == null &&
         _phoneError == null &&
@@ -605,7 +600,7 @@ class _RegistrationPageState extends ConsumerState<RegistrationPage> {
         leading: Container(
           margin: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withValues(alpha: 0.7),
             borderRadius: BorderRadius.circular(100),
           ),
           clipBehavior: Clip.antiAlias,

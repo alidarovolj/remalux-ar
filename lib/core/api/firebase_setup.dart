@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 
 Future<void> initializeFirebase() async {
   await Firebase.initializeApp();
@@ -7,7 +8,7 @@ Future<void> initializeFirebase() async {
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print("Handling a background message: ${message.messageId}");
+  debugPrint("Handling a background message: ${message.messageId}");
 }
 
 Future<void> requestNotificationPermissions() async {
@@ -18,5 +19,5 @@ Future<void> requestNotificationPermissions() async {
     sound: true,
   );
 
-  print('User granted permission: ${settings.authorizationStatus}');
+  debugPrint('User granted permission: ${settings.authorizationStatus}');
 }

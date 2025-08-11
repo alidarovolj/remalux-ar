@@ -1,25 +1,15 @@
 import 'dart:async';
-// import 'dart:io'; // Commented out for now
-import 'dart:math'; // No longer needed for placeholder
-import 'dart:typed_data';
-import 'dart:ui' as ui;
-
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Needed for rootBundle to load the model
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:image/image.dart' as img;
-import 'package:flutter/foundation.dart'; // Needed for kIsWeb
-import 'dart:io'; // Needed for Platform
-// import 'package:onnxruntime/onnxruntime.dart'; // Not needed if model is out
-// import 'package:path_provider/path_provider.dart'; // Not needed for now
-// import 'package:permission_handler/permission_handler.dart'; // Permissions removed for now
+import 'package:flutter/foundation.dart';
 
 class WallPainterScreen extends StatefulWidget {
   final Color? initialColor;
 
-  const WallPainterScreen({Key? key, this.initialColor}) : super(key: key);
+  const WallPainterScreen({super.key, this.initialColor});
 
   @override
   State<WallPainterScreen> createState() => _WallPainterScreenState();
@@ -43,72 +33,18 @@ class _WallPainterScreenState extends State<WallPainterScreen> {
   TensorType? _inputType;
   TensorType? _outputType;
 
-  // Placeholder animation variables - no longer needed
-  // double _animationTime = 0.0;
-
-  // Image processing - comment out for now
-  // ui.Image? _cameraImage;
-  // ui.Image? _paintedImage;
-  // List<PaintedArea> _paintedAreas = [];
-  // bool _isProcessing = false;
-  // int _lastProcessedTime = 0;
-
-  // Для отрисовки реального изображения
-  // Uint8List? _cameraImageBytes;
-  // img.Image? _imgLibImage;
-
-  // ONNX Model related - comment out for now
-  // OrtEnv? _ortEnv;
-  // OrtSession? _ortSession;
-  // bool _isModelLoaded = false;
-  // static const String _modelPath = 'assets/ml/model.onnx';
-  // static const String _inputName = 'pixel_values';
-  // static const String _outputName = 'logits';
-  // static const int _modelInputHeight = 32;
-  // static const int _modelInputWidth = 32;
-  // static const int _modelOutputHeight = _modelInputHeight ~/ 4;
-  // static const int _modelOutputWidth = _modelInputWidth ~/ 4;
-  // static const int _numClasses = 150;
-  // int _wallClassIndex =
-  //     9;
-
-  // final List<MapEntry<String, BlendMode>> _blendModes = [
-  //   MapEntry('Основной', BlendMode.overlay),
-  //   MapEntry('Яркий', BlendMode.colorDodge),
-  //   MapEntry('Глубокий', BlendMode.multiply),
-  //   MapEntry('Светлый', BlendMode.screen),
-  //   MapEntry('Натур.', BlendMode.softLight),
-  // ];
-
   @override
   void initState() {
     super.initState();
     _selectedColor = widget.initialColor ?? Colors.blue;
     _initCamera();
     _loadModel();
-    // _startProcessingTimer(); // Removed placeholder timer call
   }
 
   Future<void> _loadModel() async {
     try {
       const modelPath = 'assets/ml/1.tflite';
-      print("Attempting to load model $modelPath");
       final interpreterOptions = InterpreterOptions();
-      // Potentially add delegates like GPU if needed
-      // Check if running on a mobile platform (excluding web)
-      /* // MODIFIED_BLOCK_START: Commenting out delegate logic
-      if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) { 
-        if (Platform.isAndroid) {
-           // Use GpuDelegateV2 for Android if available
-           // interpreterOptions.addDelegate(GpuDelegateV2()); 
-           print("Android platform detected, GPU delegate (V2) could be added here.");
-        } else if (Platform.isIOS) {
-           // Use GpuDelegate for Metal on iOS
-           // interpreterOptions.addDelegate(GpuDelegate()); // Commenting this out
-           print("iOS platform detected, GPU (Metal) delegate was attempted."); // Keep log for info
-        }
-      }
-      */ // MODIFIED_BLOCK_END
 
       // Create the base interpreter
       _interpreter =
@@ -125,21 +61,13 @@ class _WallPainterScreenState extends State<WallPainterScreen> {
       _outputShape = outputTensor.shape;
       _outputType = outputTensor.type;
 
-      print('Base Model Input Shape: $_inputShape, Type: $_inputType');
-      print('Base Model Output Shape: $_outputShape, Type: $_outputType');
-
-      // Create the IsolateInterpreter
-      print('Creating IsolateInterpreter...');
       _isolateInterpreter =
           await IsolateInterpreter.create(address: _interpreter!.address);
-      print('IsolateInterpreter created.');
 
       setState(() {
         _isModelLoaded = true;
       });
-      print('TFLite model loaded and IsolateInterpreter created successfully.');
     } catch (e) {
-      print('Error loading TFLite model or creating IsolateInterpreter: $e');
       // Ensure model is marked as not loaded on error
       setState(() {
         _isModelLoaded = false;
@@ -149,12 +77,9 @@ class _WallPainterScreenState extends State<WallPainterScreen> {
 
   Future<void> _initCamera() async {
     try {
-      print("_initCamera: Getting available cameras...");
       _cameras = await availableCameras();
-      print("_initCamera: Found ${_cameras?.length ?? 0} cameras.");
 
       if (_cameras != null && _cameras!.isNotEmpty) {
-        print("_initCamera: Initializing CameraController...");
         _cameraController = CameraController(
           _cameras![0],
           ResolutionPreset.high, // Changed to high for better detail
@@ -164,21 +89,15 @@ class _WallPainterScreenState extends State<WallPainterScreen> {
         );
 
         await _cameraController!.initialize();
-        print("_initCamera: CameraController initialized.");
 
-        _cameraController!
-            .startImageStream(_processCameraImage); // Start image stream
-        print("_initCamera: Image stream started.");
+        _cameraController!.startImageStream(_processCameraImage);
 
         if (mounted) {
-          print("_initCamera: Calling setState to refresh UI.");
           setState(() {});
         }
-      } else {
-        print("_initCamera: No cameras found.");
       }
     } catch (e) {
-      print('Camera initialization error in _initCamera: $e');
+      debugPrint('Camera initialization error in _initCamera: $e');
     }
   }
 
@@ -193,9 +112,6 @@ class _WallPainterScreenState extends State<WallPainterScreen> {
         order: img.ChannelOrder.bgra,
       );
     } else if (cameraImage.format.group == ImageFormatGroup.yuv420) {
-      // Basic YUV to RGB conversion (simplified)
-      // This will be slow and might not be perfectly accurate.
-      // Consider a native plugin or a more optimized Dart library for YUV conversion if performance is critical.
       final int width = cameraImage.width;
       final int height = cameraImage.height;
       final image = img.Image(width: width, height: height);
@@ -224,7 +140,6 @@ class _WallPainterScreenState extends State<WallPainterScreen> {
       }
       return image;
     } else {
-      print("Unsupported image format: ${cameraImage.format.group}");
       return img.Image(width: 1, height: 1); // Return minimal image
     }
   }
@@ -232,17 +147,14 @@ class _WallPainterScreenState extends State<WallPainterScreen> {
   List<List<List<List<double>>>> _prepareImageForModel(
       CameraImage cameraImage) {
     if (_inputShape == null || _inputType == null) {
-      print("Error: Model input shape or type is null.");
       return [];
     }
     if (_inputType != TensorType.float32) {
-      print("Error: Model input type is not Float32. Got $_inputType");
       return [];
     }
 
     img.Image image = _convertCameraImage(cameraImage);
     if (image.width <= 1 || image.height <= 1) {
-      print("Error: Converted image has invalid dimensions.");
       return [];
     }
 
@@ -280,6 +192,11 @@ class _WallPainterScreenState extends State<WallPainterScreen> {
         _outputType == null) {
       return;
     }
+
+    // Save screen dimensions before async operations
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
+
     _isProcessing = true;
 
     try {
@@ -295,7 +212,6 @@ class _WallPainterScreenState extends State<WallPainterScreen> {
         final flatOutputBuffer = Float32List(outputSize);
         output = {0: flatOutputBuffer};
       } else {
-        print("Error: Model output type is not Float32. Got $_outputType");
         _isProcessing = false;
         return;
       }
@@ -311,15 +227,14 @@ class _WallPainterScreenState extends State<WallPainterScreen> {
       final int outputHeight = _outputShape![1]; // 65
       final int outputWidth = _outputShape![2]; // 65
       final int numClasses = _outputShape![3]; // 21
-      // TODO: IMPORTANT! Verify and update this index for your specific '1.tflite' model!
       const int wallClassIndex = 1; // Placeholder index
 
       Path newMaskPath = Path();
       // Scaling factors to map model output coordinates to screen coordinates
       // Note: This assumes the CameraPreview fills the screen width/height.
       // Adjust if your layout is different.
-      final double scaleX = MediaQuery.of(context).size.width / outputWidth;
-      final double scaleY = MediaQuery.of(context).size.height / outputHeight;
+      final double scaleX = screenWidth / outputWidth;
+      final double scaleY = screenHeight / outputHeight;
 
       // Iterate through the output buffer
       for (int y = 0; y < outputHeight; y++) {
@@ -355,54 +270,15 @@ class _WallPainterScreenState extends State<WallPainterScreen> {
       // */ // MODIFIED_BLOCK_END - REMOVING COMMENT
       // --- End of temporarily commented out block ---
     } catch (e, stackTrace) {
-      print("Error processing image: $e");
-      print("Stack trace: $stackTrace");
+      debugPrint("Error processing image: $e");
+      debugPrint("Stack trace: $stackTrace");
     } finally {
       _isProcessing = false;
     }
   }
 
-  // _processCameraImage would be used with a real segmentation model.
-  // void _processCameraImage(CameraImage image) async {
-  //   if (!_isModelLoaded || _interpreter == null || _isProcessing) {
-  //     return;
-  //   }
-  //   _isProcessing = true;
-  //
-  //   // TODO: Add actual image preparation and model inference here
-  //   // For example:
-  //   // 1. Convert CameraImage to the format expected by the model (e.g., RGB, specific size)
-  //   // 2. Prepare input tensor
-  //   // 3. Run inference: _interpreter.run(input, output);
-  //   // 4. Process output tensor to create a mask Path
-  //   // 5. setState(() { _maskPath = generatedPath; });
-  //
-  //   _isProcessing = false;
-  // }
-
-  // Future<img.Image?> _convertYUVToImage(CameraImage image) async { // Commented out
-  //   // ... entire method commented ...
-  // }
-
-  // void _updatePaintedImage() async { // Commented out
-  //    // ... entire method commented ...
-  // }
-
-  // Future<void> _drawPaintedArea(Canvas canvas, Size size, PaintedArea area) async { // Commented out
-  //   // ... entire method commented ...
-  // }
-
-  // Future<Uint8List?> _getWallMaskFromModel(Size displaySize) async { // Commented out
-  //   // ... entire method commented ...
-  // }
-
-  // Path _createPathFromMask(Uint8List mask, Size size) { // Commented out
-  //   // ... entire method commented ...
-  // }
-
   @override
   void dispose() {
-    print("WallPainterScreen disposing...");
     // _processingTimer?.cancel(); // Removed
     _cameraController
         ?.stopImageStream(); // Stop stream before disposing controller
@@ -416,18 +292,13 @@ class _WallPainterScreenState extends State<WallPainterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print("WallPainterScreen building UI...");
     if (_cameraController == null ||
         !_cameraController!.value.isInitialized ||
         !_isModelLoaded) {
-      // Added _isModelLoaded check
-      print(
-          "WallPainterScreen build: Camera or Model not ready, showing loading indicator.");
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
       );
     }
-    print("WallPainterScreen build: Camera ready, showing CameraPreview.");
     return Scaffold(
       appBar: AppBar(
         title: const Text('AR Wall Painter (Placeholder)'),
@@ -460,7 +331,6 @@ class _WallPainterScreenState extends State<WallPainterScreen> {
   // }
 
   void _showColorPicker() {
-    print("_showColorPicker called");
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -487,19 +357,7 @@ class _WallPainterScreenState extends State<WallPainterScreen> {
       ),
     );
   }
-
-  // Future<void> _takePicture() async { // Commented out
-  //   // ... entire method commented ...
-  // }
 }
-
-// class PaintedArea { // Commented out
-//   // ... entire class commented ...
-// }
-
-// class PaintedImagePainter extends CustomPainter { // Commented out
-//   // ... entire class commented ...
-// }
 
 class MaskPainter extends CustomPainter {
   final Path maskPath;
@@ -510,12 +368,9 @@ class MaskPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = color.withOpacity(0.6) // Apply selected color with some opacity
+      ..color = color.withValues(alpha: 0.6)
       ..style = PaintingStyle.fill;
 
-    // Clip the canvas to the camera preview size if necessary,
-    // or ensure maskPath is in the correct coordinate space.
-    // For simplicity, assuming maskPath is already in screen coordinates.
     canvas.drawPath(maskPath, paint);
   }
 

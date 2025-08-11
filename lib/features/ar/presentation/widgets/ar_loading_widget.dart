@@ -77,7 +77,7 @@ class _ArLoadingWidgetState extends State<ArLoadingWidget>
                         gradient: LinearGradient(
                           colors: [
                             AppColors.primary,
-                            AppColors.primary.withOpacity(0.6),
+                            AppColors.primary.withValues(alpha: 0.6),
                           ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
@@ -85,7 +85,7 @@ class _ArLoadingWidgetState extends State<ArLoadingWidget>
                         borderRadius: BorderRadius.circular(60),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.primary.withOpacity(0.3),
+                            color: AppColors.primary.withValues(alpha: 0.3),
                             blurRadius: 20,
                             spreadRadius: 5,
                           ),
@@ -131,7 +131,7 @@ class _ArLoadingWidgetState extends State<ArLoadingWidget>
             const SizedBox(height: 40),
 
             // Progress indicator
-            SizedBox(
+            const SizedBox(
               width: 200,
               child: LinearProgressIndicator(
                 backgroundColor: Colors.white24,

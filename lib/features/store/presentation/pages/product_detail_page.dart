@@ -5,8 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'dart:ui';
 import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/features/store/domain/models/product_detail.dart'
-    hide ProductVariant;
-import 'package:remalux_ar/features/store/domain/models/product_detail.dart'
     as models show ProductVariant;
 import 'package:remalux_ar/features/store/presentation/providers/product_detail_provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -177,7 +175,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                 filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withValues(alpha: 0.7),
                     shape: BoxShape.circle,
                   ),
                   child: IconButton(
@@ -203,7 +201,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                         filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.7),
+                            color: Colors.white.withValues(alpha: 0.7),
                             shape: BoxShape.circle,
                           ),
                           child: IconButton(
@@ -243,7 +241,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                   filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.7),
+                      color: Colors.white.withValues(alpha: 0.7),
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
@@ -343,7 +341,8 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                       ImageFilter.blur(sigmaX: 40, sigmaY: 40),
                                   child: Container(
                                     decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.7),
+                                      color:
+                                          Colors.white.withValues(alpha: 0.7),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Material(
@@ -395,7 +394,8 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFF3B4D8B).withOpacity(0.1),
+                                color: const Color(0xFF3B4D8B)
+                                    .withValues(alpha: 0.1),
                                 offset: const Offset(0, 1),
                                 blurRadius: 5,
                                 spreadRadius: 0,
@@ -464,7 +464,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                               decoration:
                                                   TextDecoration.lineThrough,
                                               color: AppColors.textPrimary
-                                                  .withOpacity(0.5),
+                                                  .withValues(alpha: 0.5),
                                             ),
                                           ),
                                         ],
@@ -501,7 +501,8 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                               });
                                             }
                                           } catch (e) {
-                                            print('Error saving product: $e');
+                                            debugPrint(
+                                                'Error saving product: $e');
                                           }
                                         },
                                         child: ColorSelection(
@@ -526,65 +527,59 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                       scrollDirection: Axis.horizontal,
                                       child: Row(
                                         children: product.productVariants
-                                                .map((variant) {
-                                              final isSelected = selectedWeight ==
-                                                      variant.weight
-                                                          .toString() ||
-                                                  (selectedWeight != null &&
-                                                      double.parse(
-                                                              selectedWeight!) ==
-                                                          variant.weight);
-                                              return Padding(
-                                                padding: const EdgeInsets.only(
-                                                    right: 8),
-                                                child: GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      selectedWeight = variant
-                                                          .weight
-                                                          .toString();
-                                                      selectedVariant = variant;
-                                                    });
-                                                  },
-                                                  child: Container(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                      horizontal: 12,
-                                                      vertical: 8,
-                                                    ),
-                                                    decoration: BoxDecoration(
-                                                      border: Border.all(
-                                                        color: isSelected
-                                                            ? AppColors
-                                                                .borderDark
-                                                            : const Color(
-                                                                0xFFF8F8F8),
-                                                      ),
-                                                      color: AppColors
-                                                          .backgroundLight,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8),
-                                                    ),
-                                                    child: Text(
-                                                      'store.weight_value'.tr(
-                                                          args: [
-                                                            variant.weight
-                                                                .toString()
-                                                          ]),
-                                                      style: const TextStyle(
-                                                        fontSize: 15,
-                                                        fontWeight:
-                                                            FontWeight.normal,
-                                                        color: AppColors
-                                                            .textPrimary,
-                                                      ),
-                                                    ),
+                                            .map((variant) {
+                                          final isSelected = selectedWeight ==
+                                                  variant.weight.toString() ||
+                                              (selectedWeight != null &&
+                                                  double.parse(
+                                                          selectedWeight!) ==
+                                                      variant.weight);
+                                          return Padding(
+                                            padding:
+                                                const EdgeInsets.only(right: 8),
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  selectedWeight =
+                                                      variant.weight.toString();
+                                                  selectedVariant = variant;
+                                                });
+                                              },
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 12,
+                                                  vertical: 8,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                    color: isSelected
+                                                        ? AppColors.borderDark
+                                                        : const Color(
+                                                            0xFFF8F8F8),
+                                                  ),
+                                                  color:
+                                                      AppColors.backgroundLight,
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                child: Text(
+                                                  'store.weight_value'
+                                                      .tr(args: [
+                                                    variant.weight.toString()
+                                                  ]),
+                                                  style: const TextStyle(
+                                                    fontSize: 15,
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                    color:
+                                                        AppColors.textPrimary,
                                                   ),
                                                 ),
-                                              );
-                                            }).toList() ??
-                                            [],
+                                              ),
+                                            ),
+                                          );
+                                        }).toList(),
                                       ),
                                     ),
                                     const SizedBox(height: 16),
@@ -970,60 +965,57 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                     ),
                                     const SizedBox(height: 8),
                                     Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: product.filterData
-                                              .map((filter) {
-                                            final titleMap = filter['title']
-                                                as Map<String, dynamic>;
-                                            final valueMap = filter['value']
-                                                as Map<String, dynamic>;
-                                            final measureMap = filter['measure']
-                                                as Map<String, dynamic>?;
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children:
+                                            product.filterData.map((filter) {
+                                          final titleMap = filter['title']
+                                              as Map<String, dynamic>;
+                                          final valueMap = filter['value']
+                                              as Map<String, dynamic>;
+                                          final measureMap = filter['measure']
+                                              as Map<String, dynamic>?;
 
-                                            return Padding(
-                                              padding: const EdgeInsets.only(
-                                                  bottom: 4),
-                                              child: Text.rich(
-                                                TextSpan(
-                                                  children: [
-                                                    TextSpan(
-                                                      text:
-                                                          '${titleMap[currentLocale] ?? titleMap['ru']}: ',
-                                                      style: const TextStyle(
-                                                        fontSize: 14,
-                                                        color: AppColors
-                                                            .textSecondary,
-                                                      ),
+                                          return Padding(
+                                            padding: const EdgeInsets.only(
+                                                bottom: 4),
+                                            child: Text.rich(
+                                              TextSpan(
+                                                children: [
+                                                  TextSpan(
+                                                    text:
+                                                        '${titleMap[currentLocale] ?? titleMap['ru']}: ',
+                                                    style: const TextStyle(
+                                                      fontSize: 14,
+                                                      color: AppColors
+                                                          .textSecondary,
                                                     ),
+                                                  ),
+                                                  TextSpan(
+                                                    text:
+                                                        '${valueMap[currentLocale] ?? valueMap['ru']}',
+                                                    style: const TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: AppColors.primary,
+                                                    ),
+                                                  ),
+                                                  if (measureMap != null)
                                                     TextSpan(
                                                       text:
-                                                          '${valueMap[currentLocale] ?? valueMap['ru']}',
+                                                          ' ${measureMap[currentLocale] ?? measureMap['ru']}',
                                                       style: const TextStyle(
                                                         fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.w600,
                                                         color:
                                                             AppColors.primary,
                                                       ),
                                                     ),
-                                                    if (measureMap != null)
-                                                      TextSpan(
-                                                        text:
-                                                            ' ${measureMap[currentLocale] ?? measureMap['ru']}',
-                                                        style: const TextStyle(
-                                                          fontSize: 14,
-                                                          color:
-                                                              AppColors.primary,
-                                                        ),
-                                                      ),
-                                                  ],
-                                                ),
+                                                ],
                                               ),
-                                            );
-                                          }).toList() ??
-                                          [],
-                                    ),
+                                            ),
+                                          );
+                                        }).toList()),
                                     const SizedBox(height: 24),
                                     if (selectedWeight != null)
                                       Text.rich(
@@ -1317,8 +1309,9 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                                                                 BoxShadow(
                                                                   color: const Color(
                                                                           0xFF3B4D8B)
-                                                                      .withOpacity(
-                                                                          0.1),
+                                                                      .withValues(
+                                                                          alpha:
+                                                                              0.1),
                                                                   offset:
                                                                       const Offset(
                                                                           0, 1),
@@ -1479,7 +1472,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                         color: Colors.white,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
+                            color: Colors.black.withValues(alpha: 0.05),
                             blurRadius: 8,
                             offset: const Offset(0, -4),
                           ),
@@ -1616,7 +1609,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                             child: Material(
                               color: selectedWeight != null
                                   ? AppColors.primary
-                                  : AppColors.primary.withOpacity(0.5),
+                                  : AppColors.primary.withValues(alpha: 0.5),
                               borderRadius: BorderRadius.circular(12),
                               child: InkWell(
                                 onTap: selectedWeight != null
@@ -1736,7 +1729,8 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                     sigmaY: _showSafeArea ? 10 : 0,
                   ),
                   child: Container(
-                    color: Colors.white.withOpacity(_showSafeArea ? 0.95 : 0.0),
+                    color: Colors.white
+                        .withValues(alpha: _showSafeArea ? 0.95 : 0.0),
                     width: double.infinity,
                   ),
                 ),

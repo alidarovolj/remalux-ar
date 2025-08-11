@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:remalux_ar/core/services/api_client.dart';
 import 'package:remalux_ar/features/auth/domain/models/auth_response.dart';
 import 'package:remalux_ar/features/auth/domain/models/login_request.dart';
@@ -20,23 +19,15 @@ class AuthRepository {
 
   Future<AuthResult> login(LoginRequest request) async {
     try {
-      debugPrint('🚀 Login request data: ${request.toJson()}');
-
       final response = await _apiClient.post(
         '/auth/login',
         data: request.toJson(),
       );
 
-      debugPrint('✅ Login response: ${response.data}');
-
       final authResponse = AuthResponse.fromJson(response.data);
       _apiClient.setAccessToken(authResponse.accessToken);
       return AuthResult(data: authResponse);
     } on DioException catch (e) {
-      debugPrint('❌ Login DioError: ${e.message}');
-      debugPrint('Request data: ${e.requestOptions.data}');
-      debugPrint('Response data: ${e.response?.data}');
-
       String errorMessage;
       if (e.response?.statusCode == 422) {
         errorMessage = 'Неверный логин или пароль';
@@ -49,7 +40,6 @@ class AuthRepository {
 
       return AuthResult(error: errorMessage);
     } catch (e) {
-      debugPrint('❌ Login error: $e');
       return AuthResult(error: 'Произошла неизвестная ошибка');
     }
   }
@@ -64,10 +54,8 @@ class AuthRepository {
         },
       );
 
-      debugPrint('✅ Get user response: ${response.data}');
       return User.fromJson(response.data);
     } catch (e) {
-      debugPrint('❌ Get user error: $e');
       return null;
     }
   }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/features/store/domain/models/product.dart';
 import 'package:remalux_ar/features/favorites/domain/providers/favorites_providers.dart';
@@ -40,22 +39,18 @@ class ProductVariantItem extends ConsumerWidget {
     final isColorable = product['is_colorable'] as bool? ?? false;
     final isFavourite = product['is_favourite'] as bool? ?? false;
     final productId = product['id'] as int?;
-    final category = (product['category'] as Map<String, dynamic>?)?['title']
-            ?[currentLocale] ??
-        (product['category'] as Map<String, dynamic>?)?['title']?['ru'] ??
-        '';
 
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFF3B4D8B).withOpacity(0.1),
+          color: const Color(0xFF3B4D8B).withValues(alpha: 0.1),
           width: 0.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF3B4D8B).withOpacity(0.1),
+            color: const Color(0xFF3B4D8B).withValues(alpha: 0.1),
             offset: const Offset(0, 1),
             blurRadius: 4,
             spreadRadius: 0,
@@ -137,7 +132,6 @@ class ProductVariantItem extends ConsumerWidget {
                           }
 
                           try {
-                            final service = ref.read(favoritesServiceProvider);
                             await ref
                                 .read(favoriteProductsProvider.notifier)
                                 .toggleFavorite(
@@ -164,7 +158,7 @@ class ProductVariantItem extends ConsumerWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.9),
+                        color: AppColors.primary.withValues(alpha: 0.9),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
@@ -285,7 +279,8 @@ class ProductVariantItem extends ConsumerWidget {
                               style: TextStyle(
                                 fontSize: 12,
                                 decoration: TextDecoration.lineThrough,
-                                color: AppColors.textPrimary.withOpacity(0.5),
+                                color: AppColors.textPrimary
+                                    .withValues(alpha: 0.5),
                               ),
                             ),
                           ] else

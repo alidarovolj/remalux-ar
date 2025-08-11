@@ -232,9 +232,9 @@ class FiltersModal extends ConsumerWidget {
                                   border:
                                       Border.all(color: AppColors.borderLight),
                                 ),
-                                child: Text(
+                                child: const Text(
                                   '3000 ₸',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
                                     color: AppColors.textPrimary,
@@ -271,9 +271,9 @@ class FiltersModal extends ConsumerWidget {
                                   border:
                                       Border.all(color: AppColors.borderLight),
                                 ),
-                                child: Text(
+                                child: const Text(
                                   '5000 ₸',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
                                     color: AppColors.textPrimary,

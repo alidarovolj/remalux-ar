@@ -32,7 +32,7 @@ class AuthRequiredModal extends StatelessWidget {
             'auth.required_description'.tr(),
             style: TextStyle(
               fontSize: 16,
-              color: AppColors.textPrimary.withOpacity(0.7),
+              color: AppColors.textPrimary.withValues(alpha: 0.7),
               height: 1.3,
             ),
             textAlign: TextAlign.center,

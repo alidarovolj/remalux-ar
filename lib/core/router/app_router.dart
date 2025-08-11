@@ -31,6 +31,7 @@ import 'package:remalux_ar/features/checkout/presentation/pages/checkout_page.da
 import 'package:remalux_ar/features/auth/presentation/pages/phone_verification_page.dart';
 import 'package:remalux_ar/screens/wall_painter_screen.dart';
 import 'package:remalux_ar/features/ar/presentation/pages/ar_page.dart';
+import 'package:remalux_ar/features/ar/presentation/pages/unity_ar_page.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -201,6 +202,28 @@ class AppRouter {
             },
           ),
         ],
+      ),
+      // Unity AR - полноэкранный режим вне таббара
+      GoRoute(
+        path: '/unity-ar',
+        name: 'unity_ar',
+        builder: (context, state) {
+          final colorParam = state.uri.queryParameters['color'];
+          Color? initialColor;
+          if (colorParam != null) {
+            try {
+              // Преобразуем HEX строку в Color
+              final colorValue = colorParam.startsWith('#')
+                  ? colorParam.substring(1)
+                  : colorParam;
+              initialColor = Color(int.parse('FF$colorValue', radix: 16));
+            } catch (e) {
+              // Если цвет не удалось парсить, используем дефолтный
+              initialColor = null;
+            }
+          }
+          return UnityArPage(initialColor: initialColor);
+        },
       ),
       GoRoute(
         path: '/checkout',

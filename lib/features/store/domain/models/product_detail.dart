@@ -1,5 +1,3 @@
-import 'package:remalux_ar/features/store/domain/models/product.dart';
-
 class ProductDetail {
   final int id;
   final Map<String, String> title;
@@ -101,39 +99,23 @@ class ProductDetail {
 
   factory ProductDetail.fromJson(Map<String, dynamic> json) {
     try {
-      print('🔍 Starting to parse ProductDetail from JSON');
-      print('📝 Input JSON: $json');
-
-      // Parse each field individually with logging
-      print('Parsing id...');
       final id = json['id'] as int;
-      print('✓ id: $id');
 
-      print('Parsing title...');
       final title = json['title'];
-      print('Raw title: $title (${title.runtimeType})');
       final Map<String, String> parsedTitle =
           Map<String, String>.from(title ?? {});
-      print('✓ title: $parsedTitle');
 
-      print('Parsing description...');
       final description = json['description'];
-      print('Raw description: $description (${description.runtimeType})');
       final Map<String, String> parsedDescription =
           Map<String, String>.from(description ?? {});
-      print('✓ description: $parsedDescription');
 
-      print('Parsing filterData...');
       final filterData = json['filter_data'];
-      print('Raw filterData: $filterData (${filterData.runtimeType})');
       final List<Map<String, dynamic>> parsedFilterData =
           (filterData as List<dynamic>?)
                   ?.map((item) => item as Map<String, dynamic>)
                   .toList() ??
               [];
-      print('✓ filterData: $parsedFilterData');
 
-      print('Parsing expense...');
       final expense = json['expense'] == null
           ? 150.0
           : json['expense'] is num
@@ -148,7 +130,6 @@ class ProductDetail {
                                   .toString()) ??
                               150.0)))
                   : 150.0;
-      print('✓ expense: $expense');
 
       final detail = ProductDetail(
         id: id,
@@ -184,11 +165,8 @@ class ProductDetail {
             [],
       );
 
-      print('✅ Successfully created ProductDetail object');
       return detail;
-    } catch (e, stackTrace) {
-      print('❌ Error parsing ProductDetail: $e');
-      print('❌ Stack trace: $stackTrace');
+    } catch (e) {
       rethrow;
     }
   }
@@ -255,25 +233,13 @@ class ProductVariant {
 
   factory ProductVariant.fromJson(Map<String, dynamic> json) {
     try {
-      print('🔍 Starting to parse ProductVariant from JSON');
-      print('📝 Input JSON: $json');
-
-      // Parse each field individually with logging
-      print('Parsing id...');
       final id = json['id'] as int;
-      print('✓ id: $id');
 
-      print('Parsing price...');
       final price = json['price'] as num;
-      print('✓ price: $price');
 
-      print('Parsing value...');
       final value = json['value'] as String;
-      print('✓ value: $value');
 
-      print('Parsing discount_price...');
       final discountPrice = json['discount_price'] as num?;
-      print('✓ discount_price: $discountPrice');
 
       final variant = ProductVariant(
         id: id,
@@ -282,11 +248,8 @@ class ProductVariant {
         discount_price: discountPrice?.toDouble(),
       );
 
-      print('✅ Successfully created ProductVariant object');
       return variant;
-    } catch (e, stackTrace) {
-      print('❌ Error parsing ProductVariant: $e');
-      print('❌ Stack trace: $stackTrace');
+    } catch (e) {
       rethrow;
     }
   }

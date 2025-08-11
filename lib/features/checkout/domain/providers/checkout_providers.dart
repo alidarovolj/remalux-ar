@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:remalux_ar/features/checkout/domain/models/delivery_type.dart';
 import 'package:remalux_ar/features/checkout/domain/models/payment_method.dart';
 import 'package:remalux_ar/features/recipients/domain/models/recipient.dart';
-import 'package:remalux_ar/core/services/api_client.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:remalux_ar/features/cart/domain/providers/cart_providers.dart';
 import 'package:dio/dio.dart';
@@ -12,7 +11,6 @@ import 'package:remalux_ar/core/services/storage_service.dart';
 
 final deliveryTypesProvider = FutureProvider<List<DeliveryType>>((ref) async {
   try {
-    // TODO: Replace with actual API call
     await Future.delayed(const Duration(seconds: 1));
     return [
       DeliveryType.fromJson({
@@ -39,7 +37,6 @@ final selectedDeliveryTypeProvider = StateProvider<DeliveryType?>((ref) {
 
 final paymentMethodsProvider = FutureProvider<List<PaymentMethod>>((ref) async {
   try {
-    // TODO: Replace with actual API call
     await Future.delayed(const Duration(seconds: 1));
     return [
       PaymentMethod.fromJson({
@@ -86,16 +83,13 @@ final validationErrorProvider = StateProvider<String?>((ref) => null);
 // Провайдер для создания заказа
 final orderProvider =
     StateNotifierProvider<OrderNotifier, AsyncValue<int?>>((ref) {
-  final apiClient = ref.watch(apiClientProvider);
-  return OrderNotifier(apiClient, ref);
+  return OrderNotifier(ref);
 });
 
 class OrderNotifier extends StateNotifier<AsyncValue<int?>> {
-  final ApiClient _apiClient;
   final Ref _ref;
 
-  OrderNotifier(this._apiClient, this._ref)
-      : super(const AsyncValue.data(null));
+  OrderNotifier(this._ref) : super(const AsyncValue.data(null));
 
   Future<bool> validateOrderData() {
     final isDelivery = _ref.read(selectedDeliveryTypeProvider)?.id == 1;
@@ -179,8 +173,6 @@ class OrderNotifier extends StateNotifier<AsyncValue<int?>> {
                 : null,
       };
 
-      print('📦 Sending order request: $requestBody');
-
       try {
         // Получаем токен напрямую из хранилища
         final token = await StorageService.getToken();
@@ -195,12 +187,6 @@ class OrderNotifier extends StateNotifier<AsyncValue<int?>> {
           },
         ));
 
-        print('📦 Token for request: ${token?.substring(0, 10)}...');
-        print('📦 Request URL: ${AppConfig.apiUrl}/orders');
-        print('📦 Request method: POST');
-        print('📦 Request headers: ${dio.options.headers}');
-        print('📦 Request body (stringified): ${jsonEncode(requestBody)}');
-
         // Отправляем тело запроса как строку JSON
         final response = await dio.post(
           '/orders',
@@ -212,27 +198,18 @@ class OrderNotifier extends StateNotifier<AsyncValue<int?>> {
           ),
         );
 
-        print('📦 Response status code: ${response.statusCode}');
-        print('📦 Response headers: ${response.headers}');
-        print('📦 Raw response data type: ${response.data.runtimeType}');
-        print('📦 Raw response data: ${response.data}');
-
         // Проверяем, содержит ли ответ строку с префиксом
         if (response.data is String &&
             response.data.toString().contains('Array to string conversion')) {
           final jsonStr = response.data
               .toString()
               .replaceFirst('Array to string conversion', '');
-          print('📦 JSON string after prefix removal: $jsonStr');
           try {
             final Map<String, dynamic> jsonData = jsonDecode(jsonStr);
-            print('📦 Parsed JSON: $jsonData');
             final orderId = jsonData['order_id'];
-            print('✅ Order created successfully. Order ID: $orderId');
             state = AsyncValue.data(orderId);
             return;
           } catch (e) {
-            print('❌ Failed to parse response: $e');
             throw Exception('Failed to parse response: $e');
           }
         } else if (response.statusCode! >= 200 && response.statusCode! < 300) {
@@ -240,38 +217,26 @@ class OrderNotifier extends StateNotifier<AsyncValue<int?>> {
             // Попробуем напрямую разобрать строку ответа как JSON
             if (response.data is String) {
               final jsonData = jsonDecode(response.data.toString());
-              print('📦 Directly parsed JSON: $jsonData');
               final orderId = jsonData['order_id'];
-              print('✅ Order created successfully. Order ID: $orderId');
               state = AsyncValue.data(orderId);
               return;
             } else {
               // Если это не строка, предполагаем, что это уже объект JSON
               final orderId = response.data['order_id'];
-              print('✅ Order created successfully. Order ID: $orderId');
               state = AsyncValue.data(orderId);
               return;
             }
           } catch (e) {
-            print('❌ Failed to parse successful response: $e');
             throw Exception('Failed to parse successful response: $e');
           }
         } else {
-          print('❌ Request failed with status code: ${response.statusCode}');
           throw Exception('Request failed with status ${response.statusCode}');
         }
       } catch (error) {
-        print('❌ Failed to create order with direct approach: $error');
         rethrow;
       }
     } catch (error, stackTrace) {
-      print('❌ Failed to create order: $error');
-      print('❌ Stack trace: $stackTrace');
-      if (error is DioException) {
-        print('❌ Response data: ${error.response?.data}');
-        print('❌ Response headers: ${error.response?.headers}');
-        print('❌ Request data: ${error.requestOptions.data}');
-      }
+      if (error is DioException) {}
       state = AsyncValue.error(error, stackTrace);
     }
   }

@@ -1,9 +1,6 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:yandex_mapkit/yandex_mapkit.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/core/widgets/custom_text_field.dart';
@@ -33,7 +30,6 @@ class _AddAddressPageState extends ConsumerState<AddAddressPage> {
   Point? _selectedPoint;
   List<MapObject> mapObjects = [];
   final _mapKey = UniqueKey();
-  bool _isMapReady = false;
 
   @override
   void dispose() {
@@ -59,7 +55,6 @@ class _AddAddressPageState extends ConsumerState<AddAddressPage> {
     if (!mounted) return;
     setState(() {
       _mapController = controller;
-      _isMapReady = true;
     });
     Future.delayed(const Duration(milliseconds: 100), _moveToAlmaty);
   }
@@ -80,14 +75,8 @@ class _AddAddressPageState extends ConsumerState<AddAddressPage> {
         ),
       );
     } catch (e) {
-      if (kDebugMode) {
-        print('Error moving camera: $e');
-      }
+      debugPrint('Error moving camera: $e');
     }
-  }
-
-  void _onAddressChanged(String value) {
-    // Пустая реализация
   }
 
   void _onAddressSelected(SearchItem result) async {
@@ -125,9 +114,7 @@ class _AddAddressPageState extends ConsumerState<AddAddressPage> {
           ];
         });
       } catch (e) {
-        if (kDebugMode) {
-          print('Error setting address: $e');
-        }
+        debugPrint('Error setting address: $e');
       }
     }
   }
@@ -269,9 +256,6 @@ class _AddAddressPageState extends ConsumerState<AddAddressPage> {
                       setState(() {
                         isSearching = false;
                       });
-                      if (kDebugMode) {
-                        print('Error searching: $e');
-                      }
                     }
                   });
                 },
@@ -336,11 +320,11 @@ class _AddAddressPageState extends ConsumerState<AddAddressPage> {
                   child: FloatingActionButton(
                     mini: true,
                     backgroundColor: Colors.white,
+                    onPressed: _moveToAlmaty,
                     child: const Icon(
                       Icons.gps_fixed,
                       color: AppColors.primary,
                     ),
-                    onPressed: _moveToAlmaty,
                   ),
                 ),
               ],
@@ -354,7 +338,7 @@ class _AddAddressPageState extends ConsumerState<AddAddressPage> {
                   const BorderRadius.vertical(top: Radius.circular(24)),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 8,
                   offset: const Offset(0, -2),
                 ),
@@ -505,9 +489,7 @@ class _AddAddressPageState extends ConsumerState<AddAddressPage> {
             });
           }
         } catch (e) {
-          if (kDebugMode) {
-            print('Error searching by point: $e');
-          }
+          debugPrint('Error searching by point: $e');
         }
       },
     );

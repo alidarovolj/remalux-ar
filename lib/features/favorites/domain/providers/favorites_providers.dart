@@ -18,17 +18,15 @@ void showFavoriteSnackBar(
 
 final favoritesServiceProvider = Provider<FavoritesService>((ref) {
   final apiClient = ref.watch(apiClientProvider);
-  return FavoritesService(apiClient, ref);
+  return FavoritesService(apiClient);
 });
 
 class FavoriteProductsNotifier
     extends StateNotifier<AsyncValue<List<FavoriteProduct>>> {
   final FavoritesService _service;
-  final Ref _ref;
   bool _mounted = true;
 
-  FavoriteProductsNotifier(this._service, this._ref)
-      : super(const AsyncValue.loading()) {
+  FavoriteProductsNotifier(this._service) : super(const AsyncValue.loading()) {
     loadFavoriteProducts();
   }
 
@@ -50,7 +48,6 @@ class FavoriteProductsNotifier
       final products = await _service.getFavoriteProducts();
       _setState(AsyncValue.data(products));
     } catch (error, stackTrace) {
-      print('❌ Error loading favorite products: $error');
       _setState(AsyncValue.error(error, stackTrace));
     }
   }
@@ -64,7 +61,6 @@ class FavoriteProductsNotifier
       }
       await loadFavoriteProducts();
     } catch (error) {
-      print('❌ Error toggling favorite: $error');
       if (context.mounted) {
         CustomSnackBar.show(
           context,
@@ -105,7 +101,6 @@ class FavoriteColorsNotifier
       final colors = await _service.getFavoriteColors();
       _setState(AsyncValue.data(colors));
     } catch (error, stackTrace) {
-      print('❌ Error loading favorite colors: $error');
       _setState(AsyncValue.error(error, stackTrace));
     }
   }
@@ -119,7 +114,6 @@ class FavoriteColorsNotifier
       }
       await loadFavoriteColors();
     } catch (error) {
-      print('❌ Error toggling favorite color: $error');
       if (context.mounted) {
         CustomSnackBar.show(
           context,
@@ -136,7 +130,7 @@ class FavoriteColorsNotifier
 final favoriteProductsProvider = StateNotifierProvider<FavoriteProductsNotifier,
     AsyncValue<List<FavoriteProduct>>>((ref) {
   final service = ref.read(favoritesServiceProvider);
-  return FavoriteProductsNotifier(service, ref);
+  return FavoriteProductsNotifier(service);
 });
 
 final favoriteColorsProvider = StateNotifierProvider<FavoriteColorsNotifier,

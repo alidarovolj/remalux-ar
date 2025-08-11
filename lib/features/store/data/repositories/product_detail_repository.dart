@@ -7,16 +7,11 @@ class ProductDetailRepository {
 
   Future<ProductDetail> getProductDetail(int productId) async {
     try {
-      print('🚀 Fetching product details for ID: $productId');
       final response = await _apiClient.get('/products/$productId');
 
-      print('📦 Raw API Response: $response');
       final productDetail = ProductDetail.fromJson(response);
-      print('✅ Successfully parsed ProductDetail: $productDetail');
       return productDetail;
-    } catch (e, stackTrace) {
-      print('❌ Error in getProductDetail: $e');
-      print('❌ Stack trace: $stackTrace');
+    } catch (e) {
       throw Exception('Failed to load product details: $e');
     }
   }

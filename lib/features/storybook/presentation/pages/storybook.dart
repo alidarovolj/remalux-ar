@@ -26,20 +26,6 @@ class StorybookScreen extends StatelessWidget {
                   context.knobs.text(label: 'Label', initial: 'Click Me');
               final enabled =
                   context.knobs.boolean(label: 'Enabled', initial: true);
-              final color = context.knobs.options<Color>(
-                label: 'Color',
-                initial: Colors.blue,
-                options: [
-                  const Option(label: 'Blue', value: Colors.blue),
-                  const Option(label: 'Green', value: Colors.green),
-                  const Option(label: 'Red', value: Colors.red),
-                  const Option(label: 'Grey', value: Colors.grey),
-                ],
-              );
-              final iconEnabled = context.knobs.boolean(
-                label: 'Show Icon',
-                initial: true,
-              );
 
               return Center(
                 child: CustomButton(

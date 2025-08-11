@@ -1,6 +1,6 @@
 #pragma once
 
-#import <UnityFramework/LifeCycleListener.h>
+#include "LifeCycleListener.h"
 
 struct UnityDisplaySurfaceBase; // Unity/UnityRendering.h
 struct RenderingSurfaceParams;  // Unity/DisplayManager.h

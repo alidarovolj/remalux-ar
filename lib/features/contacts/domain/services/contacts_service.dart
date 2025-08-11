@@ -35,15 +35,12 @@ class ContactsService {
           try {
             return Contact.fromJson(json as Map<String, dynamic>);
           } catch (e) {
-            print('Error parsing contact: $e');
-            print('Contact data: $json');
             rethrow;
           }
         }).toList();
       }
       throw Exception('Failed to load contacts');
     } catch (e) {
-      print('Error getting contacts: $e');
       rethrow;
     }
   }

@@ -229,7 +229,7 @@ struct ValueType_t6D9B272BD21782F0A9A14F2E41F85A50E97A986F_marshaled_pinvoke
 struct ValueType_t6D9B272BD21782F0A9A14F2E41F85A50E97A986F_marshaled_com
 {
 };
-struct __JobReflectionRegistrationOutput__3374025189_t91E187C1DD3D25EE17A2450429740C71519A3BD1  : public RuntimeObject
+struct __JobReflectionRegistrationOutput__3788794053_tD54E01044A4951AFF563985594D5C49810E5BD1C  : public RuntimeObject
 {
 };
 struct xxHash3_t1B0090718977D51798C540A03964F9CB74D52462  : public RuntimeObject
@@ -8312,7 +8312,7 @@ inline void IJobExtensions_EarlyJobInit_TisConstructJob_t55C543914D2A5CE4D61B4BB
 	((  void (*) (const RuntimeMethod*))IJobExtensions_EarlyJobInit_TisIl2CppFullySharedGenericStruct_mE94EF6A2653FA245FC0DC74F3DC48D7DF0B66BC6_gshared)(method);
 }
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void EarlyInitHelpers_JobReflectionDataCreationFailed_mD6AB08D5BB411CCE38A87793C3C7062EC91FD1EC (Exception_t* ___0_ex, const RuntimeMethod* method) ;
-IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void __JobReflectionRegistrationOutput__3374025189_CreateJobReflectionData_mBF8E88BFA580246D7DBFD7A2679615CC6041A346 (const RuntimeMethod* method) ;
+IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void __JobReflectionRegistrationOutput__3788794053_CreateJobReflectionData_m6806608585DD1220E5D09D6FB01F6A61C38D98CC (const RuntimeMethod* method) ;
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void AllocatorManager_InitializeU24StackAllocator_Try_000000A7U24BurstDirectCall_m7075C698AD2EEB5677CDEE101AAA342C0F75F95A (const RuntimeMethod* method) ;
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void AllocatorManager_InitializeU24SlabAllocator_Try_000000B5U24BurstDirectCall_m0F04E653C96D95F99BD81994C4F27990CA598004 (const RuntimeMethod* method) ;
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void Try_000000DFU24BurstDirectCall_Initialize_mA0FB0EAA8B949E9CAE5202B62791FC0548A725F1 (const RuntimeMethod* method) ;
@@ -16587,7 +16587,7 @@ IL2CPP_EXTERN_C  String_t* UnsafeText_ToString_m02C6D467CDF758100B8CCC3199168304
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void __JobReflectionRegistrationOutput__3374025189_CreateJobReflectionData_mBF8E88BFA580246D7DBFD7A2679615CC6041A346 (const RuntimeMethod* method) 
+IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void __JobReflectionRegistrationOutput__3788794053_CreateJobReflectionData_m6806608585DD1220E5D09D6FB01F6A61C38D98CC (const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
 	if (!s_Il2CppMethodInitialized)
@@ -16659,10 +16659,10 @@ IL_006b:
 		return;
 	}
 }
-IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void __JobReflectionRegistrationOutput__3374025189_EarlyInit_m616D6EAB3C3AB3ED115CA9F1389290C552DB9CAB (const RuntimeMethod* method) 
+IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void __JobReflectionRegistrationOutput__3788794053_EarlyInit_m519787E8173BF7633C3562516A68E1C80F93D219 (const RuntimeMethod* method) 
 {
 	{
-		__JobReflectionRegistrationOutput__3374025189_CreateJobReflectionData_mBF8E88BFA580246D7DBFD7A2679615CC6041A346(NULL);
+		__JobReflectionRegistrationOutput__3788794053_CreateJobReflectionData_m6806608585DD1220E5D09D6FB01F6A61C38D98CC(NULL);
 		return;
 	}
 }

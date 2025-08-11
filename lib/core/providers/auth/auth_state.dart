@@ -56,7 +56,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
         await logout();
       }
     } catch (e) {
-      print('Error fetching user profile: $e');
       // On any error, logout the user
       await logout();
     }

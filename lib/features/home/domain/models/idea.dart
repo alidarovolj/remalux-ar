@@ -82,10 +82,7 @@ class ColorTitle {
         }),
         hex: json['hex'] as String,
       );
-    } catch (e, stackTrace) {
-      print('Error parsing ColorTitle: $e');
-      print('JSON: $json');
-      print('Stack trace: $stackTrace');
+    } catch (e) {
       rethrow;
     }
   }
@@ -110,10 +107,7 @@ class RoomTitle {
           'en': json['en'],
         }),
       );
-    } catch (e, stackTrace) {
-      print('Error parsing RoomTitle: $e');
-      print('JSON: $json');
-      print('Stack trace: $stackTrace');
+    } catch (e) {
       rethrow;
     }
   }
@@ -134,10 +128,7 @@ class ContentItem {
         type: json['type'] as String,
         content: json['content'] as Map<String, dynamic>,
       );
-    } catch (e, stackTrace) {
-      print('Error parsing ContentItem: $e');
-      print('JSON: $json');
-      print('Stack trace: $stackTrace');
+    } catch (e) {
       rethrow;
     }
   }
@@ -164,10 +155,7 @@ class ColorInfo {
         ral: json['ral'] as String,
         title: Idea._parseTranslations(json['title']),
       );
-    } catch (e, stackTrace) {
-      print('Error parsing ColorInfo: $e');
-      print('JSON: $json');
-      print('Stack trace: $stackTrace');
+    } catch (e) {
       rethrow;
     }
   }

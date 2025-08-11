@@ -7,7 +7,6 @@ String formatIsoDate(String isoDate,
     final formatter = DateFormat(format, locale);
     return formatter.format(dateTime);
   } catch (e) {
-    print('Error formatting date: $e');
     return isoDate;
   }
 }

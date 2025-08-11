@@ -25,9 +25,6 @@ import 'package:remalux_ar/core/api/firebase_setup.dart';
 Future<void> _loadGoogleFonts() async {
   // Отключаем загрузку шрифтов через интернет
   GoogleFonts.config.allowRuntimeFetching = false;
-
-  // Используем предварительно загруженные локальные шрифты
-  print('Fonts configured to use only bundled assets');
 }
 
 void main() async {
@@ -52,28 +49,17 @@ void main() async {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       // Request APNS token first
       final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
-      print('APNS Token: $apnsToken');
 
       // Wait for APNS token to be set
       if (apnsToken == null) {
-        print('Waiting for APNS token...');
         await Future.delayed(const Duration(seconds: 1));
       }
     }
 
-    // Get FCM token
-    final fcmToken = await FirebaseMessaging.instance.getToken();
-    print('FCM Token: $fcmToken');
-
     // Listen for token refresh
-    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
-      print('FCM Token refreshed: $newToken');
-      // TODO: Send this token to your server
-    });
+    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {});
 
-    print('Initializing SharedPreferences...');
     final prefs = await SharedPreferences.getInstance();
-    print('SharedPreferences initialized successfully with instance: $prefs');
 
     // Initialize Amplitude
     final amplitudeApiKey = dotenv.env['AMPLITUDE_API_KEY'];
@@ -107,7 +93,7 @@ void main() async {
                 ref.read(auth_state.authProvider.notifier).initializeAuth();
                 ref.read(tokenInitializerProvider);
               } catch (e) {
-                print('Ошибка инициализации авторизации: $e');
+                rethrow;
               }
 
               return App(router: router, initialRoute: '/');
@@ -117,7 +103,6 @@ void main() async {
       ),
     );
   } catch (e) {
-    print('Error initializing app: $e');
     // Запускаем минимальное приложение в случае ошибки
     runApp(
       MaterialApp(

@@ -49,11 +49,6 @@ class _PhoneVerificationPageState extends ConsumerState<PhoneVerificationPage> {
     filter: {"#": RegExp(r'[0-9]')},
   );
 
-  final _codeMaskFormatter = MaskTextInputFormatter(
-    mask: '####',
-    filter: {"#": RegExp(r'[0-9]')},
-  );
-
   @override
   void initState() {
     super.initState();
@@ -247,7 +242,7 @@ class _PhoneVerificationPageState extends ConsumerState<PhoneVerificationPage> {
         leading: Container(
           margin: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withValues(alpha: 0.7),
             borderRadius: BorderRadius.circular(100),
           ),
           clipBehavior: Clip.antiAlias,
@@ -515,7 +510,7 @@ class _PhoneVerificationPageState extends ConsumerState<PhoneVerificationPage> {
               if (_isLoading)
                 Positioned.fill(
                   child: Container(
-                    color: Colors.white.withOpacity(0.8),
+                    color: Colors.white.withValues(alpha: 0.8),
                     child: const Center(
                       child: SizedBox(
                         width: 24,
@@ -568,7 +563,6 @@ class _PhoneVerificationPageState extends ConsumerState<PhoneVerificationPage> {
             onTap: _remainingTime == 0
                 ? () {
                     _startResendTimer();
-                    // TODO: Implement resend code API call
                   }
                 : null,
             child: Text(

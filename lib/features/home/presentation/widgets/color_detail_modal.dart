@@ -164,7 +164,7 @@ class _ColorDetailModalState extends ConsumerState<ColorDetailModal> {
                   onTap: () {
                     // Переход на экран AR-перекрашивания стен с выбранным цветом
                     final colorHex = widget.color.hex; // С символом #
-                    context.push('/ar?color=$colorHex');
+                    context.push('/unity-ar?color=$colorHex');
                   },
                   child: Container(
                     height: 52,

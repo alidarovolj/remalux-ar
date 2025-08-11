@@ -64,7 +64,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               'lib/core/assets/icons/profile/heart.svg',
               width: 24,
               height: 24,
-              color: AppColors.textPrimary,
+              colorFilter: const ColorFilter.mode(
+                  AppColors.textPrimary, BlendMode.srcIn),
             ),
             onPressed: () => context.push('/favorites'),
           ),

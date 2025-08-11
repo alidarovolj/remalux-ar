@@ -83,10 +83,6 @@ class NewsDetailPage extends ConsumerWidget {
       ),
     );
   }
-
-  String _formatDate(DateTime date) {
-    return '${date.day}.${date.month}.${date.year}';
-  }
 }
 
 class _NewsDetailSkeleton extends StatelessWidget {

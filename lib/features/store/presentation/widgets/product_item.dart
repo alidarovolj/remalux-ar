@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
 import 'package:remalux_ar/features/store/domain/models/product.dart';
 
@@ -24,12 +23,12 @@ class ProductItem extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: const Color(0xFF3B4D8B).withOpacity(0.1),
+            color: const Color(0xFF3B4D8B).withValues(alpha: 0.1),
             width: 0.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF3B4D8B).withOpacity(0.1),
+              color: const Color(0xFF3B4D8B).withValues(alpha: 0.1),
               offset: const Offset(0, 1),
               blurRadius: 4,
               spreadRadius: 0,

@@ -1,16 +1,15 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_embed_unity/flutter_embed_unity.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class ArScreen extends StatefulWidget {
-  const ArScreen({Key? key}) : super(key: key);
+  const ArScreen({super.key});
 
   @override
-  _ArScreenState createState() => _ArScreenState();
+  ArScreenState createState() => ArScreenState();
 }
 
-class _ArScreenState extends State<ArScreen> {
+class ArScreenState extends State<ArScreen> {
   Color _selectedColor = Colors.blue; // Начальный цвет
 
   final List<Color> _availableColors = [
@@ -49,19 +48,14 @@ class _ArScreenState extends State<ArScreen> {
   void _handleUnityEvent(String eventType, String data) {
     switch (eventType) {
       case 'onUnityReady':
-        debugPrint('✅ Unity готов к работе!');
         setState(() {
           _isUnityReady = true;
         });
-        // Отправляем начальный цвет, как только Unity будет готов
         _sendColorToUnity(_selectedColor);
         break;
       case 'colorChanged':
-        debugPrint('🎨 Unity подтвердил изменение цвета: $data');
         break;
       case 'error':
-        debugPrint('❌ Ошибка от Unity: $data');
-        // Показываем SnackBar с ошибкой
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Ошибка в Unity: $data'),
@@ -70,24 +64,18 @@ class _ArScreenState extends State<ArScreen> {
         );
         break;
       default:
-        debugPrint('❔ Неизвестное событие от Unity: $eventType');
     }
   }
 
   void _sendToUnity(String gameObjectName, String methodName, String message) {
     if (_isUnityReady) {
       sendToUnity(gameObjectName, methodName, message);
-      debugPrint(
-          '🚀 Отправлено в Unity -> GO: $gameObjectName, Method: $methodName, Msg: $message');
-    } else {
-      debugPrint('⚠️ Unity не готов. Сообщение не отправлено.');
     }
   }
 
   void _sendColorToUnity(Color color) {
-    // Конвертируем цвет в HEX-строку
     String hexColor =
-        '#${color.value.toRadixString(16).substring(2).toUpperCase()}';
+        '#${color.toARGB32().toRadixString(16).substring(2).toUpperCase()}';
     _sendToUnity(
       'FlutterUnityManager',
       'SetPaintColor',
@@ -133,7 +121,7 @@ class _ArScreenState extends State<ArScreen> {
         title: const Text('AR Покраска (Embed)'),
         actions: [
           IconButton(
-            icon: Icon(Icons.palette),
+            icon: const Icon(Icons.palette),
             onPressed: _showColorPicker,
           ),
         ],
@@ -161,7 +149,7 @@ class _ArScreenState extends State<ArScreen> {
   Widget _buildColorPalette() {
     return Container(
       height: 60,
-      color: Colors.black.withOpacity(0.5),
+      color: Colors.black.withValues(alpha: 0.5),
       child: Center(
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,

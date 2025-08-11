@@ -48,13 +48,11 @@ class ApiClient {
   void setAccessToken(String token) {
     _accessToken = token;
     dio.options.headers['Authorization'] = 'Bearer $token';
-    // print('🔑 Token set in ApiClient: ${token.substring(0, 10)}...');
   }
 
   void removeAccessToken() {
     _accessToken = null;
     dio.options.headers.remove('Authorization');
-    // print('🔑 Token removed from ApiClient');
   }
 
   String? get accessToken => _accessToken;
@@ -67,36 +65,12 @@ class ApiClient {
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
-          // _logDivider();
-          // print("➡️ Запрос");
-          // print("Метод: ${options.method}");
-          // print("URL: ${options.uri}");
-          // if (options.headers.isNotEmpty) {
-          //   print("Заголовки: ${options.headers}");
-          // }
-          // if (options.data != null) {
-          //   print("Данные: ${options.data}");
-          // }
-          // _logDivider();
           return handler.next(options);
         },
         onResponse: (response, handler) {
-          // _logDivider();
-          // print("✅ Ответ");
-          // print("Статус: ${response.statusCode}");
-          // print("Данные: ${response.data}");
-          // _logDivider();
           return handler.next(response);
         },
         onError: (DioException e, handler) {
-          // _logDivider();
-          // print("❌ Ошибка");
-          // print("Статус: ${e.response?.statusCode ?? 'Нет ответа'}");
-          // print("Сообщение: ${e.message}");
-          // if (e.response?.data != null) {
-          //   print("Данные ошибки: ${e.response?.data}");
-          // }
-          // _logDivider();
           return handler.next(e);
         },
       ),
@@ -111,7 +85,6 @@ class ApiClient {
         responseBody: false,
         responseHeader: false,
         error: false,
-        logPrint: (log) => print(log), // Redirect logs to console
       ),
     );
 
@@ -119,26 +92,11 @@ class ApiClient {
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
-          final curlCommand = _generateCurlCommand(options);
-          print('cURL: $curlCommand');
           return handler.next(options); // Proceed with the request
         },
       ),
     );
   }
-
-  // Helper to generate a cURL command for a request
-  String _generateCurlCommand(RequestOptions options) {
-    final headers = options.headers.entries
-        .map((e) => "-H '${e.key}: ${e.value}'")
-        .join(' ');
-    final data = options.data != null ? "--data '${options.data}'" : '';
-    return "curl -X ${options.method} '${options.uri}' $headers $data";
-  }
-
-  // void _logDivider() {
-  //   print("------------------------------------");
-  // }
 
   Future<Map<String, dynamic>> get(
     String endpoint, {
@@ -158,7 +116,6 @@ class ApiClient {
 
       // Handle unauthorized response
       if (response.statusCode == 401) {
-        // print('❌ Unauthorized request: $endpoint');
         removeAccessToken();
         return {
           'data': [],
@@ -173,9 +130,6 @@ class ApiClient {
 
       return response.data as Map<String, dynamic>;
     } on DioException catch (e) {
-      // print('API Error: ${e.message}');
-      // print('Response: ${e.response?.data}');
-
       // Handle unauthorized error
       if (e.response?.statusCode == 401) {
         removeAccessToken();
@@ -213,7 +167,6 @@ class ApiClient {
 
       // Handle unauthorized response
       if (response.statusCode == 401) {
-        // print('❌ Unauthorized request: $endpoint');
         removeAccessToken();
         return {
           'data': [],
@@ -228,9 +181,6 @@ class ApiClient {
 
       return response.data as Map<String, dynamic>;
     } on DioException catch (e) {
-      // print('API Error: ${e.message}');
-      // print('Response: ${e.response?.data}');
-
       // Handle unauthorized error
       if (e.response?.statusCode == 401) {
         removeAccessToken();

@@ -167,9 +167,7 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
                                             ColorDetailModal(color: color),
                                       );
                                     },
-                                    onFavoritePressed: () {
-                                      // TODO: Implement favorite functionality
-                                    },
+                                    onFavoritePressed: () {},
                                   ),
                                 );
                               },
@@ -185,7 +183,8 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
               AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 height: _showSafeArea ? MediaQuery.of(context).padding.top : 0,
-                color: Colors.white.withOpacity(_showSafeArea ? 1.0 : 0.0),
+                color:
+                    Colors.white.withValues(alpha: _showSafeArea ? 1.0 : 0.0),
                 width: double.infinity,
               ),
               // Back button
@@ -202,7 +201,7 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: Colors.black.withValues(alpha: 0.1),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -388,7 +387,7 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12),
                           child: Container(
-                            color: Colors.black.withOpacity(0.5),
+                            color: Colors.black.withValues(alpha: 0.5),
                             child: Center(
                               child: Text(
                                 '+${photos.length - 3}',
@@ -423,7 +422,7 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),
@@ -481,9 +480,7 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
                           Icons.favorite_border,
                           color: Color(0xFF666666),
                         ),
-                        onPressed: () {
-                          // TODO: Implement favorite functionality
-                        },
+                        onPressed: () {},
                       ),
                     ],
                   ),
@@ -491,7 +488,6 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
                 // Visualization button
                 GestureDetector(
                   onTap: () {
-                    // TODO: Implement visualization
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('ideas.visualization_coming_soon'.tr()),
@@ -594,14 +590,12 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
     final colorsToShow =
         colors != null && colors.isNotEmpty ? colors : defaultColors;
 
-    String _getImageNameFromTitle(Map<String, dynamic>? colorTitle) {
+    String getImageNameFromTitle(Map<String, dynamic>? colorTitle) {
       if (colorTitle == null) {
-        print('DEBUG: colorTitle is null, using default grey.png');
         return 'grey.png';
       }
 
       final ruTitle = colorTitle['ru']?.toLowerCase() ?? '';
-      print('DEBUG: colorTitle ru value: "$ruTitle"');
 
       String imageName;
       switch (ruTitle) {
@@ -637,12 +631,8 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
           break;
       }
 
-      print('DEBUG: Selected image: $imageName for color: $ruTitle');
       return imageName;
     }
-
-    // Давайте также проверим сам объект idea и его colorTitle
-    print('DEBUG: Full idea.colorTitle: ${idea?.colorTitle}');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -661,7 +651,7 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
                   height: 150,
                   color: Colors.white,
                   child: Image.asset(
-                    'lib/core/assets/images/colors/${_getImageNameFromTitle(idea?.colorTitle)}',
+                    'lib/core/assets/images/colors/${getImageNameFromTitle(idea?.colorTitle)}',
                     fit: BoxFit.cover,
                     opacity: const AlwaysStoppedAnimation(1.0),
                   ),
@@ -676,7 +666,7 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
                   height: 125,
                   color: Colors.white,
                   child: Image.asset(
-                    'lib/core/assets/images/colors/${_getImageNameFromTitle(idea?.colorTitle)}',
+                    'lib/core/assets/images/colors/${getImageNameFromTitle(idea?.colorTitle)}',
                     fit: BoxFit.cover,
                     opacity: const AlwaysStoppedAnimation(1.0),
                   ),
@@ -691,7 +681,7 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
                   height: 150,
                   color: Colors.white,
                   child: Image.asset(
-                    'lib/core/assets/images/colors/${_getImageNameFromTitle(idea?.colorTitle)}',
+                    'lib/core/assets/images/colors/${getImageNameFromTitle(idea?.colorTitle)}',
                     fit: BoxFit.cover,
                     opacity: const AlwaysStoppedAnimation(1.0),
                   ),
@@ -709,7 +699,7 @@ class _IdeaDetailPageState extends ConsumerState<IdeaDetailPage> {
                     ],
                   ),
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.5),
+                    color: Colors.white.withValues(alpha: 0.5),
                   ),
                   borderRadius: BorderRadius.circular(20),
                 ),

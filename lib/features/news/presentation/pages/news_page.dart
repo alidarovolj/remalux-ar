@@ -76,8 +76,8 @@ class NewsPage extends ConsumerWidget {
                                   "body": Style(
                                     fontSize: FontSize(15),
                                     lineHeight: const LineHeight(1.4),
-                                    color:
-                                        AppColors.textPrimary.withOpacity(0.6),
+                                    color: AppColors.textPrimary
+                                        .withValues(alpha: 0.6),
                                     margin: Margins.zero,
                                     padding: HtmlPaddings.zero,
                                     maxLines: 3,
@@ -105,7 +105,7 @@ class NewsPage extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 10,
                           offset: const Offset(0, 2),
                         ),
@@ -147,7 +147,7 @@ class NewsPage extends ConsumerWidget {
                                     "body": Style(
                                       fontSize: FontSize(13),
                                       color: AppColors.textPrimary
-                                          .withOpacity(0.6),
+                                          .withValues(alpha: 0.6),
                                       margin: Margins.zero,
                                       padding: HtmlPaddings.zero,
                                       maxLines: 2,

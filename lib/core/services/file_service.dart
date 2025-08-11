@@ -24,7 +24,6 @@ class FileService {
         throw 'Could not launch $url';
       }
     } catch (e) {
-      print('Error opening PDF: $e');
       rethrow;
     }
   }
@@ -40,10 +39,8 @@ class FileService {
         bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes),
       );
 
-      print('File downloaded to: ${file.path}');
       return file.path;
     } catch (e) {
-      print('Error downloading PDF: $e');
       rethrow;
     }
   }

@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
-import 'package:remalux_ar/features/addresses/domain/models/address.dart';
 import 'package:remalux_ar/features/addresses/domain/providers/addresses_provider.dart';
 import 'package:remalux_ar/features/checkout/domain/providers/checkout_providers.dart';
 

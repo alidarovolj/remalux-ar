@@ -14,16 +14,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:remalux_ar/features/home/domain/providers/selected_color_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'dart:async';
-import 'package:remalux_ar/features/auth/domain/providers/auth_provider.dart';
-import 'package:remalux_ar/core/providers/auth/auth_state.dart' as auth_state;
 import 'package:remalux_ar/features/profile/presentation/pages/profile_page.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:remalux_ar/features/store/presentation/providers/store_providers.dart';
-import 'package:remalux_ar/features/store/presentation/widgets/single_filter_modal.dart';
-import 'package:remalux_ar/features/store/presentation/widgets/sorting_modal.dart';
-import 'package:remalux_ar/features/store/presentation/widgets/store_categories_grid.dart';
 import 'package:remalux_ar/features/home/presentation/providers/categories_provider.dart';
-import 'package:remalux_ar/features/profile/presentation/pages/profile_page.dart';
 import 'package:remalux_ar/core/widgets/auth_required_modal.dart';
 
 class StorePage extends ConsumerStatefulWidget {
@@ -134,8 +127,6 @@ class _StorePageState extends ConsumerState<StorePage> {
         queryParams['order_by'] = selectedSorting;
       }
 
-      print('Search query params: $queryParams'); // Debug print
-
       // Fetch products with updated parameters
       productsNotifier.fetchProducts(
         queryParams: queryParams.isEmpty ? null : queryParams,
@@ -170,8 +161,6 @@ class _StorePageState extends ConsumerState<StorePage> {
       queryParams['order_by'] = selectedSorting;
     }
 
-    print('Search query params: $queryParams'); // Debug print
-
     // Fetch products with updated parameters
     productsNotifier.fetchProducts(
       queryParams: queryParams.isEmpty ? null : queryParams,
@@ -181,7 +170,6 @@ class _StorePageState extends ConsumerState<StorePage> {
   @override
   Widget build(BuildContext context) {
     final productsAsync = ref.watch(productsProvider);
-    final filtersAsync = ref.watch(filtersProvider);
     final selectedColor = ref.watch(selectedColorProvider);
     final currentLocale = context.locale.languageCode;
 
@@ -231,7 +219,8 @@ class _StorePageState extends ConsumerState<StorePage> {
                             ),
                             style: TextStyle(
                               fontSize: 14,
-                              color: AppColors.textPrimary.withOpacity(0.5),
+                              color:
+                                  AppColors.textPrimary.withValues(alpha: 0.5),
                             ),
                           ),
                           productsAsync.maybeWhen(
@@ -336,8 +325,8 @@ class _StorePageState extends ConsumerState<StorePage> {
                                   'store.try_different_filters'.tr(),
                                   style: TextStyle(
                                     fontSize: 14,
-                                    color:
-                                        AppColors.textPrimary.withOpacity(0.5),
+                                    color: AppColors.textPrimary
+                                        .withValues(alpha: 0.5),
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
@@ -623,7 +612,8 @@ class _StorePageState extends ConsumerState<StorePage> {
                               decoration: InputDecoration(
                                 hintText: 'store.search_products'.tr(),
                                 hintStyle: TextStyle(
-                                  color: AppColors.textPrimary.withOpacity(0.5),
+                                  color: AppColors.textPrimary
+                                      .withValues(alpha: 0.5),
                                   fontSize: 15,
                                 ),
                                 prefixIcon: Padding(
@@ -890,9 +880,7 @@ class _StorePageState extends ConsumerState<StorePage> {
                                         shape: BoxShape.circle,
                                       ),
                                       child: IconButton(
-                                        onPressed: () {
-                                          // TODO: Implement favorite toggle
-                                        },
+                                        onPressed: () {},
                                         icon: SvgPicture.asset(
                                           'lib/core/assets/icons/heart.svg',
                                           width: 16,

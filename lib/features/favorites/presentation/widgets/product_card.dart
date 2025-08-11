@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:remalux_ar/core/theme/colors.dart';
 import 'package:remalux_ar/features/favorites/domain/models/favorite_product.dart';
 import 'package:remalux_ar/features/favorites/domain/providers/favorites_providers.dart';
@@ -26,26 +25,6 @@ class ProductCard extends ConsumerWidget {
 
       return title['ru']?.toString() ?? '';
     } catch (e) {
-      print('Error getting product title: $e');
-      return '';
-    }
-  }
-
-  String _getCategory() {
-    try {
-      final productData =
-          product.product.attributes['product'] as Map<String, dynamic>?;
-      if (productData == null) return '';
-
-      final category = productData['category'] as Map<String, dynamic>?;
-      if (category == null) return '';
-
-      final title = category['title'] as Map<String, dynamic>?;
-      if (title == null) return '';
-
-      return title['ru']?.toString() ?? '';
-    } catch (e) {
-      print('Error getting category: $e');
       return '';
     }
   }
@@ -57,28 +36,7 @@ class ProductCard extends ConsumerWidget {
       if (productData == null) return false;
       return productData['is_colorable'] as bool? ?? false;
     } catch (e) {
-      print('Error checking if product is colorable: $e');
       return false;
-    }
-  }
-
-  List<int>? _getPriceRange() {
-    try {
-      final productData =
-          product.product.attributes['product'] as Map<String, dynamic>?;
-      if (productData == null) return null;
-
-      final priceRange = productData['price_range'] as List<dynamic>?;
-      if (priceRange == null || priceRange.length != 2) return null;
-
-      final from = (priceRange[0] as num).toInt();
-      final to = (priceRange[1] as num).toInt();
-
-      if (from == 0 && to == 0) return null;
-      return [from, to];
-    } catch (e) {
-      print('Error getting price range: $e');
-      return null;
     }
   }
 
@@ -98,7 +56,6 @@ class ProductCard extends ConsumerWidget {
       if (price == null || price == 0) return null;
       return price.toDouble();
     } catch (e) {
-      print('Error getting price: $e');
       return null;
     }
   }
@@ -141,7 +98,6 @@ class ProductCard extends ConsumerWidget {
           ),
         );
       } catch (e) {
-        print('Error getting price range: $e');
         return const SizedBox.shrink();
       }
     }
@@ -150,7 +106,6 @@ class ProductCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final title = _getTitle();
-    final category = _getCategory();
     final isColorable = _isColorable();
 
     return GestureDetector(
@@ -161,7 +116,7 @@ class ProductCard extends ConsumerWidget {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF3B4D8B).withOpacity(0.1),
+              color: const Color(0xFF3B4D8B).withValues(alpha: 0.1),
               offset: const Offset(0, 1),
               blurRadius: 5,
               spreadRadius: 0,

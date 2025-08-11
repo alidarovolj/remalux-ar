@@ -21,7 +21,6 @@ class ColorCard extends ConsumerWidget {
       final hexString = hex.startsWith('#') ? hex.substring(1) : hex;
       return Color(int.parse('0xFF$hexString'));
     } catch (e) {
-      print('Error parsing color hex: $e');
       return Colors.grey;
     }
   }
@@ -31,7 +30,6 @@ class ColorCard extends ConsumerWidget {
       final title = color.color.title;
       return title['ru']?.toString() ?? '';
     } catch (e) {
-      print('Error getting color title: $e');
       return '';
     }
   }
@@ -49,7 +47,7 @@ class ColorCard extends ConsumerWidget {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -117,7 +115,7 @@ class ColorCard extends ConsumerWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    color.color.ral ?? '',
+                    color.color.ral,
                     style: const TextStyle(
                       fontSize: 13,
                       color: Colors.grey,

@@ -6,12 +6,9 @@ import 'dart:convert';
 
 class ApiClient {
   final Dio _dio;
-  final String _baseUrl;
-  String? _accessToken;
 
   ApiClient({String? baseUrl})
-      : _baseUrl = baseUrl ?? AppConfig.apiUrl,
-        _dio = Dio(BaseOptions(
+      : _dio = Dio(BaseOptions(
           baseUrl: baseUrl ?? AppConfig.apiUrl,
           connectTimeout: const Duration(seconds: 30),
           receiveTimeout: const Duration(seconds: 30),
@@ -25,39 +22,23 @@ class ApiClient {
     // Add request interceptor for logging
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) {
-        print('🌐 Request URL: ${options.baseUrl}${options.path}');
-        print('🌐 Request Method: ${options.method}');
-        print('🌐 Request Headers: ${options.headers}');
-        print('📤 Request Data: ${options.data}');
         return handler.next(options);
       },
       onResponse: (response, handler) {
-        print('📥 Response Status: ${response.statusCode}');
-        print('📥 Response Data: ${response.data}');
-        print('📥 Response Headers: ${response.headers}');
         return handler.next(response);
       },
       onError: (DioException e, handler) {
-        print('❌ Error Type: ${e.type}');
-        print('❌ Error Message: ${e.message}');
-        print('❌ Error Response: ${e.response?.data}');
-        print('❌ Request Path: ${e.requestOptions.path}');
-        print('❌ Request Data: ${e.requestOptions.data}');
         return handler.next(e);
       },
     ));
   }
 
   void setAccessToken(String token) {
-    _accessToken = token;
     _dio.options.headers['Authorization'] = 'Bearer $token';
-    print('🔑 Token set in ApiClient: ${token.substring(0, 10)}...');
   }
 
   void clearAccessToken() {
-    _accessToken = null;
     _dio.options.headers.remove('Authorization');
-    print('🔑 Authorization header removed from ApiClient');
   }
 
   Future<Response> post(
@@ -94,7 +75,6 @@ class ApiClient {
           final jsonData = jsonDecode(jsonStr);
           response.data = jsonData;
         } catch (e) {
-          print('❌ Failed to parse modified response: $e');
           rethrow;
         }
       }
@@ -109,13 +89,6 @@ class ApiClient {
 
       return response;
     } on DioException catch (e) {
-      print('❌ DioException in post request:');
-      print('❌ Type: ${e.type}');
-      print('❌ Message: ${e.message}');
-      print('❌ Response data: ${e.response?.data}');
-      print('❌ Request data: ${e.requestOptions.data}');
-      print('❌ URL: ${e.requestOptions.uri}');
-
       // Try to handle the error response if it contains the special format
       if (e.response?.data is String &&
           e.response!.data.toString().contains('Array to string conversion')) {
@@ -130,12 +103,11 @@ class ApiClient {
             statusCode: 200,
           );
         } catch (parseError) {
-          print('❌ Failed to parse error response: $parseError');
+          rethrow;
         }
       }
       rethrow;
     } catch (e) {
-      print('❌ Unexpected error in post request: $e');
       rethrow;
     }
   }
@@ -168,7 +140,6 @@ class ApiClient {
     try {
       return await get('/auth/check-email', queryParameters: {'email': email});
     } catch (e) {
-      print('Error checking email availability: $e');
       return null;
     }
   }
@@ -177,7 +148,6 @@ class ApiClient {
     try {
       return await get('/auth/check-phone', queryParameters: {'phone': phone});
     } catch (e) {
-      print('Error checking phone availability: $e');
       return null;
     }
   }
@@ -222,13 +192,9 @@ final apiClientProvider = Provider<ApiClient>((ref) {
 
 // Provider that handles token initialization
 final tokenInitializerProvider = FutureProvider<void>((ref) async {
-  print('🔄 Initializing token...');
   final token = await StorageService.getToken();
   if (token != null) {
-    print('✅ Found stored token, setting it in ApiClient');
     final apiClient = ref.read(apiClientProvider);
     apiClient.setAccessToken(token);
-  } else {
-    print('❌ No stored token found');
   }
 });

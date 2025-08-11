@@ -20,7 +20,6 @@ class _AddressesPageState extends ConsumerState<AddressesPage> {
   @override
   void initState() {
     super.initState();
-    print('📱 AddressesPage initState');
     // Force refresh addresses on page visit
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -30,13 +29,9 @@ class _AddressesPageState extends ConsumerState<AddressesPage> {
   }
 
   Future<void> _refreshAddresses() async {
-    print('🔄 Force refreshing addresses');
     try {
-      print('📱 Starting addresses refresh');
       await ref.read(addressesProvider.notifier).refreshAddresses();
-      print('✅ Addresses refresh completed successfully');
     } catch (error) {
-      print('❌ Addresses refresh failed: $error');
       if (mounted) {
         CustomSnackBar.show(
           context,
@@ -50,7 +45,6 @@ class _AddressesPageState extends ConsumerState<AddressesPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Remove refresh call from here to avoid setState during build
   }
 
   @override

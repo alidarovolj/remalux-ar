@@ -32,7 +32,6 @@ class Auth {
 
       return authResponse;
     } catch (e) {
-      print('❌ Login failed: $e');
       return null;
     }
   }
@@ -41,7 +40,6 @@ class Auth {
     try {
       final token = await StorageService.getToken();
       if (token == null) {
-        print('❌ Get user failed: No token available');
         return null;
       }
 
@@ -51,15 +49,12 @@ class Auth {
       final response = await _apiClient.get('/auth/me');
       return User.fromJson(response.data as Map<String, dynamic>);
     } catch (e) {
-      print('❌ Get user failed: $e');
       return null;
     }
   }
 
   Future<void> register(RegisterRequest request) async {
     try {
-      print('📤 Registration request data: ${request.toJson()}');
-
       final response = await _apiClient.post(
         '/auth/registration',
         data: request.toJson(),
@@ -69,10 +64,6 @@ class Auth {
           responseType: ResponseType.plain,
         ),
       );
-
-      print('📥 Raw response data: ${response.data}');
-      print('📥 Status code: ${response.statusCode}');
-      print('📥 Headers: ${response.headers}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return;
@@ -94,19 +85,6 @@ class Auth {
 
       throw Exception(errorMessage);
     } on DioException catch (e) {
-      print('❌ Registration DioException: ${e.message}');
-      print('❌ Error type: ${e.type}');
-      print('❌ Error: ${e.error}');
-      print('❌ Request: ${e.requestOptions.uri}');
-      print('❌ Request headers: ${e.requestOptions.headers}');
-      print('❌ Request data: ${e.requestOptions.data}');
-
-      if (e.response != null) {
-        print('❌ Raw response data: ${e.response?.data}');
-        print('❌ Response headers: ${e.response?.headers}');
-      }
-      print('❌ Status code: ${e.response?.statusCode}');
-
       String errorMessage = 'Registration failed';
 
       switch (e.type) {
@@ -141,27 +119,23 @@ class Auth {
 
       throw Exception(errorMessage);
     } catch (e) {
-      print('❌ Registration error: $e');
       throw Exception('Registration failed: $e');
     }
   }
 
   Future<bool> checkEmailAvailability(String email) async {
     try {
-      final response = await _apiClient.get(
+      await _apiClient.get(
         '/auth/email-exists',
         queryParameters: {'email': email},
       );
-      // Если получили успешный ответ (200), значит email доступен
       return true;
     } catch (e) {
       if (e is DioException) {
-        // Если получили 409 Conflict, значит email уже существует
         if (e.response?.statusCode == 409) {
           return false;
         }
       }
-      print('Error checking email availability: $e');
       // В случае других ошибок считаем email недоступным
       return false;
     }
@@ -169,20 +143,18 @@ class Auth {
 
   Future<bool> checkPhoneAvailability(String phone) async {
     try {
-      final response = await _apiClient.get(
+      await _apiClient.get(
         '/auth/phone-exists',
         queryParameters: {'phone_number': phone},
       );
-      // Если получили успешный ответ (200), значит телефон доступен
       return true;
     } catch (e) {
       if (e is DioException) {
-        // Если получили 409 Conflict, значит телефон уже существует
         if (e.response?.statusCode == 409) {
           return false;
         }
       }
-      print('Error checking phone availability: $e');
+
       // В случае других ошибок считаем телефон недоступным
       return false;
     }

@@ -23,7 +23,6 @@ class _CategoriesRowState extends State<CategoriesRow>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _heightAnimation;
-  late Animation<double> _opacityAnimation;
 
   @override
   void initState() {
@@ -36,14 +35,6 @@ class _CategoriesRowState extends State<CategoriesRow>
     _heightAnimation = Tween<double>(
       begin: 230.0,
       end: 50.0,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOut,
-    ));
-
-    _opacityAnimation = Tween<double>(
-      begin: 1.0,
-      end: 0.0,
     ).animate(CurvedAnimation(
       parent: _controller,
       curve: Curves.easeInOut,

@@ -71,7 +71,6 @@ class ArNotifier extends StateNotifier<ArState> {
         );
         // Отправляем текущий цвет после инициализации Unity
         _sendColorToUnity(state.selectedColor);
-        print('Unity инициализирован, отправлен начальный цвет: ${state.selectedColor}');
       }
     });
   }
@@ -99,32 +98,26 @@ class ArNotifier extends StateNotifier<ArState> {
 
   void _sendColorToUnity(Color color) {
     if (!state.isUnityLoaded) {
-      print('🔴 Unity еще не загружен, отложена отправка цвета');
       return;
     }
 
     final colorHex =
-        '#${color.red.toRadixString(16).padLeft(2, '0')}${color.green.toRadixString(16).padLeft(2, '0')}${color.blue.toRadixString(16).padLeft(2, '0')}';
+        '#${color.r.toInt().toRadixString(16).padLeft(2, '0')}${color.g.toInt().toRadixString(16).padLeft(2, '0')}${color.b.toInt().toRadixString(16).padLeft(2, '0')}';
 
     try {
-      print('🎨 Отправляем цвет в Unity: $colorHex (RGB: ${color.red}, ${color.green}, ${color.blue})');
-      
       // Используем новый API для отправки сообщений
       sendToUnity(
         'FlutterUnityManager',
         'SetPaintColor',
         colorHex,
       );
-      print('✅ Цвет успешно отправлен в Unity: $colorHex');
     } catch (e) {
-      print('❌ Ошибка отправки цвета в Unity: $e');
       setError('Не удалось отправить цвет в Unity');
     }
   }
 
   void _sendPaintingModeToUnity(bool isPainting) {
     if (!state.isUnityLoaded) {
-      print('Unity еще не загружен, отложена отправка режима рисования');
       return;
     }
 
@@ -134,15 +127,13 @@ class ArNotifier extends StateNotifier<ArState> {
         'SetPaintingMode',
         isPainting ? 'true' : 'false',
       );
-      print('Отправлен режим рисования в Unity: $isPainting');
     } catch (e) {
-      print('Ошибка отправки режима рисования в Unity: $e');
+      debugPrint('Ошибка отправки режима рисования в Unity: $e');
     }
   }
 
   void resetWalls() {
     if (!state.isUnityLoaded) {
-      print('Unity еще не загружен, нельзя сбросить стены');
       return;
     }
 
@@ -152,15 +143,13 @@ class ArNotifier extends StateNotifier<ArState> {
         'ResetWalls',
         '',
       );
-      print('Отправлен сброс стен в Unity');
     } catch (e) {
-      print('Ошибка сброса стен в Unity: $e');
+      debugPrint('Ошибка сброса стен в Unity: $e');
     }
   }
 
   void toggleFlashlight() {
     if (!state.isUnityLoaded) {
-      print('Unity еще не загружен, нельзя переключить вспышку');
       return;
     }
 
@@ -170,9 +159,8 @@ class ArNotifier extends StateNotifier<ArState> {
         'ToggleFlashlight',
         '',
       );
-      print('Отправлено переключение вспышки в Unity');
     } catch (e) {
-      print('Ошибка переключения вспышки в Unity: $e');
+      debugPrint('Ошибка переключения вспышки в Unity: $e');
     }
   }
 }

@@ -60,13 +60,6 @@ class _DetailedColorCardState extends ConsumerState<DetailedColorCard> {
     return widget.color.isFavourite;
   }
 
-  int _getId() {
-    if (widget.color is FavoriteColor) {
-      return widget.color.color.id;
-    }
-    return widget.color.id;
-  }
-
   Map<String, String> _getTitle() {
     if (widget.color is FavoriteColor) {
       return widget.color.color.title;
@@ -85,7 +78,6 @@ class _DetailedColorCardState extends ConsumerState<DetailedColorCard> {
   Widget build(BuildContext context) {
     final hexColor = _getHexColor();
     final isFavorite = _isFavorite();
-    final id = _getId();
     final title = _getTitle();
     final ral = _getRal();
 

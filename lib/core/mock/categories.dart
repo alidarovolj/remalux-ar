@@ -6,33 +6,25 @@ final List<Category> mockCategories = [
     name: 'AI Помощь',
     iconPath: 'lib/core/assets/images/categories/ai.png',
     route: '/ai-help',
-    onTap: () {
-      print('AI Помощь category tapped');
-    },
+    onTap: () {},
   ),
   Category(
     name: 'Врачи',
     iconPath: 'lib/core/assets/images/categories/stetoscope2.png',
     route: '/doctors',
-    onTap: () {
-      print('Navigate to doctors');
-    },
+    onTap: () {},
   ),
   Category(
     name: 'Анализы',
     iconPath: 'lib/core/assets/images/categories/stetoscope.png',
     route: '/analyses',
-    onTap: () {
-      print('Анализы category tapped');
-    },
+    onTap: () {},
   ),
   Category(
     name: 'SOS',
     iconPath: 'lib/core/assets/images/categories/pharma.png',
     route: '/emergency',
-    onTap: () {
-      print('SOS category tapped');
-    },
+    onTap: () {},
   ),
 ];
 
@@ -42,33 +34,25 @@ final List<Category> horizontalCategories = [
     name: 'Медработники',
     iconPath: 'lib/core/assets/images/categories/employees.png',
     route: '/medical-staff',
-    onTap: () {
-      print('Медработники category tapped');
-    },
+    onTap: () {},
   ),
   Category(
     name: 'Стоматологии',
     iconPath: 'lib/core/assets/images/categories/stom.png',
     route: '/dentists',
-    onTap: () {
-      print('Стоматологии category tapped');
-    },
+    onTap: () {},
   ),
   Category(
     name: 'SOS',
     iconPath: 'lib/core/assets/images/categories/bus.png',
     route: '/emergency',
-    onTap: () {
-      print('SOS category tapped');
-    },
+    onTap: () {},
   ),
   Category(
     name: 'Мед. карта',
     iconPath: 'lib/core/assets/images/categories/card.png',
     route: '/medical-card',
-    onTap: () {
-      print('Мед. карта category tapped');
-    },
+    onTap: () {},
   ),
 ];
 
@@ -79,9 +63,7 @@ final List<SaleCategory> doctorsCategories = [
     route: '/medical-staff',
     sale: true,
     saleValue: 20,
-    onTap: () {
-      print('Медработники category tapped');
-    },
+    onTap: () {},
   ),
   SaleCategory(
     name: 'Ухо, горло, нос ',
@@ -89,9 +71,7 @@ final List<SaleCategory> doctorsCategories = [
     route: '/dentists',
     sale: false,
     saleValue: 20,
-    onTap: () {
-      print('Стоматологии category tapped');
-    },
+    onTap: () {},
   ),
   SaleCategory(
     name: 'Живот, печень, пищеварение',
@@ -99,9 +79,7 @@ final List<SaleCategory> doctorsCategories = [
     route: '/emergency',
     sale: true,
     saleValue: 10,
-    onTap: () {
-      print('Живот, печень, пищеварение category tapped');
-    },
+    onTap: () {},
   ),
   SaleCategory(
     name: 'Сердце и сосуды',
@@ -109,9 +87,7 @@ final List<SaleCategory> doctorsCategories = [
     route: '/medical-card',
     sale: true,
     saleValue: 5,
-    onTap: () {
-      print('Сердце и сосуды category tapped');
-    },
+    onTap: () {},
   ),
   SaleCategory(
     name: 'Женское и мужское здоровье',
@@ -119,9 +95,7 @@ final List<SaleCategory> doctorsCategories = [
     route: '/medical-card',
     sale: false,
     saleValue: 20,
-    onTap: () {
-      print('Женское и мужское здоровье category tapped');
-    },
+    onTap: () {},
   ),
   SaleCategory(
     name: 'Кожа и волосы',
@@ -129,9 +103,7 @@ final List<SaleCategory> doctorsCategories = [
     route: '/medical-card',
     sale: false,
     saleValue: 20,
-    onTap: () {
-      print('Кожа и волосы category tapped');
-    },
+    onTap: () {},
   ),
   SaleCategory(
     name: 'Кости и суставы',
@@ -139,9 +111,7 @@ final List<SaleCategory> doctorsCategories = [
     route: '/medical-card',
     sale: true,
     saleValue: 15,
-    onTap: () {
-      print('Кости и суставы category tapped');
-    },
+    onTap: () {},
   ),
   SaleCategory(
     name: 'Хирурги и травматологи',
@@ -149,9 +119,7 @@ final List<SaleCategory> doctorsCategories = [
     route: '/medical-card',
     sale: true,
     saleValue: 25,
-    onTap: () {
-      print('Хирурги и травматологи category tapped');
-    },
+    onTap: () {},
   ),
   SaleCategory(
     name: 'Зубы',
@@ -159,9 +127,7 @@ final List<SaleCategory> doctorsCategories = [
     route: '/medical-card',
     sale: true,
     saleValue: 10,
-    onTap: () {
-      print('Зубы category tapped');
-    },
+    onTap: () {},
   ),
   SaleCategory(
     name: 'Зрение и слух',
@@ -169,9 +135,7 @@ final List<SaleCategory> doctorsCategories = [
     route: '/medical-card',
     sale: true,
     saleValue: 20,
-    onTap: () {
-      print('Зрение и слух category tapped');
-    },
+    onTap: () {},
   ),
   SaleCategory(
     name: 'Нервы и психика',
@@ -179,9 +143,7 @@ final List<SaleCategory> doctorsCategories = [
     route: '/medical-card',
     sale: true,
     saleValue: 20,
-    onTap: () {
-      print('Нервы и психика category tapped');
-    },
+    onTap: () {},
   ),
 ];
 
@@ -192,9 +154,7 @@ final List<SaleCategory> analysesCategories = [
     route: '/analyses',
     sale: true,
     saleValue: 20,
-    onTap: () {
-      print('Анализы category tapped');
-    },
+    onTap: () {},
   ),
   SaleCategory(
     name: 'Чекапы',
@@ -202,9 +162,7 @@ final List<SaleCategory> analysesCategories = [
     route: '/analyses',
     sale: true,
     saleValue: 20,
-    onTap: () {
-      print('Анализы category tapped');
-    },
+    onTap: () {},
   ),
   SaleCategory(
     name: 'Скидки',
@@ -212,8 +170,6 @@ final List<SaleCategory> analysesCategories = [
     route: '/analyses',
     sale: true,
     saleValue: 20,
-    onTap: () {
-      print('Анализы category tapped');
-    },
+    onTap: () {},
   ),
 ];

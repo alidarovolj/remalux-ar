@@ -177,7 +177,7 @@ class IdeaItem extends StatelessWidget {
                             ((idea.colors?.length ?? 0) - 1) * 4 +
                             16,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.6),
+                          color: Colors.white.withValues(alpha: 0.6),
                           borderRadius: BorderRadius.circular(28),
                         ),
                         padding: const EdgeInsets.symmetric(

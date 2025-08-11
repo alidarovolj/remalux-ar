@@ -2,7 +2,7 @@
 
 #import <QuartzCore/CADisplayLink.h>
 
-#import <UnityFramework/RenderPluginDelegate.h>
+#include "RenderPluginDelegate.h"
 
 @class UnityView;
 @class UnityViewControllerBase;

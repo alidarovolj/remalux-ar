@@ -7,7 +7,6 @@ import 'package:remalux_ar/core/theme/colors.dart';
 import 'package:remalux_ar/features/auth/domain/models/user.dart';
 import 'package:remalux_ar/features/auth/domain/providers/auth_provider.dart';
 import 'package:remalux_ar/core/services/storage_service.dart';
-import 'package:remalux_ar/core/services/api_client.dart';
 import 'package:remalux_ar/features/profile/presentation/widgets/profile_skeleton.dart';
 import 'package:remalux_ar/features/profile/presentation/widgets/logout_confirmation_modal.dart';
 import 'package:flutter/services.dart';
@@ -24,29 +23,22 @@ class UserNotifier extends StateNotifier<AsyncValue<User?>> {
   final Ref ref;
 
   UserNotifier(this.ref) : super(const AsyncValue.loading()) {
-    print('📱 UserNotifier created');
     _initUser();
   }
 
   Future<void> _initUser() async {
-    print('🔑 Checking token...');
     final token = await StorageService.getToken();
     if (token == null) {
-      print('❌ No token found');
       state = const AsyncValue.data(null);
       return;
     }
-    print('✅ Token found');
 
     await getCurrentUser();
   }
 
   Future<void> getCurrentUser() async {
-    print('📡 Sending getCurrentUser request...');
-
     final token = await StorageService.getToken();
     if (token == null) {
-      print('❌ No token available for getCurrentUser');
       state = const AsyncValue.data(null);
       return;
     }
@@ -56,22 +48,17 @@ class UserNotifier extends StateNotifier<AsyncValue<User?>> {
       final user = await auth.getCurrentUser();
 
       if (user != null) {
-        print('✅ User data received: ${user.name}');
         state = AsyncValue.data(user);
       } else {
-        print('❌ No user data received');
         await StorageService.removeToken();
         state = const AsyncValue.data(null);
       }
     } catch (e) {
-      print('❌ getCurrentUser failed: $e');
       state = AsyncValue.error(e, StackTrace.current);
     }
   }
 
   Future<void> refresh() async {
-    print('🔄 Refreshing user data...');
-
     // Keep the current state while refreshing
     final currentUser = state.valueOrNull;
     if (currentUser != null) {
@@ -80,9 +67,7 @@ class UserNotifier extends StateNotifier<AsyncValue<User?>> {
 
     try {
       await getCurrentUser();
-      print('✅ User refresh completed');
     } catch (e) {
-      print('❌ User refresh failed: $e');
       // If refresh fails but we had a user before, restore the previous state
       // instead of showing an error or logging out
       if (currentUser != null) {
@@ -94,7 +79,6 @@ class UserNotifier extends StateNotifier<AsyncValue<User?>> {
   }
 
   Future<void> logout() async {
-    print('🚪 Logging out user...');
     await StorageService.removeToken();
     state = const AsyncValue.data(null);
   }
@@ -113,12 +97,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    print('📱 ProfilePage initState');
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(userProvider.notifier).refresh().then((_) {
-        print('✅ Initial profile refresh completed');
-      }).catchError((error) {
-        print('❌ Initial profile refresh failed: $error');
+      ref
+          .read(userProvider.notifier)
+          .refresh()
+          .then((_) {})
+          .catchError((error) {
+        debugPrint('❌ Initial profile refresh failed: $error');
       });
     });
   }
@@ -132,7 +117,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     final userAsync = ref.watch(userProvider);
-    print('🎨 ProfilePage building with state: ${userAsync.toString()}');
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
@@ -304,7 +288,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                           'lib/core/assets/icons/profile/smartphone.svg',
                           width: 20,
                           height: 20,
-                          color: AppColors.textPrimary,
+                          colorFilter: const ColorFilter.mode(
+                              AppColors.textPrimary, BlendMode.srcIn),
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -351,7 +336,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                           'lib/core/assets/icons/profile/mail.svg',
                           width: 20,
                           height: 20,
-                          color: AppColors.textPrimary,
+                          colorFilter: const ColorFilter.mode(
+                              AppColors.textPrimary, BlendMode.srcIn),
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -467,19 +453,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   context.push('/recipients');
                 },
               ),
-
-              // Menu Items
-              // const SizedBox(height: 16),
-              // ProfileMenuItem(
-              //   icon: Icons.location_on_outlined,
-              //   title: 'Адреса доставок',
-              //   onTap: () => context.push('/addresses'),
-              // ),
-              // ProfileMenuItem(
-              //   icon: Icons.business_outlined,
-              //   title: 'Наши филиалы',
-              //   onTap: () => context.push('/contacts'),
-              // ),
 
               const SizedBox(height: 32),
 
@@ -789,7 +762,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               padding: const EdgeInsets.symmetric(vertical: 12),
               child: Row(
                 children: [
-                  SvgPicture.asset(icon, width: 24, height: 24),
+                  SvgPicture.asset(
+                    icon,
+                    width: 24,
+                    height: 24,
+                    colorFilter: ColorFilter.mode(
+                        titleColor ?? AppColors.textPrimary, BlendMode.srcIn),
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(

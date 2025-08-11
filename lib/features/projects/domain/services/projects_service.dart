@@ -35,15 +35,12 @@ class ProjectsService {
           try {
             return ProjectModel.fromJson(json as Map<String, dynamic>);
           } catch (e) {
-            print('Error parsing project: $e');
-            print('Project data: $json');
             rethrow;
           }
         }).toList();
       }
       throw Exception('Failed to load projects');
     } catch (e) {
-      print('Error getting projects: $e');
       rethrow;
     }
   }

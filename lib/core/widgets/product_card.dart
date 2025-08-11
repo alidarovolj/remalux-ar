@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:remalux_ar/core/styles/constants.dart';
 
 class ProductCard extends StatelessWidget {
@@ -53,7 +52,7 @@ class ProductCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF3B4D8B).withOpacity(0.1),
+              color: const Color(0xFF3B4D8B).withValues(alpha: 0.1),
               offset: const Offset(0, 1),
               blurRadius: 5,
               spreadRadius: 0,

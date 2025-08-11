@@ -47,7 +47,9 @@ class LoaderModal extends StatefulWidget {
     await Future.delayed(const Duration(seconds: 3));
 
     // Close the modal using the modal's context
-    if (modalContext != null && Navigator.canPop(modalContext!)) {
+    if (modalContext != null &&
+        context.mounted &&
+        Navigator.canPop(modalContext!)) {
       Navigator.pop(modalContext!);
     }
   }
@@ -59,7 +61,6 @@ class LoaderModal extends StatefulWidget {
 class _LoaderModalState extends State<LoaderModal>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _animation;
 
   @override
   void initState() {
@@ -68,11 +69,6 @@ class _LoaderModalState extends State<LoaderModal>
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     )..repeat();
-
-    _animation = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOut,
-    );
   }
 
   @override

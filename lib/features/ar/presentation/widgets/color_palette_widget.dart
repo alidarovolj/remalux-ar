@@ -4,7 +4,7 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:remalux_ar/features/ar/domain/providers/ar_provider.dart';
 
 class ColorPaletteWidget extends ConsumerWidget {
-  const ColorPaletteWidget({Key? key}) : super(key: key);
+  const ColorPaletteWidget({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -17,7 +17,7 @@ class ColorPaletteWidget extends ConsumerWidget {
       child: Material(
         borderRadius: BorderRadius.circular(16),
         elevation: 8,
-        shadowColor: Colors.black.withOpacity(0.3),
+        shadowColor: Colors.black.withValues(alpha: 0.3),
         child: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
@@ -39,7 +39,6 @@ class ColorPaletteWidget extends ConsumerWidget {
                       color: color,
                       isSelected: isSelected,
                       onTap: () {
-                        print('🎨 Пользователь выбрал цвет: $color');
                         arNotifier.selectColor(color);
                       },
                     );
@@ -99,13 +98,13 @@ class ColorPaletteWidget extends ConsumerWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: color.withOpacity(0.3),
+              color: color.withValues(alpha: 0.3),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
             if (isSelected)
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
+                color: Colors.black.withValues(alpha: 0.2),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -148,7 +147,7 @@ class ColorPaletteWidget extends ConsumerWidget {
                 ),
                 child: Center(
                   child: Text(
-                    '#${pickerColor.red.toRadixString(16).padLeft(2, '0')}${pickerColor.green.toRadixString(16).padLeft(2, '0')}${pickerColor.blue.toRadixString(16).padLeft(2, '0')}'
+                    '#${pickerColor.r.toInt().toRadixString(16).padLeft(2, '0')}${pickerColor.g.toInt().toRadixString(16).padLeft(2, '0')}${pickerColor.b.toInt().toRadixString(16).padLeft(2, '0')}'
                         .toUpperCase(),
                     style: TextStyle(
                       color: pickerColor.computeLuminance() > 0.5
@@ -188,7 +187,6 @@ class ColorPaletteWidget extends ConsumerWidget {
           ),
           ElevatedButton(
             onPressed: () {
-              print('🎨 Пользователь выбрал кастомный цвет: $pickerColor');
               arNotifier.selectColor(pickerColor);
               Navigator.pop(context);
             },

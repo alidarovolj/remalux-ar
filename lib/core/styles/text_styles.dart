@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:remalux_ar/core/styles/constants.dart';
 
 class AppTextStyles {
   // Стили заголовков для Ysabeau

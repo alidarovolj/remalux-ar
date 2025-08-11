@@ -37,18 +37,14 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage>
   late TabController _tabController;
 
   Future<void> _refreshFavorites() async {
-    print('🔄 Force refreshing favorites');
     final token = await StorageService.getToken();
     if (token != null) {
       try {
-        print('📱 Starting favorites refresh');
         await Future.wait([
           ref.read(favoriteProductsProvider.notifier).loadFavoriteProducts(),
           ref.read(favoriteColorsProvider.notifier).loadFavoriteColors(),
         ]);
-        print('✅ Favorites refresh completed successfully');
       } catch (error) {
-        print('❌ Favorites refresh failed: $error');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -58,8 +54,6 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage>
           );
         }
       }
-    } else {
-      print('⚠️ No token found, skipping favorites refresh');
     }
   }
 
@@ -74,7 +68,6 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage>
     _tabController.addListener(() {
       setState(() {}); // Rebuild to update icon colors
     });
-    print('📱 FavoritesPage initState');
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _refreshFavorites();
     });
@@ -120,7 +113,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage>
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -813,7 +806,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage>
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -886,7 +879,7 @@ class _ProductSkeletonCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -988,7 +981,7 @@ class _ColorSkeletonCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
