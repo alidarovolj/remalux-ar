@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:remalux_ar/core/providers/auth/auth_state.dart';
 import 'custom_tabbar.dart';
-import 'development_notice_modal.dart';
 
 class MainTabBarScreen extends ConsumerStatefulWidget {
   final Widget child;
@@ -28,6 +27,7 @@ class _MainTabBarScreenState extends ConsumerState<MainTabBarScreen>
     '/store': 1,
     '/products/': 1,
     '/ar': 2,
+    '/unity-ar': 2, // Добавили mapping для Unity AR
     '/cart': 3,
     '/checkout': 3,
     '/profile': 4,
@@ -48,7 +48,7 @@ class _MainTabBarScreenState extends ConsumerState<MainTabBarScreen>
   final Map<int, String> _tabIndexToRoutes = {
     0: '/',
     1: '/store',
-    2: '/ar',
+    2: '/unity-ar', // Направляем на Unity AR страницу
     3: '/cart',
     4: '/profile',
   };
@@ -97,21 +97,15 @@ class _MainTabBarScreenState extends ConsumerState<MainTabBarScreen>
         }
       }
 
-      // Show development modal for AR tab
+      // Переход на AR страницу (убрали блокировку)
       if (index == 2) {
-        showDevelopmentModal(context);
+        context
+            .push('/unity-ar'); // Переходим на полноэкранную Unity AR страницу
         return;
       }
 
       context.go(route);
     }
-  }
-
-  void showDevelopmentModal(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => const DevelopmentNoticeModal(),
-    );
   }
 
   @override

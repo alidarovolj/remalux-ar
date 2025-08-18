@@ -177,54 +177,14 @@ class _UnityColorPaletteWidgetState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Заголовок с информацией
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Выберите цвет:',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: widget.isEnabled ? Colors.black87 : Colors.grey,
-                    ),
-                  ),
-                  // Кнопка произвольного цвета
-                  GestureDetector(
-                    onTap: widget.isEnabled ? _showColorPicker : null,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.grey.shade300),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.palette,
-                            color: widget.isEnabled
-                                ? Colors.grey.shade600
-                                : Colors.grey.shade400,
-                            size: 14,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Свой',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: widget.isEnabled
-                                  ? Colors.grey.shade600
-                                  : Colors.grey.shade400,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+              // Заголовок
+              Text(
+                'Выберите цвет:',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: widget.isEnabled ? Colors.black87 : Colors.grey,
+                ),
               ),
 
               const SizedBox(height: 12),
@@ -324,7 +284,7 @@ class _UnityColorPaletteWidgetState
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   child: Text(
-                                    colorData.hex,
+                                    colorData.ral,
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 8,

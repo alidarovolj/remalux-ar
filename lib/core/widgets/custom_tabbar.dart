@@ -118,16 +118,29 @@ class CustomTabBar extends StatelessWidget {
             ),
           ),
         ),
-        // AR Cube Icon
+        // AR Cube Icon - кликабельный
         Positioned(
           top: -20,
           left: 0,
           right: 0,
           child: Center(
-            child: Image.asset(
-              'lib/core/assets/images/cube.png',
-              width: 50,
-              height: 58,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(30),
+              onTap: () {
+                // Принудительно устанавливаем AR таб как активный
+                tabController.animateTo(2);
+              },
+              child: Container(
+                padding: const EdgeInsets.all(8), // Увеличиваем область клика
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Image.asset(
+                  'lib/core/assets/images/cube.png',
+                  width: 50,
+                  height: 58,
+                ),
+              ),
             ),
           ),
         ),

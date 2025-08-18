@@ -34,17 +34,24 @@ class _ArPageState extends ConsumerState<ArPage> {
     final arNotifier = ref.read(arProvider.notifier);
 
     return Scaffold(
+      backgroundColor: Colors.black, // Черный фон для всего экрана
       extendBodyBehindAppBar: true,
       appBar: _buildAppBar(context),
       body: Stack(
         children: [
-          // Unity AR Widget
+          // Unity AR Widget на весь экран
           if (arState.errorMessage == null)
-            SizedBox(
-              child: EmbedUnity(
-                onMessageFromUnity: (message) {
-                  _handleUnityMessage(message, arNotifier);
-                },
+            EmbedUnity(
+              onMessageFromUnity: (message) {
+                _handleUnityMessage(message, arNotifier);
+              },
+            ),
+
+          // Черная маска с прозрачным окном поверх камеры
+          if (arState.errorMessage == null)
+            Positioned.fill(
+              child: CustomPaint(
+                painter: _CameraMaskPainter(),
               ),
             ),
 
@@ -106,21 +113,31 @@ class _ArPageState extends ConsumerState<ArPage> {
               child: ArControlsWidget(),
             ),
 
-          // Color Palette
-          if (arState.isUnityLoaded && arState.errorMessage == null)
-            const Positioned(
-              bottom: 120,
-              left: 0,
-              right: 0,
-              child: ColorPaletteWidget(),
-            ),
-
-          // Paint Toggle Button
+          // Color Palette внутри рамки
           if (arState.isUnityLoaded && arState.errorMessage == null)
             Positioned(
-              bottom: 40,
-              left: 0,
-              right: 0,
+              bottom: 160, // Увеличил отступ снизу для нового дизайна
+              left: 42, // +10 для новых отступов
+              right: 42, // +10 для новых отступов
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.7),
+                  borderRadius: BorderRadius.circular(25),
+                  border:
+                      Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                ),
+                child: const ColorPaletteWidget(),
+              ),
+            ),
+
+          // Paint Toggle Button внутри рамки
+          if (arState.isUnityLoaded && arState.errorMessage == null)
+            Positioned(
+              bottom: 80, // Увеличил отступ снизу для нового дизайна
+              left: 42, // +10 для новых отступов
+              right: 42, // +10 для новых отступов
               child: Center(
                 child: _buildPaintToggleButton(arState, arNotifier),
               ),
@@ -303,4 +320,43 @@ class _ArPageState extends ConsumerState<ArPage> {
       ),
     );
   }
+}
+
+/// CustomPainter для создания черной маски с прозрачным окном
+class _CameraMaskPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.black
+      ..style = PaintingStyle.fill;
+
+    // Создаем полный черный прямоугольник
+    final fullRect = Rect.fromLTWH(0, 0, size.width, size.height);
+
+    // Создаем прямоугольник для прозрачного окна
+    const margin = EdgeInsets.only(left: 26, right: 26, top: 36, bottom: 36);
+    final windowRect = Rect.fromLTWH(
+      margin.left,
+      margin.top,
+      size.width - margin.left - margin.right,
+      size.height - margin.top - margin.bottom,
+    );
+
+    // Создаем скругленный прямоугольник для окна
+    final windowRRect = RRect.fromRectAndRadius(
+      windowRect,
+      const Radius.circular(16),
+    );
+
+    // Создаем путь с вырезом
+    final path = Path()
+      ..addRect(fullRect)
+      ..addRRect(windowRRect)
+      ..fillType = PathFillType.evenOdd;
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

@@ -1,25 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_embed_unity/flutter_embed_unity.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:remalux_ar/core/theme/colors.dart';
-import '../widgets/unity_color_palette_widget.dart';
+import 'package:remalux_ar/features/home/domain/providers/colors_provider.dart';
+import '../widgets/ar_color_bottom_sheet.dart';
 import '../../domain/models/unity_models.dart';
 import '../../domain/services/unity_color_manager.dart';
 
-class UnityArPage extends StatefulWidget {
+class UnityArPage extends ConsumerStatefulWidget {
   final Color? initialColor;
 
   const UnityArPage({super.key, this.initialColor});
 
   @override
-  State<UnityArPage> createState() => _UnityArPageState();
+  ConsumerState<UnityArPage> createState() => _UnityArPageState();
 }
 
-class _UnityArPageState extends State<UnityArPage> with WidgetsBindingObserver {
+class _UnityArPageState extends ConsumerState<UnityArPage>
+    with WidgetsBindingObserver {
   final UnityColorManager _unityManager = UnityColorManager();
 
   // Состояние UI
   List<UnityClass> _availableClasses = [];
-  UnityClass? _selectedClass;
   Color? _selectedColor;
   bool _isUnityReady = false;
   bool _isLoading = true;
@@ -57,7 +60,6 @@ class _UnityArPageState extends State<UnityArPage> with WidgetsBindingObserver {
                   classId: 0, className: 'wall', currentColor: '#0074D9'),
             ];
             // Всегда работаем со стенами
-            _selectedClass = _availableClasses.first;
           }
         });
         // Принудительно ставим Unity в состояние "готов"
@@ -86,7 +88,7 @@ class _UnityArPageState extends State<UnityArPage> with WidgetsBindingObserver {
               const UnityClass(
                   classId: 0, className: 'wall', currentColor: '#0074D9'),
             ];
-            _selectedClass = _availableClasses.first;
+            // Всегда работаем со стенами
           }
         });
       }
@@ -101,11 +103,7 @@ class _UnityArPageState extends State<UnityArPage> with WidgetsBindingObserver {
     };
 
     _unityManager.onClassClicked = (clickedClass) {
-      if (mounted) {
-        setState(() {
-          _selectedClass = clickedClass;
-        });
-      }
+      // Всегда работаем только со стенами, игнорируем клики по классам
     };
 
     _unityManager.onColorChanged = (colorEvent) {
@@ -135,6 +133,46 @@ class _UnityArPageState extends State<UnityArPage> with WidgetsBindingObserver {
 
     // Всегда применяем цвет к стенам (classId: 0)
     _unityManager.setClassColor(0, color);
+  }
+
+  void _showColorBottomSheet({int? mainColorId, String? categoryName}) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => ArColorBottomSheet(
+        onColorSelected: _onColorSelected,
+        selectedColor: _selectedColor,
+        preselectedMainColorId: mainColorId,
+        categoryName: categoryName,
+      ),
+    );
+  }
+
+  String _getImageName(String colorName) {
+    final colorKey = colorName.toLowerCase();
+    switch (colorKey) {
+      case 'grey':
+        return 'grey.png';
+      case 'blue':
+        return 'Blue.png';
+      case 'pink':
+        return 'Pink.png';
+      case 'orange':
+        return 'Coral.png';
+      case 'purple':
+        return 'Purple.png';
+      case 'brown':
+        return 'Brown.png';
+      case 'white':
+        return 'aqua.png';
+      case 'green':
+        return 'Green.png';
+      case 'yellow':
+        return 'Yellow.png';
+      default:
+        return 'grey.png';
+    }
   }
 
   void _showSnackBar(String message, {required bool isSuccess}) {
@@ -167,17 +205,24 @@ class _UnityArPageState extends State<UnityArPage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black, // Черный фон для всего экрана
       extendBodyBehindAppBar: true,
       appBar: _buildAppBar(context),
       body: Stack(
         children: [
-          // Unity AR Widget
+          // Unity AR Widget на весь экран
           if (_errorMessage == null)
-            Container(
-              child: EmbedUnity(
-                onMessageFromUnity: (message) {
-                  _unityManager.handleUnityMessage(message);
-                },
+            EmbedUnity(
+              onMessageFromUnity: (message) {
+                _unityManager.handleUnityMessage(message);
+              },
+            ),
+
+          // Черная маска с прозрачным окном поверх камеры
+          if (_errorMessage == null)
+            Positioned.fill(
+              child: CustomPaint(
+                painter: _CameraMaskPainter(),
               ),
             ),
 
@@ -189,55 +234,75 @@ class _UnityArPageState extends State<UnityArPage> with WidgetsBindingObserver {
 
           // UI Controls - показываем когда Unity готов или принудительно через 8 секунд
           if (_isUnityReady && _errorMessage == null) ...[
-            // Инструкция
-            Positioned(
-              top: kToolbarHeight + MediaQuery.of(context).padding.top + 10,
-              left: 16,
-              right: 16,
-              child: _buildInstructionCard(),
-            ),
-
             // Убрали список классов - работаем только со стенами
 
-            // Цветовая палитра (показываем всегда если Unity готов)
+            // Скролл основных цветов снизу внутри рамки
             Positioned(
-              bottom: 140, // Увеличили отступ снизу для новой высоты палитры
-              left: 0,
-              right: 0,
-              child: Column(
-                children: [
-                  // Информация о текущем режиме
-                  Container(
-                    margin:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.7),
-                      borderRadius: BorderRadius.circular(8),
+              bottom: 60, // +20 для новой рамки снизу
+              left: 42, // +10 для новых отступов
+              right: 42, // +10 для новых отступов
+              child: Container(
+                height: 80,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.7),
+                  borderRadius: BorderRadius.circular(25),
+                  border:
+                      Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                ),
+                child: ref.watch(colorsProvider).when(
+                      data: (colors) => SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: colors
+                              .map((color) => GestureDetector(
+                                    onTap: () => _showColorBottomSheet(
+                                      mainColorId: color.id,
+                                      categoryName: color.title['ru'] ??
+                                          color.title['en'] ??
+                                          '',
+                                    ),
+                                    child: Container(
+                                      width: 60,
+                                      height: 60,
+                                      margin: const EdgeInsets.only(right: 12),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black
+                                                .withValues(alpha: 0.3),
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 4),
+                                          ),
+                                        ],
+                                      ),
+                                      child: ClipOval(
+                                        child: Image.asset(
+                                          'lib/core/assets/images/colors/${_getImageName(color.title['en']?.toLowerCase() ?? '')}',
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  ))
+                              .toList(),
+                        ),
+                      ),
+                      loading: () => const Center(
+                        child: CircularProgressIndicator(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      ),
+                      error: (error, stack) => const Center(
+                        child: Text(
+                          'Ошибка загрузки',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
                     ),
-                    child: const Text(
-                      'Покраска стен',
-                      style: TextStyle(color: Colors.white, fontSize: 14),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-
-                  // Палитра цветов
-                  UnityColorPaletteWidget(
-                    onColorSelected: _onColorSelected,
-                    selectedColor: _selectedColor,
-                    isEnabled: true, // Всегда доступна
-                  ),
-                ],
               ),
-            ),
-
-            // Кнопки управления
-            Positioned(
-              bottom: 40,
-              left: 16,
-              right: 16,
-              child: _buildActionButtons(),
             ),
           ],
         ],
@@ -266,31 +331,13 @@ class _UnityArPageState extends State<UnityArPage> with WidgetsBindingObserver {
           color: Colors.black.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(20),
         ),
-        child: Text(
-          'AR Окрашивание 2.0',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
+        child: SvgPicture.asset(
+          'lib/core/assets/icons/logo.svg',
+          height: 32,
         ),
       ),
       centerTitle: true,
       actions: [
-        Container(
-          margin: const EdgeInsets.only(right: 8),
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.5),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.white),
-            onPressed: _isUnityReady
-                ? () {
-                    _unityManager.requestAvailableClasses();
-                  }
-                : null,
-          ),
-        ),
         Container(
           margin: const EdgeInsets.only(right: 8),
           decoration: BoxDecoration(
@@ -303,54 +350,6 @@ class _UnityArPageState extends State<UnityArPage> with WidgetsBindingObserver {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildInstructionCard() {
-    String instruction;
-    IconData icon;
-    Color color;
-
-    if (!_isUnityReady) {
-      instruction = 'Загрузка AR...';
-      icon = Icons.hourglass_bottom;
-      color = Colors.orange;
-    } else if (_availableClasses.isEmpty) {
-      instruction = 'Наведите камеру на комнату для поиска объектов';
-      icon = Icons.camera_alt;
-      color = Colors.blue;
-    } else if (_selectedClass == null) {
-      instruction = 'Выберите объект для покраски из списка ниже';
-      icon = Icons.touch_app;
-      color = Colors.green;
-    } else {
-      instruction = 'Выберите цвет для: ${_selectedClass!.className}';
-      icon = Icons.palette;
-      color = AppColors.primary;
-    }
-
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.7),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              instruction,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -454,92 +453,39 @@ class _UnityArPageState extends State<UnityArPage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildActionButtons() {
-    return Row(
-      children: [
-        Expanded(
-          child: ElevatedButton.icon(
-            onPressed: _isUnityReady
-                ? () {
-                    _unityManager.showAllClasses();
-                  }
-                : null,
-            icon: const Icon(Icons.visibility),
-            label: const Text('Показать все'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 12),
-            ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: ElevatedButton.icon(
-            onPressed: _isUnityReady
-                ? () {
-                    setState(() {
-                      _selectedClass = null;
-                      _selectedColor = null;
-                    });
-                    _unityManager.resetColors();
-                    _showSnackBar('Цвета сброшены', isSuccess: true);
-                  }
-                : null,
-            icon: const Icon(Icons.refresh),
-            label: const Text('Сбросить'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 12),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   void _showHelpDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Как использовать AR 2.0'),
+        title: const Text('Как использовать Remalux Visualizer'),
         content: const SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                '1. Сканирование комнаты',
+                '1. Наведите камеру на стены',
                 style: TextStyle(fontWeight: FontWeight.w600),
               ),
               SizedBox(height: 8),
               Text(
-                  'Наведите камеру на разные объекты в комнате. Unity автоматически определит стены, пол, мебель и другие объекты.'),
+                  'Направьте камеру устройства на стены комнаты для активации AR технологии.'),
               SizedBox(height: 16),
               Text(
-                '2. Выбор объекта',
+                '2. Выберите цвет краски',
                 style: TextStyle(fontWeight: FontWeight.w600),
               ),
               SizedBox(height: 8),
               Text(
-                  'Из списка обнаруженных объектов выберите тот, который хотите покрасить.'),
+                  'Используйте палитру цветов с RAL кодами для выбора подходящего оттенка Remalux.'),
               SizedBox(height: 16),
               Text(
-                '3. Выбор цвета',
+                '3. Просматривайте результат',
                 style: TextStyle(fontWeight: FontWeight.w600),
               ),
               SizedBox(height: 8),
               Text(
-                  'Используйте цветовую палитру для выбора подходящего цвета краски.'),
-              SizedBox(height: 16),
-              Text(
-                '4. Просмотр результата',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-              SizedBox(height: 8),
-              Text(
-                  'AR покажет в реальном времени, как будет выглядеть объект в выбранном цвете.'),
+                  'AR покажет в реальном времени, как будут выглядеть ваши стены в выбранном цвете краски Remalux.'),
             ],
           ),
         ),
@@ -552,4 +498,43 @@ class _UnityArPageState extends State<UnityArPage> with WidgetsBindingObserver {
       ),
     );
   }
+}
+
+/// CustomPainter для создания черной маски с прозрачным окном
+class _CameraMaskPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.black
+      ..style = PaintingStyle.fill;
+
+    // Создаем полный черный прямоугольник
+    final fullRect = Rect.fromLTWH(0, 0, size.width, size.height);
+
+    // Создаем прямоугольник для прозрачного окна
+    const margin = EdgeInsets.only(left: 26, right: 26, top: 36, bottom: 36);
+    final windowRect = Rect.fromLTWH(
+      margin.left,
+      margin.top,
+      size.width - margin.left - margin.right,
+      size.height - margin.top - margin.bottom,
+    );
+
+    // Создаем скругленный прямоугольник для окна
+    final windowRRect = RRect.fromRectAndRadius(
+      windowRect,
+      const Radius.circular(16),
+    );
+
+    // Создаем путь с вырезом
+    final path = Path()
+      ..addRect(fullRect)
+      ..addRRect(windowRRect)
+      ..fillType = PathFillType.evenOdd;
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
